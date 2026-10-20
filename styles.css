@@ -1,0 +1,7435 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+
+@font-face {
+  font-family: "Inter-Regular";
+  src: local("Inter"), url("https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2") format("woff2");
+  font-weight: 400;
+}
+@font-face {
+  font-family: "Inter-Medium";
+  src: local("Inter Medium"), local("Inter"), url("https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuI6fAZ9hiA.woff2") format("woff2");
+  font-weight: 500;
+}
+@font-face {
+  font-family: "Inter-SemiBold";
+  src: local("Inter SemiBold"), local("Inter"), url("https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuGKYAZ9hiA.woff2") format("woff2");
+  font-weight: 600;
+}
+@font-face {
+  font-family: "Inter-Bold";
+  src: local("Inter Bold"), local("Inter"), url("https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuFuYAZ9hiA.woff2") format("woff2");
+  font-weight: 700;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: #f8f6f1;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #202020;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+* {
+  box-sizing: border-box;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+button, input, select, textarea {
+  font-family: inherit;
+}
+
+
+.site-view {
+  display: none !important;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+  width: 100%;
+  max-width: 100vw;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+.site-view.active-view {
+  display: flex !important;
+  opacity: 1;
+}
+#view-dashboard.site-view.active-view {
+  display: flex !important;
+  flex-direction: row;
+}
+
+.discover-alderhaven-events,
+.harbour-walk-event-details,
+.book-your-harbour-walk,
+.harbour-walk-booking-confirmed,
+.tourism-office-bookings-dashboard {
+  width: 100% !important;
+  max-width: 100vw !important;
+  box-sizing: border-box !important;
+  overflow-x: hidden !important;
+}
+
+
+.action, .action2, .category-filter, .category-filter2,
+.event-card, .page-action, .page-action2,
+.decrease, .increase, .edit, .selection, .view-action,
+.utility-link, .navigation-item, .navigation-item2,
+.status-tab, .status-tab2, .back-action,
+.explore-navigation > div, .active-link, .navigation-link,
+button, [role="button"] {
+  cursor: pointer;
+  user-select: none;
+}
+
+
+.discover-alderhaven-events .event-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.discover-alderhaven-events .event-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(36, 100, 87, 0.12);
+}
+
+.discover-alderhaven-events .action2:hover,
+.discover-alderhaven-events .visitor-actions .action:hover,
+.harbour-walk-event-details .action2:hover,
+.book-your-harbour-walk .action:hover,
+.harbour-walk-booking-confirmed .action:hover,
+.tourism-office-bookings-dashboard .action2:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+  transition: all 0.15s ease;
+}
+
+
+.discover-alderhaven-events .category-filter2.active {
+  background: #1E3A8A;
+  border-radius: 100px;
+}
+.discover-alderhaven-events .category-filter2.active .label4 {
+  color: #ffffff;
+}
+.discover-alderhaven-events .category-filter.active {
+  background: #1E3A8A;
+  border-radius: 100px;
+}
+.discover-alderhaven-events .category-filter.active .label3 {
+  color: #ffffff;
+}
+
+
+.tourism-office-bookings-dashboard .status-tab2.active {
+  background: #1E3A8A;
+  border-radius: 8px;
+}
+.tourism-office-bookings-dashboard .status-tab2.active .label3 {
+  color: #ffffff;
+}
+.tourism-office-bookings-dashboard .status-tab.active {
+  background: #1E3A8A;
+  border-radius: 8px;
+}
+.tourism-office-bookings-dashboard .status-tab.active .label7 {
+  color: #ffffff;
+}
+
+
+.discover-alderhaven-events .search-query input,
+.tourism-office-bookings-dashboard .booking-search input,
+.book-your-harbour-walk .input input,
+.book-your-harbour-walk .request-input textarea {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 15px;
+  color: #202020;
+}
+.discover-alderhaven-events .search-query input::placeholder,
+.tourism-office-bookings-dashboard .booking-search input::placeholder,
+.book-your-harbour-walk .request-input textarea::placeholder {
+  color: #8c8b82;
+}
+
+.discover-alderhaven-events .date-filter select,
+.tourism-office-bookings-dashboard .filter select {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 14px;
+  color: #202020;
+  cursor: pointer;
+}
+
+
+.ald-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 30, 26, 0.65);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+.ald-modal-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+.ald-modal-dialog {
+  background: #ffffff;
+  border: 1px solid #dddcd3;
+  border-radius: 16px;
+  max-width: 840px;
+  width: 95%;
+  max-height: 92vh;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.18);
+  padding: 30px 32px;
+  position: relative;
+}
+.ald-modal-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid #dddcd3;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+  color: #66746e;
+  transition: all 0.15s ease;
+}
+.ald-modal-close:hover {
+  background: #f8f6f1;
+  color: #202020;
+}
+
+
+.ald-toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ald-toast {
+  background: #1E3A8A;
+  color: #ffffff;
+  padding: 14px 20px;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  animation: aldToastIn 0.25s ease-out;
+}
+.ald-toast.error {
+  background: #c53030;
+}
+@keyframes aldToastIn {
+  from { transform: translateY(12px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+
+.ald-form-group {
+  margin-bottom: 20px;
+}
+.ald-form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #202020;
+  margin-bottom: 6px;
+}
+.ald-form-input, .ald-form-select, .ald-form-textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #dddcd3;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #202020;
+  background: #f8f6f1;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+.ald-form-input:focus, .ald-form-select:focus, .ald-form-textarea:focus {
+  border-color: #1E3A8A;
+  background: #ffffff;
+}
+.ald-btn-primary {
+  background: #1E3A8A;
+  color: #ffffff;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.ald-btn-primary:hover {
+  background: #1E40AF;
+}
+.ald-btn-outline {
+  background: transparent;
+  color: #202020;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 14px;
+  border: 1px solid #dddcd3;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.ald-btn-outline:hover {
+  background: #f8f6f1;
+}
+
+
+
+.discover-alderhaven-events,
+.discover-alderhaven-events * {
+  box-sizing: border-box;
+}
+
+.discover-alderhaven-events {
+  background: #f8f6f1;
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    position: relative;
+    overflow: hidden;
+}
+
+.discover-alderhaven-events .visitor-navigation {
+  background: #ffffff;
+  border-style: solid;
+  border-color: #dddcd3;
+  border-width: 0px 0px 1px 0px;
+  padding: 0 clamp(16px, 2.5vw, 36px);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  align-self: stretch;
+  width: 100%;
+  max-width: 100vw;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  min-height: 76px;
+  height: 80px;
+  position: relative;
+  overflow: visible;
+  gap: 12px;
+}
+
+.discover-alderhaven-events .alderhaven-identity {
+  display: flex;
+    flex-direction: row;
+    gap: 12px;
+    align-items: center;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.discover-alderhaven-events .local-emblem {
+  background: #1E3A8A;
+    border-radius: 100px;
+    display: flex;
+    flex-direction: row;
+    gap: 0px;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 42px;
+    height: 42px;
+    position: relative;
+    overflow: hidden;
+}
+
+.discover-alderhaven-events .waves {
+  flex-shrink: 0;
+    width: 25px;
+    height: 25px;
+    position: relative;
+    overflow: visible;
+}
+
+.discover-alderhaven-events .wordmark {
+  display: flex;
+    flex-direction: column;
+    gap: 3px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.discover-alderhaven-events .locality {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 22px;
+    letter-spacing: -0.7undefined;
+    font-weight: 400;
+    position: relative;
+}
+
+.discover-alderhaven-events .office {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Medium", sans-serif;
+    font-size: 10px;
+    letter-spacing: 1.5undefined;
+    font-weight: 500;
+    position: relative;
+}
+
+.discover-alderhaven-events .explore-navigation {
+  display: flex;
+    flex-direction: row;
+    gap: 32px;
+    align-items: center;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.discover-alderhaven-events .active-link {
+  color: #1E3A8A;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    position: relative;
+}
+
+.discover-alderhaven-events .navigation-link {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    position: relative;
+}
+
+.discover-alderhaven-events .visitor-actions {
+  display: flex;
+  flex-direction: row;
+  gap: clamp(6px, 0.7vw, 10px);
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 1;
+  min-width: 0;
+  position: relative;
+  overflow: visible;
+}
+
+.discover-alderhaven-events .support {
+  color: #66746e;
+  text-align: left;
+  font-family: "Inter-SemiBold", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  position: relative;
+  padding: 0 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.discover-alderhaven-events .action {
+  background: #ffffff;
+  border-radius: 8px;
+  border-style: solid;
+  border-color: #dddcd3;
+  border-width: 1px;
+  padding: 0px 12px;
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  height: 38px;
+  position: relative;
+  overflow: visible;
+  white-space: nowrap;
+}
+
+.discover-alderhaven-events .ticket {
+  flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    position: relative;
+    overflow: visible;
+}
+
+.discover-alderhaven-events .label {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    position: relative;
+}
+
+.discover-alderhaven-events .destination-introduction {
+  padding: 48px 64px 40px 64px;
+    display: flex;
+    flex-direction: row;
+    gap: 56px;
+    align-items: center;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.discover-alderhaven-events .welcome {
+  display: flex;
+    flex-direction: column;
+    gap: 23px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    width: 526px;
+    position: relative;
+    overflow: hidden;
+}
+
+.discover-alderhaven-events .eyebrow {
+  color: #1E3A8A;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 12px;
+    letter-spacing: 2undefined;
+    font-weight: 600;
+    position: relative;
+}
+
+.discover-alderhaven-events .headline {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 56px;
+    line-height: 108%;
+    letter-spacing: -2.6undefined;
+    font-weight: 400;
+    position: relative;
+    align-self: stretch;
+}
+
+.discover-alderhaven-events .introduction {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 17px;
+    line-height: 160%;
+    font-weight: 400;
+    position: relative;
+    align-self: stretch;
+}
+
+.discover-alderhaven-events .community-note {
+  display: flex;
+    flex-direction: row;
+    gap: 9px;
+    align-items: center;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.discover-alderhaven-events .heart-handshake {
+  flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    position: relative;
+    overflow: visible;
+}
+
+.discover-alderhaven-events .message {
+  color: #1E3A8A;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    position: relative;
+}
+
+.discover-alderhaven-events .destination-photograph {
+  border-radius: 18px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+    align-items: flex-start;
+    justify-content: flex-end;
+    flex: 1;
+    height: 360px;
+    position: relative;
+    overflow: hidden;
+}
+
+.discover-alderhaven-events .place-caption {
+  background: #ffffff;
+    border-radius: 6px;
+    padding: 9px 12px 9px 12px;
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.discover-alderhaven-events .map-pin {
+  flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    position: relative;
+    overflow: visible;
+}
+
+.discover-alderhaven-events .location {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Medium", sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    position: relative;
+}
+
+.discover-alderhaven-events .event-finder {
+  padding: 0px 64px 44px 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.discover-alderhaven-events .search-controls {
+  background: #ffffff;
+    border-radius: 12px;
+    border-style: solid;
+    border-color: #dddcd3;
+    border-width: 1px;
+    padding: 14px;
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+    align-items: center;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.discover-alderhaven-events .search-query {
+  padding: 0px 12px 0px 12px;
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    align-items: center;
+    justify-content: flex-start;
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.discover-alderhaven-events .search {
+  flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    position: relative;
+    overflow: visible;
+}
+
+.discover-alderhaven-events .placeholder {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 15px;
+    font-weight: 400;
+    position: relative;
+}
+
+.discover-alderhaven-events .divider {
+  background: #dddcd3;
+    flex-shrink: 0;
+    width: 1px;
+    height: 36px;
+    position: relative;
+}
+
+.discover-alderhaven-events .date-filter {
+  padding: 0px 8px 0px 8px;
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    align-items: center;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    width: 226px;
+    position: relative;
+    overflow: hidden;
+}
+
+.discover-alderhaven-events .calendar-days {
+  flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    position: relative;
+    overflow: visible;
+}
+
+.discover-alderhaven-events .date-range {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    position: relative;
+}
+
+.discover-alderhaven-events .chevron-down {
+  flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    position: relative;
+    overflow: visible;
+}
+
+.discover-alderhaven-events .action2 {
+  background: #1E3A8A;
+    border-radius: 6px;
+    border-style: solid;
+    border-color: #1E3A8A;
+    border-width: 1px;
+    padding: 0px 20px 0px 20px;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    height: 48px;
+    position: relative;
+    overflow: hidden;
+}
+
+.discover-alderhaven-events .arrow-right {
+  flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    position: relative;
+    overflow: visible;
+}
+
+.discover-alderhaven-events .label2 {
+  color: #ffffff;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    position: relative;
+}
+
+.discover-alderhaven-events .categories {
+  display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.discover-alderhaven-events .category-filter {
+  background: #1E3A8A;
+    border-radius: 100px;
+    border-style: solid;
+    border-color: #1E3A8A;
+    border-width: 1px;
+    padding: 11px 18px 11px 18px;
+    display: flex;
+    flex-direction: row;
+    gap: 0px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.discover-alderhaven-events .label3 {
+  color: #ffffff;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    position: relative;
+}
+
+.discover-alderhaven-events .category-filter2 {
+  background: rgba(0, 0, 0, 0);
+    border-radius: 100px;
+    border-style: solid;
+    border-color: #dddcd3;
+    border-width: 1px;
+    padding: 11px 18px 11px 18px;
+    display: flex;
+    flex-direction: row;
+    gap: 0px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.discover-alderhaven-events .label4 {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    position: relative;
+}
+
+.discover-alderhaven-events .upcoming-events {
+  padding: 0px 64px 48px 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.discover-alderhaven-events .results-heading {
+  display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.discover-alderhaven-events .heading {
+  display: flex;
+    flex-direction: column;
+    gap: 7px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.discover-alderhaven-events .title {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 30px;
+    letter-spacing: -0.9undefined;
+    font-weight: 400;
+    position: relative;
+}
+
+.discover-alderhaven-events .result-count {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    position: relative;
+}
+
+.discover-alderhaven-events .sort {
+  display: flex;
+    flex-direction: row;
+    gap: 9px;
+    align-items: center;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.discover-alderhaven-events .sort-label {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    position: relative;
+}
+
+.discover-alderhaven-events .selection {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    position: relative;
+}
+
+.discover-alderhaven-events .chevron-down2 {
+  flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    position: relative;
+    overflow: visible;
+}
+
+.discover-alderhaven-events .event-row {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 24px !important;
+  align-items: stretch !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.discover-alderhaven-events .event-card {
+  background: #ffffff;
+  border-radius: 12px;
+  border-style: solid;
+  border-color: #dddcd3;
+  border-width: 1px;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  position: relative;
+  overflow: hidden;
+  height: 100% !important;
+  min-height: 490px !important;
+  box-sizing: border-box !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.discover-alderhaven-events .event-photograph {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  align-self: stretch;
+  width: 100%;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  height: 200px !important;
+  position: relative;
+  overflow: hidden;
+  background-position: center !important;
+  background-size: cover !important;
+  background-repeat: no-repeat !important;
+}
+
+.discover-alderhaven-events .date-marker {
+  background: #ffffff;
+  border-radius: 6px;
+  padding: 6px 10px;
+  display: flex;
+  flex-direction: row;
+  gap: 0px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+.discover-alderhaven-events .month {
+  color: #243c37;
+  text-align: left;
+  font-family: "Inter-SemiBold", sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  position: relative;
+  letter-spacing: 0.5px;
+}
+
+.discover-alderhaven-events .event-information {
+  padding: 20px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  align-self: stretch !important;
+  flex: 1 1 auto !important;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box !important;
+}
+
+.discover-alderhaven-events .event-info-main {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+}
+
+.discover-alderhaven-events .event-info-footer {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  margin-top: auto !important;
+}
+
+.discover-alderhaven-events .category {
+  color: #1E3A8A;
+  text-align: left;
+  font-family: "Inter-SemiBold", sans-serif;
+  font-size: 11px;
+  letter-spacing: 1px;
+  font-weight: 700;
+  position: relative;
+  height: 16px;
+  line-height: 16px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.discover-alderhaven-events .title2 {
+  color: #243c37;
+  text-align: left;
+  font-family: "Inter-SemiBold", sans-serif;
+  font-size: 17px !important;
+  line-height: 1.35 !important;
+  font-weight: 700 !important;
+  position: relative;
+  align-self: stretch;
+  height: 2.7em !important;
+  min-height: 2.7em !important;
+  max-height: 2.7em !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  margin-bottom: 8px !important;
+}
+
+.discover-alderhaven-events .date {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 8px !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  flex-shrink: 0 !important;
+  position: relative !important;
+  overflow: hidden !important;
+  height: 20px !important;
+  margin-bottom: 6px !important;
+}
+
+.discover-alderhaven-events .calendar-days2 {
+  flex-shrink: 0;
+  width: 15px;
+  height: 15px;
+  position: relative;
+  overflow: visible;
+}
+
+.discover-alderhaven-events .schedule {
+  color: #4B5563;
+  text-align: left;
+  font-family: "Inter-Regular", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  position: relative;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.discover-alderhaven-events .location2 {
+  color: #66746e;
+  text-align: left;
+  font-family: "Inter-Regular", sans-serif;
+  font-size: 12.5px;
+  font-weight: 400;
+  position: relative;
+  align-self: stretch;
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  height: 20px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  margin-bottom: 12px !important;
+}
+
+.discover-alderhaven-events .booking-information {
+  border-style: solid;
+  border-color: #dddcd3;
+  border-width: 1px 0px 0px 0px;
+  padding: 12px 0px 0px 0px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  align-self: stretch;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+  height: 38px;
+  box-sizing: border-box;
+}
+
+.discover-alderhaven-events .price {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  align-items: baseline;
+  justify-content: flex-start;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.discover-alderhaven-events .amount {
+  color: #1E3A8A;
+  text-align: left;
+  font-family: "Inter-Bold", sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  position: relative;
+}
+
+.discover-alderhaven-events .unit {
+  color: #66746e;
+  text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    position: relative;
+}
+
+.discover-alderhaven-events .status {
+  background: #eaf1eb;
+    border-radius: 100px;
+    padding: 6px 10px 6px 10px;
+    display: flex;
+    flex-direction: row;
+    gap: 0px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.discover-alderhaven-events .label5 {
+  color: #1E3A8A;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    position: relative;
+}
+
+.discover-alderhaven-events .calendar-days3 {
+  flex-shrink: 0;
+    width: 15px;
+    height: 15px;
+    position: relative;
+    overflow: visible;
+}
+
+.discover-alderhaven-events .calendar-days4 {
+  flex-shrink: 0;
+    width: 15px;
+    height: 15px;
+    position: relative;
+    overflow: visible;
+}
+
+.discover-alderhaven-events .status2 {
+  background: #faefd9;
+    border-radius: 100px;
+    padding: 6px 10px 6px 10px;
+    display: flex;
+    flex-direction: row;
+    gap: 0px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.discover-alderhaven-events .label6 {
+  color: #865728;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    position: relative;
+}
+
+.discover-alderhaven-events .calendar-days5 {
+  flex-shrink: 0;
+    width: 15px;
+    height: 15px;
+    position: relative;
+    overflow: visible;
+}
+
+.discover-alderhaven-events .calendar-days6 {
+  flex-shrink: 0;
+    width: 15px;
+    height: 15px;
+    position: relative;
+    overflow: visible;
+}
+
+.discover-alderhaven-events .calendar-days7 {
+  flex-shrink: 0;
+    width: 15px;
+    height: 15px;
+    position: relative;
+    overflow: visible;
+}
+
+.discover-alderhaven-events .pagination {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  align-self: stretch !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  margin-top: 32px !important;
+  padding-top: 24px !important;
+  border-top: 1px solid #E5E7EB !important;
+  flex-wrap: wrap !important;
+  gap: 16px !important;
+}
+
+.discover-alderhaven-events .results-range {
+  color: #4B5563;
+  text-align: left;
+  font-family: "Inter-Medium", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  position: relative;
+}
+
+.discover-alderhaven-events .pages {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 8px !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  flex-shrink: 0 !important;
+  position: relative !important;
+}
+
+.pagination-page-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 38px !important;
+  height: 38px !important;
+  padding: 0 12px !important;
+  background: #FFFFFF !important;
+  color: #1E3A8A !important;
+  border: 1px solid #D1D5DB !important;
+  border-radius: 8px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.pagination-page-btn:hover {
+  background: #EFF6FF !important;
+  border-color: #1E3A8A !important;
+}
+
+.pagination-page-btn.active {
+  background: #1E3A8A !important;
+  color: #FFFFFF !important;
+  border-color: #1E3A8A !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 6px rgba(30, 58, 138, 0.25) !important;
+}
+
+.pagination-nav-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  height: 38px !important;
+  padding: 0 14px !important;
+  background: #FFFFFF !important;
+  color: #1E3A8A !important;
+  border: 1px solid #D1D5DB !important;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.pagination-nav-btn:hover:not([disabled]) {
+  background: #EFF6FF !important;
+  border-color: #1E3A8A !important;
+}
+
+.discover-alderhaven-events .visitor-assistance {
+  background: #eaf1eb;
+    padding: 32px 64px 32px 64px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.discover-alderhaven-events .help-message {
+  display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.discover-alderhaven-events .title3 {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 22px;
+    font-weight: 400;
+    position: relative;
+}
+
+.discover-alderhaven-events .description {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    position: relative;
+}
+
+.discover-alderhaven-events .message-circle {
+  flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    position: relative;
+    overflow: visible;
+}
+
+.discover-alderhaven-events .visitor-footer {
+  background: #efeadf;
+    padding: 40px 64px 40px 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.discover-alderhaven-events .contact-information {
+  display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.discover-alderhaven-events .waves2 {
+  flex-shrink: 0;
+    width: 25px;
+    height: 25px;
+    position: relative;
+    overflow: visible;
+}
+
+.discover-alderhaven-events .welcome2 {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 15px;
+    font-weight: 400;
+    position: relative;
+}
+
+.discover-alderhaven-events .contact {
+  display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.discover-alderhaven-events .email {
+  color: #1E3A8A;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    position: relative;
+}
+
+.discover-alderhaven-events .opening-hours {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    position: relative;
+}
+
+.discover-alderhaven-events .legal-information {
+  display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.discover-alderhaven-events .disclosure {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    position: relative;
+}
+
+.discover-alderhaven-events .legal-links {
+  display: flex;
+    flex-direction: row;
+    gap: 24px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.discover-alderhaven-events .accessibility {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    position: relative;
+}
+
+.discover-alderhaven-events .privacy {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    position: relative;
+}
+
+.discover-alderhaven-events .terms {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    position: relative;
+}
+
+
+.harbour-walk-event-details,
+.harbour-walk-event-details * {
+  box-sizing: border-box;
+}
+
+.harbour-walk-event-details {
+  background: #f8f6f1;
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    position: relative;
+    overflow: visible;
+}
+
+.harbour-walk-event-details .visitor-navigation {
+  background: #ffffff;
+  border-style: solid;
+  border-color: #dddcd3;
+  border-width: 0px 0px 1px 0px;
+  padding: 0 clamp(16px, 2.5vw, 36px);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  align-self: stretch;
+  width: 100%;
+  max-width: 100vw;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  min-height: 76px;
+  height: 80px;
+  position: relative;
+  overflow: visible;
+  gap: 12px;
+}
+
+.harbour-walk-event-details .alderhaven-identity {
+  display: flex;
+    flex-direction: row;
+    gap: 12px;
+    align-items: center;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-event-details .local-emblem {
+  background: #1E3A8A;
+    border-radius: 100px;
+    display: flex;
+    flex-direction: row;
+    gap: 0px;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 42px;
+    height: 42px;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-event-details .waves {
+  flex-shrink: 0;
+    width: 25px;
+    height: 25px;
+    position: relative;
+    overflow: visible;
+}
+
+.harbour-walk-event-details .wordmark {
+  display: flex;
+    flex-direction: column;
+    gap: 3px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-event-details .locality {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 22px;
+    letter-spacing: -0.7undefined;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-event-details .office {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Medium", sans-serif;
+    font-size: 10px;
+    letter-spacing: 1.5undefined;
+    font-weight: 500;
+    position: relative;
+}
+
+.harbour-walk-event-details .explore-navigation {
+  display: flex;
+    flex-direction: row;
+    gap: 32px;
+    align-items: center;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-event-details .active-link {
+  color: #1E3A8A;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    position: relative;
+}
+
+.harbour-walk-event-details .navigation-link {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-event-details .visitor-actions {
+  display: flex;
+  flex-direction: row;
+  gap: clamp(6px, 0.7vw, 10px);
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 1;
+  min-width: 0;
+  position: relative;
+  overflow: visible;
+}
+
+.harbour-walk-event-details .support {
+  color: #66746e;
+  text-align: left;
+  font-family: "Inter-SemiBold", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  position: relative;
+  padding: 0 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.harbour-walk-event-details .action {
+  background: #ffffff;
+  border-radius: 8px;
+  border-style: solid;
+  border-color: #dddcd3;
+  border-width: 1px;
+  padding: 0px 12px;
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  height: 38px;
+  position: relative;
+  overflow: visible;
+  white-space: nowrap;
+}
+
+.harbour-walk-event-details .ticket {
+  flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    position: relative;
+    overflow: visible;
+}
+
+.harbour-walk-event-details .label {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    position: relative;
+}
+
+.harbour-walk-event-details .event-content {
+  padding: 28px 48px 64px 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    align-items: stretch;
+    justify-content: flex-start;
+    align-self: stretch;
+    max-width: 1240px;
+    margin: 0 auto;
+    width: 100%;
+    position: relative;
+    overflow: visible;
+}
+
+.harbour-walk-event-details .breadcrumb {
+  display: flex;
+    flex-direction: row;
+    gap: 9px;
+    align-items: center;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-event-details .parent {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-event-details .chevron-right {
+  flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+    position: relative;
+    overflow: visible;
+}
+
+.harbour-walk-event-details .category {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-event-details .chevron-right2 {
+  flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+    position: relative;
+    overflow: visible;
+}
+
+.harbour-walk-event-details .current {
+  color: #1E3A8A;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-event-details .event-heading {
+  display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-event-details .title-group {
+  display: flex;
+    flex-direction: column;
+    gap: 13px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-event-details .category2 {
+  color: #1E3A8A;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 11px;
+    letter-spacing: 1.8undefined;
+    font-weight: 600;
+    position: relative;
+}
+
+.harbour-walk-event-details .title {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 46px;
+    letter-spacing: -1.8undefined;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-event-details .subtitle {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-event-details .share-2 {
+  flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    position: relative;
+    overflow: visible;
+}
+
+.harbour-walk-event-details .coastal-gallery {
+  display: block;
+    align-self: stretch;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    border-radius: 14px;
+}
+
+.harbour-walk-event-details .headland-walk {
+  border-radius: 14px;
+    width: 100%;
+    height: 400px;
+    position: relative;
+    object-fit: cover;
+    display: block;
+}
+
+.harbour-walk-event-details .harbour-details {
+  display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-event-details .harbour-photograph {
+  border-radius: 12px;
+    align-self: stretch;
+    flex-shrink: 0;
+    height: 187px;
+    position: relative;
+    object-fit: cover;
+}
+
+.harbour-walk-event-details .guide-photograph {
+  border-radius: 12px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+    align-items: flex-start;
+    justify-content: flex-end;
+    align-self: stretch;
+    flex-shrink: 0;
+    height: 187px;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-event-details .gallery-action {
+  background: #ffffff;
+    border-radius: 6px;
+    padding: 8px 12px 8px 12px;
+    display: flex;
+    flex-direction: row;
+    gap: 7px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-event-details .images {
+  flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    position: relative;
+    overflow: visible;
+}
+
+.harbour-walk-event-details .label2 {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Medium", sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    position: relative;
+}
+
+.harbour-walk-event-details .event-and-tickets {
+  display: flex;
+    flex-direction: row;
+    gap: 48px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.harbour-walk-event-details .practical-information {
+  display: flex;
+    flex-direction: column;
+    gap: 0px;
+    align-items: stretch;
+    justify-content: flex-start;
+    position: relative;
+    overflow: visible;
+}
+
+.harbour-walk-event-details .at-a-glance {
+  background: #efeadf;
+    border-radius: 12px;
+    padding: 24px;
+    display: flex;
+    flex-direction: row;
+    gap: 24px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-event-details .event-fact {
+  display: flex;
+    flex-direction: row;
+    gap: 12px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-event-details .calendar-days {
+  flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    position: relative;
+    overflow: visible;
+}
+
+.harbour-walk-event-details .information {
+  display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-event-details .label3 {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-event-details .value {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    position: relative;
+    align-self: stretch;
+}
+
+.harbour-walk-event-details .supporting-detail {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    line-height: 150%;
+    font-weight: 400;
+    position: relative;
+    align-self: stretch;
+}
+
+.harbour-walk-event-details .map-pin {
+  flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    position: relative;
+    overflow: visible;
+}
+
+.harbour-walk-event-details .footprints {
+  flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    position: relative;
+    overflow: visible;
+}
+
+.harbour-walk-event-details .about-the-walk {
+  display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-event-details .heading {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 26px;
+    letter-spacing: -0.5undefined;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-event-details .description {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 15px;
+    line-height: 175%;
+    font-weight: 400;
+    position: relative;
+    align-self: stretch;
+}
+
+.harbour-walk-event-details .inclusion {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 15px;
+    line-height: 175%;
+    font-weight: 400;
+    position: relative;
+    align-self: stretch;
+}
+
+.harbour-walk-event-details .walk-itinerary {
+  display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-event-details .heading2 {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 22px;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-event-details .itinerary-stop {
+  display: flex;
+    flex-direction: row;
+    gap: 20px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-event-details .time {
+  color: #1E3A8A;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    position: relative;
+    width: auto;
+    white-space: nowrap;
+}
+
+.harbour-walk-event-details .stop-information {
+  display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-event-details .title2 {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-event-details .description2 {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    position: relative;
+    align-self: stretch;
+}
+
+.harbour-walk-event-details .before-you-book {
+  background: #ffffff;
+    border-radius: 12px;
+    border-style: solid;
+    border-color: #dddcd3;
+    border-width: 1px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-event-details .heading3 {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 21px;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-event-details .event-fact2 {
+  display: flex;
+    flex-direction: row;
+    gap: 12px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-event-details .accessibility {
+  flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    position: relative;
+    overflow: visible;
+}
+
+.harbour-walk-event-details .cloud-sun {
+  flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    position: relative;
+    overflow: visible;
+}
+
+.harbour-walk-event-details .reserve-tickets {
+  display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    width: 382px;
+    position: relative;
+}
+
+.harbour-walk-event-details .ticket-panel {
+  background: #ffffff;
+    border-radius: 12px;
+    border-style: solid;
+    border-color: #dddcd3;
+    border-width: 1px;
+    padding: 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    box-shadow: 0px 6px 24px 0px rgba(32, 57, 43, 0.05);
+    overflow: hidden;
+}
+
+.harbour-walk-event-details .pricing-headline {
+  display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-event-details .starting-price {
+  display: flex;
+    flex-direction: row;
+    gap: 5px;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-event-details .price {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 32px;
+    font-weight: 600;
+    position: relative;
+}
+
+.harbour-walk-event-details .unit {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-event-details .status {
+  background: #eaf1eb;
+    border-radius: 100px;
+    padding: 6px 10px 6px 10px;
+    display: flex;
+    flex-direction: row;
+    gap: 0px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-event-details .label4 {
+  color: #1E3A8A;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    position: relative;
+}
+
+.harbour-walk-event-details .date-picker {
+  display: flex;
+    flex-direction: column;
+    gap: 9px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-event-details .label5 {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-event-details .selected-date {
+  background: #eaf1eb;
+    border-radius: 6px;
+    border-style: solid;
+    border-color: #1E3A8A;
+    border-width: 1px;
+    padding: 13px;
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    align-items: center;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-event-details .calendar-days2 {
+  flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    position: relative;
+    overflow: visible;
+}
+
+.harbour-walk-event-details .date {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-event-details .chevron-down {
+  flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    position: relative;
+    overflow: visible;
+}
+
+.harbour-walk-event-details .time-picker {
+  display: flex;
+    flex-direction: column;
+    gap: 9px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-event-details .selected-time {
+  background: #eaf1eb;
+    border-radius: 6px;
+    border-style: solid;
+    border-color: #1E3A8A;
+    border-width: 1px;
+    padding: 10px 16px 10px 16px;
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-event-details .check {
+  flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    position: relative;
+    overflow: visible;
+}
+
+.harbour-walk-event-details .time2 {
+  color: #1E3A8A;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-event-details .divider {
+  background: #dddcd3;
+    align-self: stretch;
+    flex-shrink: 0;
+    height: 1px;
+    position: relative;
+}
+
+.harbour-walk-event-details .ticket-selection {
+  display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-event-details .ticket-type {
+  display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-event-details .name {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-event-details .age-range {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-event-details .quantity-control {
+  display: flex;
+    flex-direction: row;
+    gap: 14px;
+    align-items: center;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-event-details .decrease {
+  border-radius: 6px;
+    border-style: solid;
+    border-color: #dddcd3;
+    border-width: 1px;
+    display: flex;
+    flex-direction: row;
+    gap: 0px;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-event-details .minus {
+  flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+    position: relative;
+    overflow: visible;
+}
+
+.harbour-walk-event-details .quantity {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    position: relative;
+}
+
+.harbour-walk-event-details .increase {
+  border-radius: 6px;
+    border-style: solid;
+    border-color: #dddcd3;
+    border-width: 1px;
+    display: flex;
+    flex-direction: row;
+    gap: 0px;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-event-details .plus {
+  flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+    position: relative;
+    overflow: visible;
+}
+
+.harbour-walk-event-details .minus2 {
+  flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+    position: relative;
+    overflow: visible;
+}
+
+.harbour-walk-event-details .plus2 {
+  flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+    position: relative;
+    overflow: visible;
+}
+
+.harbour-walk-event-details .price-item {
+  display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-event-details .item {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    position: relative;
+}
+
+.harbour-walk-event-details .amount {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 24px;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-event-details .fee-policy {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-event-details .action2 {
+  background: #1E3A8A;
+    border-radius: 6px;
+    border-style: solid;
+    border-color: #1E3A8A;
+    border-width: 1px;
+    padding: 0px 20px 0px 20px;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    align-self: stretch;
+    flex-shrink: 0;
+    height: 48px;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-event-details .arrow-right {
+  flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    position: relative;
+    overflow: visible;
+}
+
+.harbour-walk-event-details .label6 {
+  color: #ffffff;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    position: relative;
+}
+
+.harbour-walk-event-details .cancellation-assurance {
+  display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-event-details .shield-check {
+  flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    position: relative;
+    overflow: visible;
+}
+
+.harbour-walk-event-details .policy {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    line-height: 150%;
+    font-weight: 400;
+    position: relative;
+    flex: 1;
+}
+
+.harbour-walk-event-details .booking-support {
+  padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-event-details .heading4 {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 15px;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-event-details .support2 {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 13px;
+    line-height: 160%;
+    font-weight: 400;
+    position: relative;
+    align-self: stretch;
+}
+
+.harbour-walk-event-details .contact {
+  color: #1E3A8A;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-event-details .hours {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-event-details .visitor-footer {
+  background: #efeadf;
+    padding: 40px 64px 40px 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-event-details .contact-information {
+  display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-event-details .waves2 {
+  flex-shrink: 0;
+    width: 25px;
+    height: 25px;
+    position: relative;
+    overflow: visible;
+}
+
+.harbour-walk-event-details .welcome {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 15px;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-event-details .contact2 {
+  display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-event-details .email {
+  color: #1E3A8A;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-event-details .opening-hours {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-event-details .legal-information {
+  display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-event-details .disclosure {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-event-details .legal-links {
+  display: flex;
+    flex-direction: row;
+    gap: 24px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-event-details .accessibility2 {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-event-details .privacy {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-event-details .terms {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    position: relative;
+}
+
+
+.book-your-harbour-walk,
+.book-your-harbour-walk * {
+  box-sizing: border-box;
+}
+
+.book-your-harbour-walk {
+  background: #f8f6f1;
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .visitor-navigation {
+  background: #ffffff;
+  border-style: solid;
+  border-color: #dddcd3;
+  border-width: 0px 0px 1px 0px;
+  padding: 0 clamp(16px, 2.5vw, 36px);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  align-self: stretch;
+  width: 100%;
+  max-width: 100vw;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  min-height: 76px;
+  height: 80px;
+  position: relative;
+  overflow: visible;
+  gap: 12px;
+}
+
+.book-your-harbour-walk .alderhaven-identity {
+  display: flex;
+    flex-direction: row;
+    gap: 12px;
+    align-items: center;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .local-emblem {
+  background: #1E3A8A;
+    border-radius: 100px;
+    display: flex;
+    flex-direction: row;
+    gap: 0px;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 42px;
+    height: 42px;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .waves {
+  flex-shrink: 0;
+    width: 25px;
+    height: 25px;
+    position: relative;
+    overflow: visible;
+}
+
+.book-your-harbour-walk .wordmark {
+  display: flex;
+    flex-direction: column;
+    gap: 3px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .locality {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 22px;
+    letter-spacing: -0.7undefined;
+    font-weight: 400;
+    position: relative;
+}
+
+.book-your-harbour-walk .office {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Medium", sans-serif;
+    font-size: 10px;
+    letter-spacing: 1.5undefined;
+    font-weight: 500;
+    position: relative;
+}
+
+.book-your-harbour-walk .visitor-actions {
+  display: flex;
+    flex-direction: row;
+    gap: 20px;
+    align-items: center;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .support {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    position: relative;
+}
+
+.book-your-harbour-walk .lock-keyhole {
+  flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    position: relative;
+    overflow: visible;
+}
+
+.book-your-harbour-walk .booking-content {
+  padding: 32px 128px 56px 128px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .back-action {
+  display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .arrow-left {
+  flex-shrink: 0;
+    width: 17px;
+    height: 17px;
+    position: relative;
+    overflow: visible;
+}
+
+.book-your-harbour-walk .label {
+  color: #1E3A8A;
+    text-align: left;
+    font-family: "Inter-Medium", sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    position: relative;
+}
+
+.book-your-harbour-walk .booking-progress {
+  display: flex;
+    flex-direction: row;
+    gap: 16px;
+    align-items: center;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .step {
+  display: flex;
+    flex-direction: row;
+    gap: 9px;
+    align-items: center;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .step-marker {
+  background: #1E3A8A;
+    border-radius: 100px;
+    display: flex;
+    flex-direction: row;
+    gap: 0px;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .number {
+  color: #ffffff;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    position: relative;
+}
+
+.book-your-harbour-walk .step-label {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    position: relative;
+}
+
+.book-your-harbour-walk .connector {
+  background: #dddcd3;
+    flex-shrink: 0;
+    width: 56px;
+    height: 1px;
+    position: relative;
+}
+
+.book-your-harbour-walk .step-label2 {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    position: relative;
+}
+
+.book-your-harbour-walk .step-marker2 {
+  background: #efeadf;
+    border-radius: 100px;
+    display: flex;
+    flex-direction: row;
+    gap: 0px;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .number2 {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    position: relative;
+}
+
+.book-your-harbour-walk .step-label3 {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    position: relative;
+}
+
+.book-your-harbour-walk .page-heading {
+  display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .title {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 38px;
+    letter-spacing: -1.2undefined;
+    font-weight: 400;
+    position: relative;
+}
+
+.book-your-harbour-walk .description {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 15px;
+    font-weight: 400;
+    position: relative;
+}
+
+.book-your-harbour-walk .checkout-layout {
+  display: flex;
+    flex-direction: row;
+    gap: 32px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .booking-form {
+  display: flex;
+    flex-direction: column;
+    gap: 24px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .contact-details {
+  background: #ffffff;
+    border-radius: 12px;
+    border-style: solid;
+    border-color: #dddcd3;
+    border-width: 1px;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .section-heading {
+  display: flex;
+    flex-direction: row;
+    gap: 13px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .section-marker {
+  background: #eaf1eb;
+    border-radius: 100px;
+    display: flex;
+    flex-direction: row;
+    gap: 0px;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .number3 {
+  color: #1E3A8A;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    position: relative;
+}
+
+.book-your-harbour-walk .section-title {
+  display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .title2 {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 22px;
+    font-weight: 400;
+    position: relative;
+}
+
+.book-your-harbour-walk .description2 {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 13px;
+    line-height: 150%;
+    font-weight: 400;
+    position: relative;
+    align-self: stretch;
+}
+
+.book-your-harbour-walk .name-fields {
+  display: flex;
+    flex-direction: row;
+    gap: 20px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .form-field {
+  display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .label2 {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    position: relative;
+}
+
+.book-your-harbour-walk .input {
+  background: #ffffff;
+    border-radius: 6px;
+    border-style: solid;
+    border-color: #dddcd3;
+    border-width: 1px;
+    padding: 0px 14px 0px 14px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    align-self: stretch;
+    flex-shrink: 0;
+    height: 48px;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .value {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    position: relative;
+}
+
+.book-your-harbour-walk .form-field2 {
+  display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .helper {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    position: relative;
+    align-self: stretch;
+}
+
+.book-your-harbour-walk .attendee-details {
+  background: #ffffff;
+    border-radius: 12px;
+    border-style: solid;
+    border-color: #dddcd3;
+    border-width: 1px;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .access-needs {
+  display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .request-input {
+  border-radius: 6px;
+    border-style: solid;
+    border-color: #dddcd3;
+    border-width: 1px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    min-height: 84px;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .placeholder {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 13px;
+    line-height: 150%;
+    font-weight: 400;
+    position: relative;
+    align-self: stretch;
+}
+
+.book-your-harbour-walk .privacy-note {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    position: relative;
+    align-self: stretch;
+}
+
+.book-your-harbour-walk .secure-payment {
+  background: #ffffff;
+    border-radius: 12px;
+    border-style: solid;
+    border-color: #dddcd3;
+    border-width: 1px;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .payment-method {
+  background: #eaf1eb;
+    border-radius: 6px;
+    border-style: solid;
+    border-color: #1E3A8A;
+    border-width: 1px;
+    padding: 14px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .card-selection {
+  display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .circle-dot {
+  flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    position: relative;
+    overflow: visible;
+}
+
+.book-your-harbour-walk .method {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    position: relative;
+}
+
+.book-your-harbour-walk .supported-cards {
+  color: #1E3A8A;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    position: relative;
+}
+
+.book-your-harbour-walk .credit-card {
+  flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    position: relative;
+    overflow: visible;
+}
+
+.book-your-harbour-walk .card-verification {
+  display: flex;
+    flex-direction: row;
+    gap: 20px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .lock-keyhole2 {
+  flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    position: relative;
+    overflow: visible;
+}
+
+.book-your-harbour-walk .divider {
+  background: #dddcd3;
+    align-self: stretch;
+    flex-shrink: 0;
+    height: 1px;
+    position: relative;
+}
+
+.book-your-harbour-walk .consent-option {
+  display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .checkbox {
+  background: #1E3A8A;
+    border-radius: 3px;
+    border-style: solid;
+    border-color: #1E3A8A;
+    border-width: 1px;
+    display: flex;
+    flex-direction: row;
+    gap: 0px;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .check {
+  flex-shrink: 0;
+    width: 13px;
+    height: 13px;
+    position: relative;
+    overflow: visible;
+}
+
+.book-your-harbour-walk .label3 {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 13px;
+    line-height: 155%;
+    font-weight: 400;
+    position: relative;
+    flex: 1;
+}
+
+.book-your-harbour-walk .checkbox2 {
+  background: #ffffff;
+    border-radius: 3px;
+    border-style: solid;
+    border-color: #dddcd3;
+    border-width: 1px;
+    display: flex;
+    flex-direction: row;
+    gap: 0px;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .action {
+  background: #1E3A8A;
+    border-radius: 6px;
+    border-style: solid;
+    border-color: #1E3A8A;
+    border-width: 1px;
+    padding: 0px 20px 0px 20px;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    align-self: stretch;
+    flex-shrink: 0;
+    height: 48px;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .lock-keyhole3 {
+  flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    position: relative;
+    overflow: visible;
+}
+
+.book-your-harbour-walk .label4 {
+  color: #ffffff;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    position: relative;
+}
+
+.book-your-harbour-walk .payment-assurance {
+  color: #66746e;
+    text-align: center;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    line-height: 150%;
+    font-weight: 400;
+    position: relative;
+    align-self: stretch;
+}
+
+.book-your-harbour-walk .order-sidebar {
+  display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    width: 392px;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .booking-summary {
+  background: #ffffff;
+    border-radius: 12px;
+    border-style: solid;
+    border-color: #dddcd3;
+    border-width: 1px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .summary-heading {
+  display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .title3 {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 20px;
+    font-weight: 400;
+    position: relative;
+}
+
+.book-your-harbour-walk .edit {
+  color: #1E3A8A;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    text-decoration: underline;
+    position: relative;
+}
+
+.book-your-harbour-walk .event-image {
+  border-radius: 6px;
+    align-self: stretch;
+    flex-shrink: 0;
+    height: 170px;
+    position: relative;
+    object-fit: cover;
+}
+
+.book-your-harbour-walk .event-title {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 23px;
+    line-height: 130%;
+    letter-spacing: -0.6undefined;
+    font-weight: 400;
+    position: relative;
+    align-self: stretch;
+}
+
+.book-your-harbour-walk .event-fact {
+  display: flex;
+    flex-direction: row;
+    gap: 12px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .calendar-days {
+  flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    position: relative;
+    overflow: visible;
+}
+
+.book-your-harbour-walk .information {
+  display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .label5 {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    position: relative;
+}
+
+.book-your-harbour-walk .value2 {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    position: relative;
+    align-self: stretch;
+}
+
+.book-your-harbour-walk .supporting-detail {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    line-height: 150%;
+    font-weight: 400;
+    position: relative;
+    align-self: stretch;
+}
+
+.book-your-harbour-walk .map-pin {
+  flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    position: relative;
+    overflow: visible;
+}
+
+.book-your-harbour-walk .price-item {
+  display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .item {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    position: relative;
+}
+
+.book-your-harbour-walk .amount {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Medium", sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    position: relative;
+}
+
+.book-your-harbour-walk .item2 {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    position: relative;
+}
+
+.book-your-harbour-walk .amount2 {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 24px;
+    font-weight: 400;
+    position: relative;
+}
+
+.book-your-harbour-walk .tax-note {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    position: relative;
+}
+
+.book-your-harbour-walk .cancellation-policy {
+  background: #eaf1eb;
+    border-radius: 12px;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .shield-check {
+  flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    position: relative;
+    overflow: visible;
+}
+
+.book-your-harbour-walk .title4 {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    position: relative;
+}
+
+.book-your-harbour-walk .policy {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 13px;
+    line-height: 165%;
+    font-weight: 400;
+    position: relative;
+    align-self: stretch;
+}
+
+.book-your-harbour-walk .booking-support {
+  padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .title5 {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 15px;
+    font-weight: 400;
+    position: relative;
+}
+
+.book-your-harbour-walk .phone {
+  color: #1E3A8A;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 15px;
+    font-weight: 400;
+    position: relative;
+}
+
+.book-your-harbour-walk .availability {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    position: relative;
+}
+
+.book-your-harbour-walk .visitor-footer {
+  background: #efeadf;
+    padding: 28px 64px 28px 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .legal-information {
+  display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .disclosure {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    position: relative;
+}
+
+.book-your-harbour-walk .legal-links {
+  display: flex;
+    flex-direction: row;
+    gap: 24px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.book-your-harbour-walk .accessibility {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    position: relative;
+}
+
+.book-your-harbour-walk .privacy {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    position: relative;
+}
+
+.book-your-harbour-walk .terms {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    position: relative;
+}
+
+
+.harbour-walk-booking-confirmed,
+.harbour-walk-booking-confirmed * {
+  box-sizing: border-box;
+}
+
+.harbour-walk-booking-confirmed {
+  background: #f8f6f1;
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    min-height: 1100px;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-booking-confirmed .visitor-navigation {
+  background: #ffffff;
+  border-style: solid;
+  border-color: #dddcd3;
+  border-width: 0px 0px 1px 0px;
+  padding: 0 clamp(16px, 2.5vw, 36px);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  align-self: stretch;
+  width: 100%;
+  max-width: 100vw;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  min-height: 76px;
+  height: 80px;
+  position: relative;
+  overflow: visible;
+  gap: 12px;
+}
+
+.harbour-walk-booking-confirmed .alderhaven-identity {
+  display: flex;
+    flex-direction: row;
+    gap: 12px;
+    align-items: center;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-booking-confirmed .local-emblem {
+  background: #1E3A8A;
+    border-radius: 100px;
+    display: flex;
+    flex-direction: row;
+    gap: 0px;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 42px;
+    height: 42px;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-booking-confirmed .waves {
+  flex-shrink: 0;
+    width: 25px;
+    height: 25px;
+    position: relative;
+    overflow: visible;
+}
+
+.harbour-walk-booking-confirmed .wordmark {
+  display: flex;
+    flex-direction: column;
+    gap: 3px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-booking-confirmed .locality {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 22px;
+    letter-spacing: -0.7undefined;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-booking-confirmed .office {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Medium", sans-serif;
+    font-size: 10px;
+    letter-spacing: 1.5undefined;
+    font-weight: 500;
+    position: relative;
+}
+
+.harbour-walk-booking-confirmed .visitor-actions {
+  display: flex;
+    flex-direction: row;
+    gap: 20px;
+    align-items: center;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-booking-confirmed .support {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-booking-confirmed .lock-keyhole {
+  flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    position: relative;
+    overflow: visible;
+}
+
+.harbour-walk-booking-confirmed .confirmation-content {
+  padding: 36px 176px 48px 176px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-booking-confirmed .booking-progress {
+  display: flex;
+    flex-direction: row;
+    gap: 16px;
+    align-items: center;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-booking-confirmed .step {
+  display: flex;
+    flex-direction: row;
+    gap: 9px;
+    align-items: center;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-booking-confirmed .step-marker {
+  background: #1E3A8A;
+    border-radius: 100px;
+    display: flex;
+    flex-direction: row;
+    gap: 0px;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-booking-confirmed .number {
+  color: #ffffff;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    position: relative;
+}
+
+.harbour-walk-booking-confirmed .step-label {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-booking-confirmed .connector {
+  background: #dddcd3;
+    flex-shrink: 0;
+    width: 56px;
+    height: 1px;
+    position: relative;
+}
+
+.harbour-walk-booking-confirmed .step-label2 {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    position: relative;
+}
+
+.harbour-walk-booking-confirmed .success-message {
+  padding: 6px 0px 0px 0px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-booking-confirmed .success-seal {
+  background: #eaf1eb;
+    border-radius: 100px;
+    display: flex;
+    flex-direction: row;
+    gap: 0px;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 58px;
+    height: 58px;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-booking-confirmed .check {
+  flex-shrink: 0;
+    width: 29px;
+    height: 29px;
+    position: relative;
+    overflow: visible;
+}
+
+.harbour-walk-booking-confirmed .title {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 40px;
+    letter-spacing: -1.5undefined;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-booking-confirmed .email-confirmation {
+  color: #66746e;
+    text-align: center;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 15px;
+    line-height: 165%;
+    font-weight: 400;
+    position: relative;
+    align-self: stretch;
+}
+
+.harbour-walk-booking-confirmed .confirmed-booking {
+  background: #ffffff;
+    border-radius: 12px;
+    border-style: solid;
+    border-color: #dddcd3;
+    border-width: 1px;
+    display: flex;
+    flex-direction: row;
+    gap: 0px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-booking-confirmed .your-experience {
+  background: #f3f5f1;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    width: 440px;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-booking-confirmed .coastal-walk {
+  border-radius: 6px;
+    align-self: stretch;
+    flex-shrink: 0;
+    height: 194px;
+    position: relative;
+    object-fit: cover;
+}
+
+.harbour-walk-booking-confirmed .category {
+  color: #1E3A8A;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 10px;
+    letter-spacing: 1.7undefined;
+    font-weight: 600;
+    position: relative;
+}
+
+.harbour-walk-booking-confirmed .event-title {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 26px;
+    letter-spacing: -0.6undefined;
+    font-weight: 400;
+    position: relative;
+    align-self: stretch;
+}
+
+.harbour-walk-booking-confirmed .event-fact {
+  display: flex;
+    flex-direction: row;
+    gap: 12px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-booking-confirmed .calendar-days {
+  flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    position: relative;
+    overflow: visible;
+}
+
+.harbour-walk-booking-confirmed .information {
+  display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-booking-confirmed .label {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-booking-confirmed .value {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    position: relative;
+    align-self: stretch;
+}
+
+.harbour-walk-booking-confirmed .supporting-detail {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    line-height: 150%;
+    font-weight: 400;
+    position: relative;
+    align-self: stretch;
+}
+
+.harbour-walk-booking-confirmed .map-pin {
+  flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    position: relative;
+    overflow: visible;
+}
+
+.harbour-walk-booking-confirmed .booking-receipt {
+  padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-booking-confirmed .reference-heading {
+  display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-booking-confirmed .heading {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 20px;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-booking-confirmed .status {
+  background: #eaf1eb;
+    border-radius: 100px;
+    padding: 6px 10px 6px 10px;
+    display: flex;
+    flex-direction: row;
+    gap: 0px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-booking-confirmed .label2 {
+  color: #1E3A8A;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    position: relative;
+}
+
+.harbour-walk-booking-confirmed .booking-reference {
+  display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-booking-confirmed .label3 {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-booking-confirmed .reference {
+  color: #1E3A8A;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 27px;
+    letter-spacing: 1undefined;
+    font-weight: 600;
+    position: relative;
+}
+
+.harbour-walk-booking-confirmed .divider {
+  background: #dddcd3;
+    align-self: stretch;
+    flex-shrink: 0;
+    height: 1px;
+    position: relative;
+}
+
+.harbour-walk-booking-confirmed .attendees-and-payment {
+  display: flex;
+    flex-direction: row;
+    gap: 32px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-booking-confirmed .attendee-list {
+  display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-booking-confirmed .attendee {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-booking-confirmed .payment-receipt {
+  display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    width: 158px;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-booking-confirmed .amount {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 28px;
+    font-weight: 600;
+    position: relative;
+}
+
+.harbour-walk-booking-confirmed .method {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-booking-confirmed .payment-date {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-booking-confirmed .action {
+  background: #1E3A8A;
+    border-radius: 6px;
+    border-style: solid;
+    border-color: #1E3A8A;
+    border-width: 1px;
+    padding: 0px 20px 0px 20px;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    align-self: stretch;
+    flex-shrink: 0;
+    height: 48px;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-booking-confirmed .download {
+  flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    position: relative;
+    overflow: visible;
+}
+
+.harbour-walk-booking-confirmed .label4 {
+  color: #ffffff;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    position: relative;
+}
+
+.harbour-walk-booking-confirmed .other-actions {
+  display: flex;
+    flex-direction: row;
+    gap: 12px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-booking-confirmed .action2 {
+  background: #ffffff;
+    border-radius: 6px;
+    border-style: solid;
+    border-color: #dddcd3;
+    border-width: 1px;
+    padding: 0px 20px 0px 20px;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    height: 48px;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-booking-confirmed .calendar-plus {
+  flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    position: relative;
+    overflow: visible;
+}
+
+.harbour-walk-booking-confirmed .label5 {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    position: relative;
+}
+
+.harbour-walk-booking-confirmed .cancellation-window {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    line-height: 160%;
+    font-weight: 400;
+    position: relative;
+    align-self: stretch;
+}
+
+.harbour-walk-booking-confirmed .prepare-for-your-visit {
+  display: flex;
+    flex-direction: column;
+    gap: 18px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-booking-confirmed .heading2 {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 23px;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-booking-confirmed .visitor-checklist {
+  display: flex;
+    flex-direction: row;
+    gap: 24px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-booking-confirmed .preparation-tip {
+  display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-booking-confirmed .ticket {
+  flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    position: relative;
+    overflow: visible;
+}
+
+.harbour-walk-booking-confirmed .title2 {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    position: relative;
+}
+
+.harbour-walk-booking-confirmed .description {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 13px;
+    line-height: 160%;
+    font-weight: 400;
+    position: relative;
+    align-self: stretch;
+}
+
+.harbour-walk-booking-confirmed .footprints {
+  flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    position: relative;
+    overflow: visible;
+}
+
+.harbour-walk-booking-confirmed .clock-3 {
+  flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    position: relative;
+    overflow: visible;
+}
+
+.harbour-walk-booking-confirmed .return-to-discovery {
+  padding: 8px 0px 0px 0px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-booking-confirmed .support2 {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-booking-confirmed .explore-link {
+  color: #1E3A8A;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-booking-confirmed .visitor-footer {
+  background: #efeadf;
+    padding: 28px 64px 28px 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-booking-confirmed .legal-information {
+  display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-booking-confirmed .disclosure {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-booking-confirmed .legal-links {
+  display: flex;
+    flex-direction: row;
+    gap: 24px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.harbour-walk-booking-confirmed .accessibility {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-booking-confirmed .privacy {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    position: relative;
+}
+
+.harbour-walk-booking-confirmed .terms {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    position: relative;
+}
+
+
+.tourism-office-bookings-dashboard,
+.tourism-office-bookings-dashboard * {
+  box-sizing: border-box;
+}
+
+.tourism-office-bookings-dashboard {
+  background: #f8f6f1;
+    display: flex;
+    flex-direction: row;
+    gap: 0px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    min-height: 1100px;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .office-navigation {
+  background: #ffffff;
+    border-style: solid;
+    border-color: #dddcd3;
+    border-width: 0px 1px 0px 0px;
+    padding: 32px 20px 24px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    align-self: stretch;
+    flex-shrink: 0;
+    width: 232px;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .navigation-group {
+  display: flex;
+    flex-direction: column;
+    gap: 36px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .alderhaven-identity {
+  display: flex;
+    flex-direction: row;
+    gap: 12px;
+    align-items: center;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .local-emblem {
+  background: #1E3A8A;
+    border-radius: 100px;
+    display: flex;
+    flex-direction: row;
+    gap: 0px;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 42px;
+    height: 42px;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .waves {
+  flex-shrink: 0;
+    width: 25px;
+    height: 25px;
+    position: relative;
+    overflow: visible;
+}
+
+.tourism-office-bookings-dashboard .wordmark {
+  display: flex;
+    flex-direction: column;
+    gap: 3px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .locality {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 22px;
+    letter-spacing: -0.7undefined;
+    font-weight: 400;
+    position: relative;
+}
+
+.tourism-office-bookings-dashboard .office {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Medium", sans-serif;
+    font-size: 10px;
+    letter-spacing: 1.5undefined;
+    font-weight: 500;
+    position: relative;
+}
+
+.tourism-office-bookings-dashboard .workspace {
+  display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .section-label {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 10px;
+    letter-spacing: 1.5undefined;
+    font-weight: 600;
+    position: relative;
+}
+
+.tourism-office-bookings-dashboard .navigation-item {
+  background: rgba(0, 0, 0, 0);
+    border-radius: 6px;
+    padding: 0px 12px 0px 12px;
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    align-items: center;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    height: 46px;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .layout-dashboard {
+  flex-shrink: 0;
+    width: 19px;
+    height: 19px;
+    position: relative;
+    overflow: visible;
+}
+
+.tourism-office-bookings-dashboard .label {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    position: relative;
+}
+
+.tourism-office-bookings-dashboard .calendar-days {
+  flex-shrink: 0;
+    width: 19px;
+    height: 19px;
+    position: relative;
+    overflow: visible;
+}
+
+.tourism-office-bookings-dashboard .navigation-item2 {
+  background: #eaf1eb;
+    border-radius: 6px;
+    padding: 0px 12px 0px 12px;
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    align-items: center;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    height: 46px;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .ticket {
+  flex-shrink: 0;
+    width: 19px;
+    height: 19px;
+    position: relative;
+    overflow: visible;
+}
+
+.tourism-office-bookings-dashboard .label2 {
+  color: #1E3A8A;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    position: relative;
+}
+
+.tourism-office-bookings-dashboard .count {
+  background: #1E3A8A;
+    border-radius: 6px;
+    padding: 3px 6px 3px 6px;
+    display: flex;
+    flex-direction: row;
+    gap: 0px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .value {
+  color: #ffffff;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 10px;
+    font-weight: 400;
+    position: relative;
+}
+
+.tourism-office-bookings-dashboard .users {
+  flex-shrink: 0;
+    width: 19px;
+    height: 19px;
+    position: relative;
+    overflow: visible;
+}
+
+.tourism-office-bookings-dashboard .chart-no-axes-combined {
+  flex-shrink: 0;
+    width: 19px;
+    height: 19px;
+    position: relative;
+    overflow: visible;
+}
+
+.tourism-office-bookings-dashboard .utility-navigation {
+  display: flex;
+    flex-direction: column;
+    gap: 18px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .utility-link {
+  padding: 0px 0px 0px 12px;
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    align-items: center;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .settings {
+  flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    position: relative;
+    overflow: visible;
+}
+
+.tourism-office-bookings-dashboard .label3 {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    position: relative;
+}
+
+.tourism-office-bookings-dashboard .circle-help {
+  flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    position: relative;
+    overflow: visible;
+}
+
+.tourism-office-bookings-dashboard .external-link {
+  flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    position: relative;
+    overflow: visible;
+}
+
+.tourism-office-bookings-dashboard .staff-account {
+  display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .office-note {
+  background: #efeadf;
+    border-radius: 6px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .title {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    position: relative;
+}
+
+.tourism-office-bookings-dashboard .description {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 11px;
+    line-height: 160%;
+    font-weight: 400;
+    position: relative;
+    align-self: stretch;
+}
+
+.tourism-office-bookings-dashboard .profile {
+  display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .avatar {
+  background: #eaf1eb;
+    border-radius: 100px;
+    display: flex;
+    flex-direction: row;
+    gap: 0px;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .initials {
+  color: #1E3A8A;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    position: relative;
+}
+
+.tourism-office-bookings-dashboard .staff-identity {
+  display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .name {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    position: relative;
+}
+
+.tourism-office-bookings-dashboard .role {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    position: relative;
+}
+
+.tourism-office-bookings-dashboard .bookings-workspace {
+  display: flex;
+    flex-direction: column;
+    gap: 0px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .office-top-bar {
+  background: #ffffff;
+    border-style: solid;
+    border-color: #dddcd3;
+    border-width: 0px 0px 1px 0px;
+    padding: 0px 32px 0px 32px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    align-self: stretch;
+    flex-shrink: 0;
+    height: 80px;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .breadcrumb {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    position: relative;
+}
+
+.tourism-office-bookings-dashboard .workspace-controls {
+  display: flex;
+    flex-direction: row;
+    gap: 24px;
+    align-items: center;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .today {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    position: relative;
+}
+
+.tourism-office-bookings-dashboard .bell {
+  flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    position: relative;
+    overflow: visible;
+}
+
+.tourism-office-bookings-dashboard .status {
+  background: #f3f5f1;
+    border-radius: 100px;
+    padding: 6px 10px 6px 10px;
+    display: flex;
+    flex-direction: row;
+    gap: 0px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .label4 {
+  color: #1E3A8A;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    position: relative;
+}
+
+.tourism-office-bookings-dashboard .dashboard-content {
+  padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .page-heading {
+  display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .heading-copy {
+  display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .title2 {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 32px;
+    letter-spacing: -1undefined;
+    font-weight: 400;
+    position: relative;
+}
+
+.tourism-office-bookings-dashboard .description2 {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    position: relative;
+}
+
+.tourism-office-bookings-dashboard .management-actions {
+  display: flex;
+    flex-direction: row;
+    gap: 12px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .action {
+  background: #ffffff;
+    border-radius: 6px;
+    border-style: solid;
+    border-color: #dddcd3;
+    border-width: 1px;
+    padding: 0px 20px 0px 20px;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    height: 48px;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .download {
+  flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    position: relative;
+    overflow: visible;
+}
+
+.tourism-office-bookings-dashboard .label5 {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    position: relative;
+}
+
+.tourism-office-bookings-dashboard .action2 {
+  background: #1E3A8A;
+    border-radius: 6px;
+    border-style: solid;
+    border-color: #1E3A8A;
+    border-width: 1px;
+    padding: 0px 20px 0px 20px;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    height: 48px;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .plus {
+  flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    position: relative;
+    overflow: visible;
+}
+
+.tourism-office-bookings-dashboard .label6 {
+  color: #ffffff;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    position: relative;
+}
+
+.tourism-office-bookings-dashboard .monthly-metrics {
+  display: flex;
+    flex-direction: row;
+    gap: 16px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .booking-metric {
+  background: #ffffff;
+    border-radius: 12px;
+    border-style: solid;
+    border-color: #dddcd3;
+    border-width: 1px;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .metric-heading {
+  display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .ticket2 {
+  flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    position: relative;
+    overflow: visible;
+}
+
+.tourism-office-bookings-dashboard .value2 {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 32px;
+    letter-spacing: -1undefined;
+    font-weight: 600;
+    position: relative;
+}
+
+.tourism-office-bookings-dashboard .context {
+  color: #1E3A8A;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    position: relative;
+    align-self: stretch;
+}
+
+.tourism-office-bookings-dashboard .users2 {
+  flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    position: relative;
+    overflow: visible;
+}
+
+.tourism-office-bookings-dashboard .wallet {
+  flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    position: relative;
+    overflow: visible;
+}
+
+.tourism-office-bookings-dashboard .clock-3 {
+  flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    position: relative;
+    overflow: visible;
+}
+
+.tourism-office-bookings-dashboard .booking-register {
+  background: #ffffff;
+    border-radius: 12px;
+    border-style: solid;
+    border-color: #dddcd3;
+    border-width: 1px;
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .status-tabs {
+  border-style: solid;
+    border-color: #dddcd3;
+    border-width: 0px 0px 1px 0px;
+    padding: 20px 20px 16px 20px;
+    display: flex;
+    flex-direction: row;
+    gap: 24px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .status-tab {
+  border-style: solid;
+    border-color: #1E3A8A;
+    border-width: 0px 0px 2px 0px;
+    padding: 0px 0px 10px 0px;
+    display: flex;
+    flex-direction: row;
+    gap: 0px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .label7 {
+  color: #1E3A8A;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    position: relative;
+}
+
+.tourism-office-bookings-dashboard .status-tab2 {
+  border-style: solid;
+    border-color: rgba(0, 0, 0, 0);
+    border-width: 0px 0px 2px 0px;
+    padding: 0px 0px 10px 0px;
+    display: flex;
+    flex-direction: row;
+    gap: 0px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .register-filters {
+  padding: 20px;
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    align-items: center;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .booking-search {
+  border-radius: 6px;
+    border-style: solid;
+    border-color: #dddcd3;
+    border-width: 1px;
+    padding: 0px 13px 0px 13px;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+    justify-content: flex-start;
+    flex: 1;
+    height: 42px;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .search {
+  flex-shrink: 0;
+    width: 17px;
+    height: 17px;
+    position: relative;
+    overflow: visible;
+}
+
+.tourism-office-bookings-dashboard .placeholder {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    position: relative;
+}
+
+.tourism-office-bookings-dashboard .filter {
+  border-radius: 6px;
+    border-style: solid;
+    border-color: #dddcd3;
+    border-width: 1px;
+    padding: 0px 14px 0px 14px;
+    display: flex;
+    flex-direction: row;
+    gap: 22px;
+    align-items: center;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    height: 42px;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .label8 {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    position: relative;
+}
+
+.tourism-office-bookings-dashboard .chevron-down {
+  flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+    position: relative;
+    overflow: visible;
+}
+
+.tourism-office-bookings-dashboard .chevron-down2 {
+  flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+    position: relative;
+    overflow: visible;
+}
+
+.tourism-office-bookings-dashboard .additional-filters {
+  border-radius: 6px;
+    border-style: solid;
+    border-color: #dddcd3;
+    border-width: 1px;
+    padding: 0px 14px 0px 14px;
+    display: flex;
+    flex-direction: row;
+    gap: 7px;
+    align-items: center;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    height: 42px;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .sliders-horizontal {
+  flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    position: relative;
+    overflow: visible;
+}
+
+.tourism-office-bookings-dashboard .register-header {
+  background: #f3f5f1;
+    padding: 0px 20px 0px 20px;
+    display: flex;
+    flex-direction: row;
+    gap: 14px;
+    align-items: center;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    height: 42px;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .selection {
+  display: flex;
+    flex-direction: row;
+    gap: 0px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    width: 22px;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .select-booking {
+  background: #ffffff;
+    border-radius: 3px;
+    border-style: solid;
+    border-color: #dddcd3;
+    border-width: 1px;
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    position: relative;
+}
+
+.tourism-office-bookings-dashboard .column-label {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    position: relative;
+    width: 100px;
+}
+
+.tourism-office-bookings-dashboard .column-label2 {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    position: relative;
+    width: 168px;
+}
+
+.tourism-office-bookings-dashboard .column-label3 {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    position: relative;
+    flex: 1;
+}
+
+.tourism-office-bookings-dashboard .column-label4 {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    position: relative;
+    width: 92px;
+}
+
+.tourism-office-bookings-dashboard .column-label5 {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    position: relative;
+    width: 44px;
+}
+
+.tourism-office-bookings-dashboard .column-label6 {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    position: relative;
+    width: 66px;
+}
+
+.tourism-office-bookings-dashboard .column-label7 {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    position: relative;
+    width: 32px;
+}
+
+.tourism-office-bookings-dashboard .booking-record {
+  background: #f2f7f1;
+    border-style: solid;
+    border-color: #dddcd3;
+    border-width: 0px 0px 1px 0px;
+    padding: 0px 20px 0px 20px;
+    display: flex;
+    flex-direction: row;
+    gap: 14px;
+    align-items: center;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    height: 76px;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .reference {
+  color: #1E3A8A;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    position: relative;
+    width: 100px;
+}
+
+.tourism-office-bookings-dashboard .guest {
+  display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    width: 168px;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .name2 {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    position: relative;
+    align-self: stretch;
+}
+
+.tourism-office-bookings-dashboard .email {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    position: relative;
+    align-self: stretch;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.tourism-office-bookings-dashboard .event {
+  display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .title3 {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Medium", sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    position: relative;
+    align-self: stretch;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.tourism-office-bookings-dashboard .category-and-time {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    position: relative;
+}
+
+.tourism-office-bookings-dashboard .event-date {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    position: relative;
+    width: 92px;
+}
+
+.tourism-office-bookings-dashboard .ticket-count {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    position: relative;
+    width: 44px;
+}
+
+.tourism-office-bookings-dashboard .total {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Medium", sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    position: relative;
+    width: 66px;
+}
+
+.tourism-office-bookings-dashboard .booking-status {
+  display: flex;
+    flex-direction: row;
+    gap: 0px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    width: 92px;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .status2 {
+  background: #eaf1eb;
+    border-radius: 100px;
+    padding: 6px 10px 6px 10px;
+    display: flex;
+    flex-direction: row;
+    gap: 0px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .view-action {
+  color: #1E3A8A;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    position: relative;
+    width: 32px;
+}
+
+.tourism-office-bookings-dashboard .booking-record2 {
+  background: #ffffff;
+    border-style: solid;
+    border-color: #dddcd3;
+    border-width: 0px 0px 1px 0px;
+    padding: 0px 20px 0px 20px;
+    display: flex;
+    flex-direction: row;
+    gap: 14px;
+    align-items: center;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    height: 76px;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .status3 {
+  background: #faefd9;
+    border-radius: 100px;
+    padding: 6px 10px 6px 10px;
+    display: flex;
+    flex-direction: row;
+    gap: 0px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .label9 {
+  color: #865728;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    position: relative;
+}
+
+.tourism-office-bookings-dashboard .status4 {
+  background: #f7eae6;
+    border-radius: 100px;
+    padding: 6px 10px 6px 10px;
+    display: flex;
+    flex-direction: row;
+    gap: 0px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .label10 {
+  color: #9f5146;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    position: relative;
+}
+
+.tourism-office-bookings-dashboard .register-pagination {
+  padding: 0px 20px 0px 20px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    align-self: stretch;
+    flex-shrink: 0;
+    height: 62px;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .result-count {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    position: relative;
+}
+
+.tourism-office-bookings-dashboard .pagination-actions {
+  display: flex;
+    flex-direction: row;
+    gap: 16px;
+    align-items: center;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .previous-page {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    position: relative;
+}
+
+.tourism-office-bookings-dashboard .current-page {
+  background: #eaf1eb;
+    border-radius: 6px;
+    padding: 7px 11px 7px 11px;
+    display: flex;
+    flex-direction: row;
+    gap: 0px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .page {
+  color: #1E3A8A;
+    text-align: left;
+    font-family: "Inter-SemiBold", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    position: relative;
+}
+
+.tourism-office-bookings-dashboard .next-page {
+  color: #1E3A8A;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    position: relative;
+}
+
+.tourism-office-bookings-dashboard .operational-overview {
+  display: flex;
+    flex-direction: row;
+    gap: 24px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .upcoming-availability {
+  background: #ffffff;
+    border-radius: 12px;
+    border-style: solid;
+    border-color: #dddcd3;
+    border-width: 1px;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .heading {
+  display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .title4 {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 17px;
+    font-weight: 400;
+    position: relative;
+}
+
+.tourism-office-bookings-dashboard .link {
+  color: #1E3A8A;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    position: relative;
+}
+
+.tourism-office-bookings-dashboard .event-capacity {
+  display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .capacity-label {
+  display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .event2 {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    position: relative;
+}
+
+.tourism-office-bookings-dashboard .booked-places {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    position: relative;
+}
+
+.tourism-office-bookings-dashboard .capacity-track {
+  background: #efeadf;
+    border-radius: 100px;
+    display: flex;
+    flex-direction: row;
+    gap: 0px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    height: 5px;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .filled-capacity {
+  background: #1E3A8A;
+    border-radius: 100px;
+    flex-shrink: 0;
+    width: 197px;
+    height: 5px;
+    position: relative;
+}
+
+.tourism-office-bookings-dashboard .filled-capacity2 {
+  background: #1E3A8A;
+    border-radius: 100px;
+    flex-shrink: 0;
+    width: 369px;
+    height: 5px;
+    position: relative;
+}
+
+.tourism-office-bookings-dashboard .filled-capacity3 {
+  background: #1E3A8A;
+    border-radius: 100px;
+    flex-shrink: 0;
+    width: 344px;
+    height: 5px;
+    position: relative;
+}
+
+.tourism-office-bookings-dashboard .recent-activity {
+  background: #ffffff;
+    border-radius: 12px;
+    border-style: solid;
+    border-color: #dddcd3;
+    border-width: 1px;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .live-status {
+  color: #1E3A8A;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    position: relative;
+}
+
+.tourism-office-bookings-dashboard .activity-item {
+  display: flex;
+    flex-direction: row;
+    gap: 12px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .circle-check {
+  flex-shrink: 0;
+    width: 17px;
+    height: 17px;
+    position: relative;
+    overflow: visible;
+}
+
+.tourism-office-bookings-dashboard .activity-detail {
+  display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.tourism-office-bookings-dashboard .title5 {
+  color: #243c37;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    position: relative;
+    align-self: stretch;
+}
+
+.tourism-office-bookings-dashboard .metadata {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    position: relative;
+    align-self: stretch;
+}
+
+.tourism-office-bookings-dashboard .mail {
+  flex-shrink: 0;
+    width: 17px;
+    height: 17px;
+    position: relative;
+    overflow: visible;
+}
+
+.tourism-office-bookings-dashboard .rotate-ccw {
+  flex-shrink: 0;
+    width: 17px;
+    height: 17px;
+    position: relative;
+    overflow: visible;
+}
+
+.tourism-office-bookings-dashboard .system-note {
+  color: #66746e;
+    text-align: left;
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    position: relative;
+    align-self: stretch;
+}
+:root {
+  --color-primary: #1E3A8A;
+  --color-primary-hover: #1E40AF;
+  --color-secondary: #D97706;
+  --color-secondary-hover: #B45309;
+  --color-neutral-dark: #1F2937;
+  --color-neutral-light: #F3F4F6;
+  --color-success: #16A34A;
+  --color-danger: #DC2626;
+  --color-danger-hover: #B91C1C;
+  --btn-height: 44px;
+  --btn-radius: 8px;
+}
+
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, a:focus-visible {
+  outline: 2px solid #1E3A8A !important;
+  outline-offset: 2px !important;
+}
+
+.nav-auth-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 38px;
+  padding: 0 14px;
+  background: #1E3A8A;
+  color: #FFFFFF;
+  border: 1px solid #1E3A8A;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.nav-auth-btn:hover {
+  background: #1E40AF;
+  border-color: #1E40AF;
+}
+
+.nav-register-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 38px;
+  padding: 0 14px;
+  background: transparent;
+  color: #D97706;
+  border: 1px solid #D97706;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.nav-register-btn:hover {
+  background: #FEF3C7;
+}
+
+.nav-user-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 38px;
+  padding: 0 10px;
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #1E3A8A;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  max-width: clamp(140px, 14vw, 200px);
+  overflow: hidden;
+  white-space: nowrap;
+  flex-shrink: 1;
+}
+.nav-user-badge:hover {
+  background: #DBEAFE;
+}
+
+.nav-user-name-role {
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+}
+
+.nav-dash-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 38px;
+  padding: 0 12px;
+  background: #FEF3C7;
+  border: 1px solid #D97706;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #B45309;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.nav-dash-btn:hover {
+  background: #FDE68A;
+}
+
+.nav-logout-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 38px;
+  padding: 0 12px;
+  background: transparent;
+  border: 1px solid #DC2626;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #DC2626;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.nav-logout-btn:hover {
+  background: #FEE2E2;
+}
+
+.card-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  width: 100%;
+}
+
+.btn-card-details {
+  flex: 1;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #FFFFFF;
+  color: #1E3A8A;
+  border: 1.5px solid #1E3A8A;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.btn-card-details:hover {
+  background: #EFF6FF;
+}
+
+.btn-card-book {
+  flex: 1;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #1E3A8A;
+  color: #FFFFFF;
+  border: 1.5px solid #1E3A8A;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.btn-card-book:hover {
+  background: #1E40AF;
+  border-color: #1E40AF;
+}
+
+.auth-modal-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #E5E7EB;
+  padding-bottom: 8px;
+}
+.auth-tab-btn {
+  flex: 1;
+  padding: 10px 16px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #4B5563;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.auth-tab-btn.active {
+  background: #EFF6FF;
+  color: #1E3A8A;
+  border-bottom: 2px solid #1E3A8A;
+}
+
+.auth-demo-chips-box {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 18px;
+}
+.auth-demo-chips-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #1E3A8A;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.auth-demo-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.demo-chip {
+  padding: 6px 12px;
+  background: #FFFFFF;
+  color: #1E3A8A;
+  border: 1px solid #CBD5E1;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.demo-chip:hover {
+  background: #1E3A8A;
+  color: #FFFFFF;
+  border-color: #1E3A8A;
+}
+
+.ald-feedback-warning {
+  padding: 12px 16px;
+  background: #FEF3C7;
+  border: 1px solid #F59E0B;
+  border-radius: 8px;
+  color: #92400E;
+  font-size: 13px;
+  line-height: 1.4;
+  margin-bottom: 16px;
+  display: none;
+}
+
+.ald-modal-destructive {
+  max-width: 560px;
+  border-top: 4px solid #DC2626 !important;
+}
+.btn-danger-confirm {
+  background: #DC2626;
+  color: #FFFFFF;
+  border: none;
+  height: 44px;
+  padding: 0 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.btn-danger-confirm:hover {
+  background: #B91C1C;
+}
+
+.hero-carousel-container {
+  position: relative !important;
+  overflow: hidden !important;
+  border-radius: 18px !important;
+  height: 360px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-end !important;
+  align-items: flex-start !important;
+  padding: 24px !important;
+  background: #111827 !important;
+}
+
+.hero-carousel-slides {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.hero-carousel-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity 0.8s ease-in-out, transform 0.8s ease-in-out;
+  transform: scale(1.03);
+}
+
+.hero-carousel-slide.active {
+  opacity: 1;
+  transform: scale(1);
+  z-index: 2;
+}
+
+.hero-carousel-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.08) 0%, rgba(15, 23, 42, 0.58) 100%);
+  pointer-events: none;
+  z-index: 3;
+}
+
+.hero-carousel-controls {
+  position: absolute;
+  bottom: 18px;
+  right: 18px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(17, 24, 39, 0.7);
+  backdrop-filter: blur(8px);
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.hero-carousel-nav {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.2);
+  color: #FFFFFF;
+  font-size: 15px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  user-select: none;
+}
+
+.hero-carousel-nav:hover {
+  background: #D97706;
+  color: #FFFFFF;
+}
+
+.hero-carousel-dots {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.hero-carousel-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.hero-carousel-dot.active {
+  width: 16px;
+  border-radius: 8px;
+  background: #D97706;
+}
+
+.dash-sidebar-nav-item {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  height: 46px !important;
+  padding: 0 16px !important;
+  border-radius: 8px !important;
+  margin-bottom: 6px !important;
+  cursor: pointer !important;
+  font-family: inherit !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: #E0E7FF !important;
+  background: transparent !important;
+  transition: all 0.2s ease !important;
+  user-select: none !important;
+}
+
+.dash-sidebar-nav-item svg {
+  flex-shrink: 0;
+  stroke: #BFDBFE;
+  transition: stroke 0.2s ease;
+}
+
+.dash-sidebar-nav-item:hover {
+  background: rgba(255, 255, 255, 0.14) !important;
+  color: #FFFFFF !important;
+}
+
+.dash-sidebar-nav-item:hover svg {
+  stroke: #FFFFFF !important;
+}
+
+.dash-sidebar-nav-item.active {
+  background: #FFFFFF !important;
+  color: #1E3A8A !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18) !important;
+}
+
+.dash-sidebar-nav-item.active svg {
+  stroke: #1E3A8A !important;
+}
+
+.dash-sidebar-nav-item.active .dash-sidebar-label {
+  color: #1E3A8A !important;
+  font-weight: 700 !important;
+}
+
+.dash-sidebar-label {
+  color: inherit;
+  font-weight: inherit;
+}
+
+.theme-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 38px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid #D1D5DB;
+  background: #FFFFFF;
+  color: #1F2937;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.theme-toggle-btn:hover {
+  background: #F3F4F6;
+  border-color: #9CA3AF;
+}
+
+.theme-icon-sun {
+  display: none;
+  stroke: #F59E0B;
+}
+
+.theme-icon-moon {
+  display: block;
+  stroke: #1E3A8A;
+}
+
+body.dark-theme,
+html.dark-theme {
+  background-color: #0F172A !important;
+  color: #F8FAFC !important;
+}
+
+body.dark-theme .discover-alderhaven-events,
+body.dark-theme .harbour-walk-event-details,
+body.dark-theme .book-your-harbour-walk,
+body.dark-theme .harbour-walk-booking-confirmed {
+  background-color: #0F172A !important;
+  color: #F8FAFC !important;
+}
+
+body.dark-theme .visitor-navigation {
+  background: #1E293B !important;
+  border-bottom: 1px solid #334155 !important;
+}
+
+body.dark-theme .locality {
+  color: #60A5FA !important;
+}
+
+body.dark-theme .active-link {
+  color: #60A5FA !important;
+}
+
+body.dark-theme .navigation-link {
+  color: #CBD5E1 !important;
+}
+
+body.dark-theme .navigation-link:hover {
+  color: #FFFFFF !important;
+}
+
+body.dark-theme .support {
+  color: #94A3B8 !important;
+}
+
+body.dark-theme .action .label {
+  color: #CBD5E1 !important;
+}
+
+body.dark-theme .headline {
+  color: #93C5FD !important;
+}
+
+body.dark-theme .introduction {
+  color: #CBD5E1 !important;
+}
+
+body.dark-theme .community-note {
+  background: rgba(30, 58, 138, 0.4) !important;
+  border-color: #1E3A8A !important;
+}
+
+body.dark-theme .community-note .message {
+  color: #BFDBFE !important;
+}
+
+body.dark-theme .community-note svg {
+  stroke: #BFDBFE !important;
+}
+
+body.dark-theme .event-finder .search-controls {
+  background: #1E293B !important;
+  border-color: #334155 !important;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.45) !important;
+}
+
+body.dark-theme .alderhaven-search-input {
+  color: #F8FAFC !important;
+  background: transparent !important;
+}
+
+body.dark-theme .alderhaven-search-input::placeholder {
+  color: #64748B !important;
+}
+
+body.dark-theme .alderhaven-date-select {
+  background: #1E293B !important;
+  color: #F8FAFC !important;
+  border-color: #334155 !important;
+}
+
+body.dark-theme .category-filter,
+body.dark-theme .category-filter2 {
+  background: #1E293B !important;
+  border-color: #334155 !important;
+  color: #CBD5E1 !important;
+}
+
+body.dark-theme .category-filter:hover,
+body.dark-theme .category-filter2:hover {
+  border-color: #60A5FA !important;
+  color: #FFFFFF !important;
+}
+
+body.dark-theme .category-filter.active,
+body.dark-theme .category-filter2.active {
+  background: #1E3A8A !important;
+  border-color: #1E3A8A !important;
+  color: #FFFFFF !important;
+}
+
+body.dark-theme .results-heading .title {
+  color: #93C5FD !important;
+}
+
+body.dark-theme .result-count {
+  color: #94A3B8 !important;
+}
+
+body.dark-theme .sort-label {
+  color: #94A3B8 !important;
+}
+
+body.dark-theme #events-sort-select {
+  background: #1E293B !important;
+  border-color: #334155 !important;
+  color: #F8FAFC !important;
+}
+
+body.dark-theme .event-card {
+  background: #1E293B !important;
+  border-color: #334155 !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35) !important;
+}
+
+body.dark-theme .event-card .title2 {
+  color: #F8FAFC !important;
+}
+
+body.dark-theme .event-card .category {
+  color: #93C5FD !important;
+}
+
+body.dark-theme .event-card .schedule {
+  color: #CBD5E1 !important;
+}
+
+body.dark-theme .event-card .location2 {
+  color: #94A3B8 !important;
+}
+
+body.dark-theme .event-card .amount {
+  color: #93C5FD !important;
+}
+
+body.dark-theme .event-card .unit {
+  color: #94A3B8 !important;
+}
+
+body.dark-theme .event-card .booking-information {
+  border-top-color: #334155 !important;
+}
+
+body.dark-theme .event-card .date-marker {
+  background: #0F172A !important;
+  border: 1px solid #334155 !important;
+}
+
+body.dark-theme .event-card .month {
+  color: #F8FAFC !important;
+}
+
+body.dark-theme .discover-alderhaven-events .pagination {
+  border-top-color: #334155 !important;
+}
+
+body.dark-theme .pagination-page-btn,
+body.dark-theme .pagination-nav-btn {
+  background: #1E293B !important;
+  border-color: #475569 !important;
+  color: #F8FAFC !important;
+}
+
+body.dark-theme .pagination-page-btn:hover,
+body.dark-theme .pagination-nav-btn:hover:not([disabled]) {
+  background: #334155 !important;
+  border-color: #64748B !important;
+}
+
+body.dark-theme .pagination-page-btn.active {
+  background: #2563EB !important;
+  border-color: #2563EB !important;
+  color: #FFFFFF !important;
+}
+
+body.dark-theme .results-range {
+  color: #94A3B8 !important;
+}
+
+body.dark-theme .btn-card-details {
+  background: #334155 !important;
+  border-color: #475569 !important;
+  color: #F8FAFC !important;
+}
+
+body.dark-theme .btn-card-details:hover {
+  background: #475569 !important;
+  color: #FFFFFF !important;
+}
+
+body.dark-theme .community-desk-cta {
+  background: #1E293B !important;
+  border-color: #334155 !important;
+}
+
+body.dark-theme .community-desk-cta .cta-title {
+  color: #93C5FD !important;
+}
+
+body.dark-theme .community-desk-cta .cta-desc {
+  color: #CBD5E1 !important;
+}
+
+body.dark-theme footer {
+  background: #0B1120 !important;
+  border-color: #1E293B !important;
+  color: #94A3B8 !important;
+}
+
+body.dark-theme footer strong {
+  color: #93C5FD !important;
+}
+
+body.dark-theme footer a {
+  color: #60A5FA !important;
+}
+
+body.dark-theme .ald-modal-dialog {
+  background: #1E293B !important;
+  border: 1px solid #334155 !important;
+  color: #F8FAFC !important;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6) !important;
+}
+
+body.dark-theme .ald-form-input,
+body.dark-theme .ald-form-textarea,
+body.dark-theme .ald-form-select {
+  background: #0F172A !important;
+  border-color: #334155 !important;
+  color: #F8FAFC !important;
+}
+
+body.dark-theme .ald-modal-close {
+  background: #334155 !important;
+  color: #F8FAFC !important;
+}
+
+body.dark-theme .bookings-workspace {
+  background: #0F172A !important;
+}
+
+body.dark-theme .bookings-workspace .breadcrumb {
+  color: #93C5FD !important;
+}
+
+body.dark-theme .booking-metric {
+  background: #1E293B !important;
+  border-color: #334155 !important;
+}
+
+body.dark-theme .booking-metric .value2 {
+  color: #93C5FD !important;
+}
+
+body.dark-theme .booking-metric .metric-heading {
+  color: #94A3B8 !important;
+}
+
+body.dark-theme #dash-tab-bookings-view > div,
+body.dark-theme #dash-tab-events-view > div {
+  background: #1E293B !important;
+  border-color: #334155 !important;
+}
+
+body.dark-theme #dash-tab-bookings-view input {
+  background: #0F172A !important;
+  border-color: #334155 !important;
+  color: #F8FAFC !important;
+}
+
+body.dark-theme .harbour-walk-event-details .current {
+  color: #F8FAFC !important;
+}
+
+body.dark-theme .harbour-walk-event-details .parent {
+  color: #93C5FD !important;
+}
+
+body.dark-theme .harbour-walk-event-details .title {
+  color: #93C5FD !important;
+}
+
+body.dark-theme .harbour-walk-event-details .subtitle {
+  color: #CBD5E1 !important;
+}
+
+body.dark-theme .harbour-walk-event-details .paragraph {
+  color: #CBD5E1 !important;
+}
+
+body.dark-theme .harbour-walk-event-details .reserve-tickets-panel {
+  background: #1E293B !important;
+  border: 1px solid #334155 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+}
+
+body.dark-theme .harbour-walk-event-details .about-experience > div,
+body.dark-theme .harbour-walk-event-details .practical-information,
+body.dark-theme .harbour-walk-event-details .guide-profile {
+  background: #1E293B !important;
+  border-color: #334155 !important;
+  color: #E2E8F0 !important;
+}
+
+body.dark-theme .harbour-walk-event-details .heading,
+body.dark-theme .harbour-walk-event-details .heading2,
+body.dark-theme .harbour-walk-event-details .name,
+body.dark-theme .harbour-walk-event-details #details-rate-price {
+  color: #93C5FD !important;
+}
+
+body.dark-theme .harbour-walk-event-details .description,
+body.dark-theme .harbour-walk-event-details .included-copy,
+body.dark-theme .harbour-walk-event-details #details-schedule-time {
+  color: #CBD5E1 !important;
+}
+
+
+body.dark-theme .theme-toggle-btn {
+  background: #1E293B;
+  border-color: #475569;
+  color: #F8FAFC;
+}
+
+body.dark-theme .theme-toggle-btn:hover {
+  background: #334155;
+  border-color: #64748B;
+}
+
+body.dark-theme .theme-icon-sun {
+  display: block;
+}
+
+body.dark-theme .theme-icon-moon {
+  display: none;
+}
+
+.visitor-navigation {
+  width: 100% !important;
+  max-width: 100vw !important;
+  box-sizing: border-box !important;
+  padding: 0 clamp(16px, 2.5vw, 36px) !important;
+  min-height: 76px !important;
+  height: 80px !important;
+  overflow: visible !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  flex-shrink: 0 !important;
+  gap: 12px !important;
+}
+
+.explore-navigation {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: clamp(10px, 1.5vw, 24px) !important;
+  flex-shrink: 1 !important;
+  min-width: 0 !important;
+}
+
+.visitor-actions {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: clamp(6px, 0.7vw, 10px) !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  flex-shrink: 1 !important;
+  min-width: 0 !important;
+  overflow: visible !important;
+}
+
+.theme-toggle-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  height: 38px !important;
+  padding: 0 10px !important;
+  border-radius: 8px !important;
+  background: #F1F5F9 !important;
+  border: 1px solid #CBD5E1 !important;
+  color: #1E293B !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+  transition: all 0.15s ease !important;
+}
+
+.theme-toggle-btn:hover {
+  background: #E2E8F0 !important;
+  border-color: #94A3B8 !important;
+}
+
+body.dark-theme .visitor-navigation {
+  background: #0B1120 !important;
+  border-color: #1E293B !important;
+}
+
+body.dark-theme .visitor-actions .action {
+  background: #1E293B !important;
+  border-color: #334155 !important;
+  color: #F8FAFC !important;
+}
+
+body.dark-theme .visitor-actions .action .label {
+  color: #F8FAFC !important;
+}
+
+body.dark-theme .visitor-actions .support {
+  color: #94A3B8 !important;
+}
+
+body.dark-theme .visitor-actions .nav-user-badge {
+  background: #1E293B !important;
+  border-color: #3B82F6 !important;
+  color: #93C5FD !important;
+}
+
+body.dark-theme .visitor-actions .nav-dash-btn {
+  background: #451A03 !important;
+  border-color: #D97706 !important;
+  color: #FDE68A !important;
+}
+
+body.dark-theme .visitor-actions .nav-dash-btn:hover {
+  background: #78350F !important;
+}
+
+body.dark-theme .visitor-actions .nav-logout-btn {
+  background: transparent !important;
+  border-color: #EF4444 !important;
+  color: #EF4444 !important;
+}
+
+body.dark-theme .visitor-actions .nav-logout-btn:hover {
+  background: rgba(239, 68, 68, 0.15) !important;
+}
+
+body.dark-theme .logout-modal-title {
+  color: #93C5FD !important;
+}
+body.dark-theme .logout-modal-subtitle {
+  color: #94A3B8 !important;
+}
+body.dark-theme .logout-modal-desc {
+  color: #E2E8F0 !important;
+}
+
+@media (max-width: 1240px) {
+  .theme-toggle-btn .theme-toggle-label {
+    display: none !important;
+  }
+  .theme-toggle-btn {
+    padding: 0 8px !important;
+    width: 38px !important;
+  }
+  .visitor-navigation {
+    padding: 0 16px !important;
+  }
+  .nav-user-name-role {
+    max-width: 110px !important;
+  }
+  .discover-alderhaven-events .event-row {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  .explore-navigation {
+    display: none !important;
+  }
+  .visitor-navigation {
+    padding: 0 14px !important;
+  }
+  .discover-alderhaven-events .destination-introduction {
+    flex-direction: column !important;
+    padding: 28px 16px !important;
+    gap: 24px !important;
+  }
+  .discover-alderhaven-events .welcome {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .discover-alderhaven-events .destination-photograph {
+    width: 100% !important;
+    height: 300px !important;
+  }
+  .discover-alderhaven-events .event-finder {
+    padding: 0 16px 32px 16px !important;
+  }
+  .booking-workspace {
+    grid-template-columns: 1fr !important;
+  }
+  .discover-alderhaven-events .event-row {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .visitor-navigation {
+    height: auto !important;
+    min-height: 64px !important;
+    flex-wrap: wrap !important;
+    padding: 10px 14px !important;
+    gap: 10px !important;
+  }
+  .visitor-actions {
+    flex-wrap: wrap !important;
+    width: 100% !important;
+    justify-content: flex-start !important;
+    gap: 6px !important;
+  }
+  .discover-alderhaven-events .search-controls {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+  .discover-alderhaven-events .divider {
+    display: none !important;
+  }
+  .discover-alderhaven-events .date-filter {
+    width: 100% !important;
+  }
+  .discover-alderhaven-events .categories {
+    flex-wrap: wrap !important;
+  }
+  .tourism-office-bookings-dashboard {
+    flex-direction: column !important;
+  }
+  .tourism-office-sidebar {
+    width: 100% !important;
+  }
+  .monthly-metrics {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .discover-alderhaven-events .event-row {
+    grid-template-columns: 1fr !important;
+  }
+  .discover-alderhaven-events .pagination {
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    gap: 12px !important;
+  }
+}
