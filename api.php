@@ -220,7 +220,8 @@ switch ($action) {
             $viewRole = trim($_GET['role'] ?? 'user');
 
             $currentUser = getAuthenticatedUser($pdo, $_GET);
-            $isMasterTourismAdmin = ($currentUserId === 3 || $currentUserId === 10 || ($currentUser && in_array($currentUser['email'], ['tourism@iligancity.gov.ph', 'emma.lewis@visit-alderhaven.example'])));
+            $currentUserId = $currentUser ? (int)$currentUser['id'] : 0;
+            $isMasterTourismAdmin = ($currentUserId === 3 || $currentUserId === 10 || ($currentUser && ($currentUser['role'] === 'admin' || in_array($currentUser['email'], ['tourism@iligancity.gov.ph', 'emma.lewis@visit-alderhaven.example']))));
 
             $query = "SELECT e.*, 
                       u.name AS coordinator_author_name,
@@ -581,7 +582,7 @@ switch ($action) {
 
     case 'create_event':
         $currentUser = getAuthenticatedUser($pdo, $requestData);
-        if (!$currentUser || $currentUser['role'] !== 'organizer') {
+        if (!$currentUser || !in_array($currentUser['role'], ['organizer', 'admin'])) {
             sendJsonResponse(
                 false, 
                 'Coordinator Authentication Required.', 
@@ -862,7 +863,7 @@ switch ($action) {
 
     case 'delete_event':
         $currentUser = getAuthenticatedUser($pdo, $requestData);
-        if (!$currentUser || $currentUser['role'] !== 'organizer') {
+        if (!$currentUser || !in_array($currentUser['role'], ['organizer', 'admin'])) {
             sendJsonResponse(
                 false, 
                 'Coordinator Authentication Required.', 
@@ -899,7 +900,7 @@ switch ($action) {
             }
 
             $isOwner = ((int)($event['coordinator_id'] ?? 0) === (int)$currentUser['id']);
-            $isMasterTourismAdmin = ((int)$currentUser['id'] === 3 || (int)$currentUser['id'] === 10 || in_array($currentUser['email'], ['tourism@iligancity.gov.ph', 'emma.lewis@visit-alderhaven.example']));
+            $isMasterTourismAdmin = ((int)$currentUser['id'] === 3 || (int)$currentUser['id'] === 10 || $currentUser['role'] === 'admin' || in_array($currentUser['email'], ['tourism@iligancity.gov.ph', 'emma.lewis@visit-alderhaven.example']));
 
             if (!$isOwner && !$isMasterTourismAdmin) {
                 sendJsonResponse(

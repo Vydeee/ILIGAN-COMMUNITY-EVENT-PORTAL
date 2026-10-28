@@ -2,1102 +2,848 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Interactive Community Event Discovery and Booking Portal in Iligan City</title>
-  <meta name="description" content="Discover, gather, and celebrate across Iligan City. Access community gatherings, cultural festivals, eco-tourism caravans, and civic occasions." />
-  
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
-  <link rel="stylesheet" href="styles.css?v=20261016_logout_modal3">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <title>Iligan Community Event Portal | Discover and Book Local Events</title>
+  <meta name="description" content="Discover community events across Iligan City, book your pass online, and let coordinators publish events for every barangay.">
+  <meta name="theme-color" content="#1E3A8A">
+  <link rel="icon" href="images/iligan_city_seal_circle.webp" type="image/webp">
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
 </head>
 <body>
-  <canvas id="confetti-canvas" aria-hidden="true" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;"></canvas>
+  <a class="skip-link" href="#main">Skip to main content</a>
 
-  <div class="discover-alderhaven-events site-view active-view" id="view-discover">
-    <div class="visitor-navigation">
-      <div class="alderhaven-identity" onclick="window.switchView('discover')" style="cursor:pointer;" title="Iligan City Community Events Portal">
-        <div class="local-emblem" style="background:#1E3A8A;">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/>
-            <path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/>
-            <path d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/>
-          </svg>
-        </div>
-        <div class="wordmark">
-          <div class="locality" style="font-weight:800;color:#1E3A8A;letter-spacing:0.5px;">ILIGAN CITY</div>
-        </div>
-      </div>
-      <div class="explore-navigation">
-        <div class="active-link" onclick="window.showWhatsOnNav()" style="cursor:pointer;">What’s on</div>
-        <div class="navigation-link" onclick="window.showAllEventsNav()" style="cursor:pointer;">All Events</div>
-        <div class="navigation-link" onclick="window.openHelpModal()" style="cursor:pointer;">Visitor information</div>
-      </div>
-      <div class="visitor-actions" style="display:flex;align-items:center;gap:10px;">
-        <button type="button" class="theme-toggle-btn" onclick="window.toggleTheme()" title="Toggle Dark/Light Mode" aria-label="Toggle Dark/Light Mode">
-          <svg class="theme-icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-          <svg class="theme-icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-          <span class="theme-toggle-label">Theme</span>
-        </button>
-        <div class="support" onclick="window.openHelpModal()" style="cursor:pointer;font-weight:600;color:#4B5563;">Help</div>
-        <div class="action" onclick="window.handleMyBookingsClick()" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;" title="My Bookings">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1E3A8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"></path><path d="M13 5v2"></path><path d="M13 17v2"></path><path d="M13 11v2"></path></svg>
-          <div class="label">My bookings <span class="nav-bookings-count"></span></div>
-        </div>
-        <button type="button" class="nav-auth-btn nav-login-btn" onclick="window.openLoginModal('login')">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
-          <span>Sign In</span>
-        </button>
-        <button type="button" class="nav-register-btn nav-register-btn" onclick="window.openLoginModal('register')">
-          <span>Register</span>
-        </button>
-        <div class="nav-user-badge" onclick="window.openProfileModal()" style="display:none;" title="View Profile">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-          <span class="nav-user-name-role">User</span>
-        </div>
-        <button type="button" class="nav-dash-btn" onclick="window.switchView('dashboard')" style="display:none;" title="Coordinator & Admin Dashboard">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
-          <span>Dashboard</span>
-        </button>
-        <button type="button" class="nav-logout-btn" onclick="window.handleLogout()" style="display:none;" title="Sign Out">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-          <span>Sign Out</span>
-        </button>
-      </div>
-    </div>
-    
-    <div class="destination-introduction">
-      <div class="welcome">
-        <div class="headline" id="hero-headline-text" style="color:#1E3A8A;font-weight:800;font-size:36px;line-height:1.2;">
-          Discover, Gather &amp; Celebrate in Iligan City
-        </div>
-        <div class="introduction" id="hero-subtitle-text" style="color:#1F2937;font-size:16px;line-height:1.6;">
-          Equipping our community with direct and easy access to local gatherings, cultural festivals, eco-tourism caravans, and civic occasions across Iligan City.
-        </div>
-      </div>
-      <div class="destination-photograph hero-carousel-container" id="hero-destination-photo">
-        <div class="hero-carousel-slides" id="hero-carousel-slides">
-          <div class="hero-carousel-slide active" style="background-image: url('images/anahaw_amphitheater.jpg');" data-location="Anahaw Amphitheater, Buhanginan Hills, Iligan City"></div>
-          <div class="hero-carousel-slide" style="background-image: url('images/kasadya_sa_diyandi.jpg');" data-location="Kasadya sa Diyandi Street Dancing, Quezon Avenue"></div>
-          <div class="hero-carousel-slide" style="background-image: url('images/diyandi_paramotor_show.jpg');" data-location="Diyandi Paramotor Air Show, Iligan Baywalk"></div>
-          <div class="hero-carousel-slide" style="background-image: url('images/itchyworms_crowd_anahaw.jpg');" data-location="Opening Salvo Live Concert, Anahaw Amphitheater"></div>
-          <div class="hero-carousel-slide" style="background-image: url('images/civic_military_parade.jpg');" data-location="Civic-Military Parade &amp; Street Exhibition, City Streets"></div>
-          <div class="hero-carousel-slide" style="background-image: url('images/pagkanaug_san_miguel.png');" data-location="Pagkanaug ni Senior San Miguel Ceremony, St. Michael Cathedral"></div>
-        </div>
-        <div class="hero-carousel-overlay"></div>
-        <div class="place-caption" id="hero-carousel-caption" style="background:rgba(30, 58, 138, 0.88);backdrop-filter:blur(6px);padding:8px 14px;border-radius:6px;display:inline-flex;align-items:center;gap:6px;position:relative;z-index:4;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-          <div class="location" id="hero-carousel-location-text" style="color:#FFFFFF;font-weight:600;font-size:13px;">Anahaw Amphitheater, Buhanginan Hills, Iligan City</div>
-        </div>
-        <div class="hero-carousel-controls">
-          <button type="button" class="hero-carousel-nav prev" onclick="window.prevHeroSlide()" aria-label="Previous Slide">‹</button>
-          <div class="hero-carousel-dots" id="hero-carousel-dots"></div>
-          <button type="button" class="hero-carousel-nav next" onclick="window.nextHeroSlide()" aria-label="Next Slide">›</button>
-        </div>
-      </div>
-    </div>
+  <!-- ============================================ -->
+  <!--                 Navigation                   -->
+  <!-- ============================================ -->
+  <header id="cs-navigation">
+    <div class="cs-container">
+      <!-- Nav Logo -->
+      <a href="#/home" class="cs-logo" aria-label="Iligan Community Event Portal, back to home">
+        <img class="cs-logo-img" src="images/iligan_city_seal_circle.webp" alt="Iligan City Official Seal" width="44" height="44" decoding="async">
+        <span class="brand-text">
+          <span class="brand-title">Iligan City</span>
+          <span class="brand-sub">Community Event Portal</span>
+        </span>
+      </a>
 
-    <div class="event-finder" id="event-finder">
-      <div class="search-controls" style="box-shadow:0 4px 16px rgba(0,0,0,0.06);border:1px solid #E5E7EB;">
-        <div class="search-query">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-          <input type="text" id="alderhaven-search-input" class="search-real-input" placeholder="Search events, places, or keywords..." oninput="window.handleSearch(this.value)" style="width:100%;font-size:15px;" />
-        </div>
-        <div class="divider"></div>
-        <div class="date-filter">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-          <select id="alderhaven-date-select" onchange="window.handleDateSelect(this.value)" style="border:none;background:transparent;outline:none;font-family:inherit;font-size:14px;color:#1F2937;cursor:pointer;width:100%;">
-            <option value="">Any date</option>
-            <option value="2026-10">October 2026</option>
-            <option value="2026-11">November 2026</option>
-            <option value="weekend">This weekend</option>
-          </select>
-        </div>
-        <div class="action2" id="find-events-btn" onclick="window.applySearchFilter()" style="cursor:pointer;background:#1E3A8A;display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:8px;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-          <div class="label2" style="color:#FFFFFF;font-weight:700;">Find events</div>
-        </div>
-      </div>
-      <div class="categories" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;">
-        <div class="category-filter active" data-cat="All" onclick="window.filterCategory('All')"><div class="label3">All events</div></div>
-        <div class="category-filter2" data-cat="Festival" onclick="window.filterCategory('Festival')"><div class="label4">Festivals</div></div>
-        <div class="category-filter2" data-cat="Eco-Tourism" onclick="window.filterCategory('Eco-Tourism')"><div class="label4">Eco-Tourism</div></div>
-        <div class="category-filter2" data-cat="Arts & Culture" onclick="window.filterCategory('Arts & Culture')"><div class="label4">Arts &amp; Culture</div></div>
-        <div class="category-filter2" data-cat="Sports" onclick="window.filterCategory('Sports')"><div class="label4">Sports</div></div>
-        <div class="category-filter2" data-cat="LGU Public Service" onclick="window.filterCategory('LGU Public Service')"><div class="label4">LGU Public Service</div></div>
-        <div class="category-filter2" data-cat="Guided tours" onclick="window.filterCategory('Guided tours')"><div class="label4">Guided tours</div></div>
-        <div class="category-filter2" data-cat="Free events" onclick="window.filterCategory('Free events')"><div class="label4">Free events</div></div>
-      </div>
-    </div>
+      <!-- Navigation List -->
+      <nav class="cs-nav" aria-label=" main navigation">
+        <!-- Mobile Nav Toggle -->
+        <button type="button" class="cs-toggle" id="cs-toggle" aria-expanded="false" aria-controls="cs-ul-wrapper" aria-label="mobile menu toggle">
+          <span class="cs-box" aria-hidden="true">
+            <span class="cs-line cs-line1" aria-hidden="true"></span>
+            <span class="cs-line cs-line2" aria-hidden="true"></span>
+            <span class="cs-line cs-line3" aria-hidden="true"></span>
+          </span>
+        </button>
 
-    <div class="upcoming-events" id="upcoming-events-section">
-      <div class="results-heading" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;">
-        <div class="heading">
-          <div class="title" style="color:#1E3A8A;font-weight:800;font-size:28px;">Upcoming Community Gatherings</div>
-          <div class="result-count" id="events-count-badge" style="color:#4B5563;font-size:14px;margin-top:4px;">Loading upcoming events...</div>
+        <!-- Wrapper for mobile slide/scale menu -->
+        <div class="cs-ul-wrapper" id="cs-ul-wrapper">
+          <ul id="cs-expanded" class="cs-ul">
+            <li class="cs-li">
+              <a href="#/home" class="cs-li-link cs-active" data-route="home" aria-current="page">
+                Home
+              </a>
+            </li>
+            <li class="cs-li">
+              <a href="#/events" class="cs-li-link" data-route="events">
+                Discover Events
+              </a>
+            </li>
+            <li class="cs-li">
+              <a href="#/about" class="cs-li-link" data-route="about">
+                About Us
+              </a>
+            </li>
+            <li class="cs-li">
+              <a href="#/contact" class="cs-li-link" data-route="contact">
+                Contact Us
+              </a>
+            </li>
+
+            <!-- Role-Based Dropdown (Visible when signed in) -->
+            <li class="cs-li cs-dropdown" data-role="user organizer admin" hidden>
+              <button type="button" class="cs-li-link cs-dropdown-toggle" id="cs-portal-dropdown-btn" aria-haspopup="menu" aria-expanded="false">
+                My Portal
+                <svg class="cs-drop-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><polyline points="6 9 12 15 18 9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <ul class="cs-drop-ul" aria-labelledby="cs-portal-dropdown-btn">
+                <li class="cs-drop-li" data-role="user organizer admin">
+                  <a href="#/bookings" class="cs-li-link cs-drop-link" data-route="bookings">My Bookings &amp; Passes</a>
+                </li>
+                <li class="cs-drop-li" data-role="organizer" hidden>
+                  <a href="#/dashboard" class="cs-li-link cs-drop-link" data-route="dashboard">Coordinator Dashboard</a>
+                </li>
+                <li class="cs-drop-li" data-role="admin" hidden>
+                  <a href="#/admin" class="cs-li-link cs-drop-link" data-route="admin">Admin Console</a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+
+          <!-- Auth Actions inside Nav (visible in desktop header & mobile drawer) -->
+          <div class="cs-nav-actions" id="nav-guest">
+            <button type="button" class="btn btn-ghost cs-btn-signin" data-open-auth="login">Sign In</button>
+            <button type="button" class="cs-button-solid" data-open-auth="register">Create Account</button>
+          </div>
+          <div class="cs-nav-actions" id="nav-user" hidden>
+            <button type="button" class="user-chip" id="open-profile" aria-haspopup="dialog">
+              <span class="avatar" id="user-avatar" aria-hidden="true">U</span>
+              <span class="user-meta">
+                <span class="user-name" id="user-name">User</span>
+                <span class="role-badge" id="user-role">Citizen</span>
+              </span>
+            </button>
+            <button type="button" class="btn btn-ghost cs-btn-logout" id="btn-logout">Sign Out</button>
+          </div>
         </div>
-        <div class="results-toolbar-actions" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-          <div class="pages top-pagination" id="events-top-pagination-controls" style="display:flex;align-items:center;gap:6px;"></div>
-          <div class="sort" style="display:flex;align-items:center;gap:8px;">
-            <div class="sort-label" style="font-weight:600;color:#4B5563;font-size:14px;">Sort by:</div>
-            <select id="events-sort-select" onchange="window.handleSort(this.value)" style="border:1px solid #E5E7EB;border-radius:6px;padding:6px 10px;background:#FFFFFF;outline:none;font-family:inherit;font-size:14px;color:#1F2937;cursor:pointer;">
-              <option value="soonest">Soonest first</option>
-              <option value="price-low">Price: Low to high</option>
-              <option value="price-high">Price: High to low</option>
-              <option value="alpha">Alphabetical (A-Z)</option>
-            </select>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+
+    <!-- ===== View: Home ===== -->
+    <section class="view" id="view-home" aria-labelledby="home-heading">
+      
+      <!-- Top Carousel Section -->
+      <section class="hero-carousel" id="hero-carousel" aria-roledescription="carousel" aria-label="Featured Community Highlights">
+        <div class="carousel-track" id="carousel-track">
+          <!-- Slides populated dynamically via app.js -->
+        </div>
+
+        <!-- Carousel navigation arrows -->
+        <button type="button" class="carousel-arrow prev" id="carousel-prev" aria-label="Previous slide">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button type="button" class="carousel-arrow next" id="carousel-next" aria-label="Next slide">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+
+        <!-- Carousel footer with dots and animated progress bar -->
+        <div class="carousel-bottom">
+          <div class="carousel-dots" id="carousel-dots" role="tablist" aria-label="Choose slide to display"></div>
+          <div class="carousel-progress" aria-hidden="true">
+            <div class="carousel-progress-bar" id="carousel-progress-bar"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Floating Search & Quick Filter Dock -->
+      <div class="search-dock-wrap">
+        <div class="container">
+          <div class="search-dock card">
+            <div class="search-dock-header">
+              <h1 id="home-heading" class="search-dock-title">Find what's happening across Iligan City</h1>
+              <p class="search-dock-sub" id="hero-sub">Browse cultural festivals, eco-tourism caravans, and barangay activities, then reserve your passes in minutes.</p>
+            </div>
+            <form class="hero-search" id="hero-search" role="search">
+              <div class="search-input-wrapper">
+                <label class="visually-hidden" for="search-input">Search events</label>
+                <svg class="icon search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                <input type="search" id="search-input" placeholder="Search by event title, venue, or barangay..." autocomplete="off">
+              </div>
+              <button type="submit" class="btn btn-secondary btn-search">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                <span>Search Events</span>
+              </button>
+            </form>
+            <div class="hero-tags" id="hero-tags" aria-label="Popular barangays"></div>
           </div>
         </div>
       </div>
-      
-      <div class="event-row" id="discover-events-container">
+
+      <div class="container section">
+        <!-- Featured Events Highlights -->
+        <div id="featured-wrap" hidden>
+          <div class="section-head">
+            <div class="section-head-title">
+              <span class="eyebrow-accent">Handpicked For You</span>
+              <h2 class="h2">Featured Community Events</h2>
+            </div>
+            <a href="#/events" class="btn btn-outline btn-sm">Explore All Events &rarr;</a>
+          </div>
+          <div class="grid cards" id="featured-grid"></div>
+        </div>
+
+        <!-- Civic Portal Highlights Section -->
+        <div class="home-pillars">
+          <div class="section-head">
+            <div class="section-head-title">
+              <span class="eyebrow-accent">City of Majestic Waterfalls</span>
+              <h2 class="h2">One Portal for Every Barangay in Iligan</h2>
+            </div>
+          </div>
+          <div class="grid home-pillar-grid">
+            <article class="card home-pillar-card">
+              <div class="pillar-icon-wrap">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+              </div>
+              <h3 class="h3">Verified City &amp; Barangay Events</h3>
+              <p class="muted">From the vibrant Diyandi Festival street dances in Poblacion to eco-runs near Maria Cristina Falls, every listing is verified by official coordinators.</p>
+              <a href="#/events" class="pillar-link">Browse Event Calendar &rarr;</a>
+            </article>
+            <article class="card home-pillar-card">
+              <div class="pillar-icon-wrap">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2M13 17v2M13 11v2"/></svg>
+              </div>
+              <h3 class="h3">Instant Digital QR Passes</h3>
+              <p class="muted">Reserve free or paid seats in seconds. Receive an instant booking reference and scannable digital pass ready for venue check-in.</p>
+              <a href="#/about" class="pillar-link">Learn How It Works &rarr;</a>
+            </article>
+            <article class="card home-pillar-card">
+              <div class="pillar-icon-wrap">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </div>
+              <h3 class="h3">LGU &amp; Coordinator Tools</h3>
+              <p class="muted">Barangay captains, tourism officers, and accredited organizers can publish events, monitor real-time seat capacity, and manage attendee rosters.</p>
+              <a href="#/contact" class="pillar-link">Partner With Us &rarr;</a>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== View: Discover events ===== -->
+    <section class="view" id="view-events" aria-labelledby="events-heading" hidden>
+      <div class="page-banner">
+        <div class="container">
+          <span class="eyebrow-accent">Community Calendar</span>
+          <h1 id="events-heading" class="h1">Discover Events Across Iligan City</h1>
+          <p class="page-banner-sub">Filter by barangay, category, date, or admission type to find upcoming gatherings and reserve your pass.</p>
+          <form class="discover-search-bar" id="discover-search-form" role="search">
+            <div class="search-input-wrapper">
+              <label class="visually-hidden" for="discover-search-input">Search events</label>
+              <svg class="icon search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+              <input type="search" id="discover-search-input" placeholder="Search by event title, venue, organizer, or barangay..." autocomplete="off">
+            </div>
+            <button type="submit" class="btn btn-secondary">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+              <span>Search</span>
+            </button>
+          </form>
+        </div>
       </div>
 
-      <div class="pagination" id="discover-events-pagination">
-        <div class="results-range" id="events-pagination-summary">
-          Showing 1–8 of 30 events
+      <div class="container section">
+        <!-- All Upcoming Events Section -->
+        <div class="section-head" id="all-events-head">
+          <div class="section-head-title">
+            <span class="eyebrow-accent">Live Directory</span>
+            <h2 class="h2">All Upcoming Events</h2>
+          </div>
+          <p class="results-badge" id="results-count" aria-live="polite"></p>
         </div>
-        <div class="pages" id="events-pagination-controls">
+
+        <!-- Filter Controls -->
+        <form class="filters card" id="filters" aria-label="Filter events">
+          <div class="field">
+            <label for="f-barangay">Barangay</label>
+            <select id="f-barangay"><option value="">All barangays</option></select>
+          </div>
+          <div class="field">
+            <label for="f-price">Price</label>
+            <select id="f-price">
+              <option value="">Any price</option>
+              <option value="free">Free events only</option>
+              <option value="paid">Paid events only</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="f-date">Date from</label>
+            <input type="date" id="f-date">
+          </div>
+          <div class="field">
+            <label for="f-sort">Sort order</label>
+            <select id="f-sort">
+              <option value="date">Date: Soonest first</option>
+              <option value="price-asc">Price: Low to high</option>
+              <option value="price-desc">Price: High to low</option>
+              <option value="slots">Available seats: Most first</option>
+            </select>
+          </div>
+          <label class="check filter-check">
+            <input type="checkbox" id="f-past">
+            <span>Show concluded</span>
+          </label>
+          <button type="button" class="btn btn-ghost" id="f-reset">Reset</button>
+        </form>
+
+        <!-- Category Pills -->
+        <div class="chips-container">
+          <div class="chips" id="category-chips" role="group" aria-label="Filter by category"></div>
+        </div>
+
+        <div id="events-alert"></div>
+        
+        <!-- Events Grid -->
+        <div class="grid cards" id="events-grid" aria-live="polite"></div>
+        
+        <div class="center">
+          <button type="button" class="btn btn-outline btn-load-more" id="load-more" hidden>
+            <span>Load More Events</span>
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
         </div>
       </div>
+    </section>
+
+    <!-- ===== View: About Us ===== -->
+    <section class="view" id="view-about" aria-labelledby="about-heading" hidden>
+      <div class="page-banner">
+        <div class="container">
+          <span class="eyebrow-accent">About the Portal</span>
+          <h1 id="about-heading" class="h1">Connecting Iliganons Through Culture, Heritage &amp; Community</h1>
+          <p class="page-banner-sub">The official digital gateway for discovering festivals, civic initiatives, eco-tourism adventures, and barangay gatherings across Iligan City.</p>
+        </div>
+      </div>
+
+      <div class="container section">
+        <div class="about-split">
+          <div class="about-Lead">
+            <span class="eyebrow-accent">Our Civic Mission</span>
+            <h2 class="h2">Empowering All 44 Barangays of the City of Majestic Waterfalls</h2>
+            <p>Iligan City is home to a rich tapestry of Maranao, Higaonon, and Visayan traditions—celebrated annually during the month-long <strong>Kasadya sa Diyandi Festival</strong> in honor of Senior San Miguel, alongside year-round eco-tourism runs, culinary expos, and barangay assemblies.</p>
+            <p>The <strong>Iligan Community Event Portal</strong> was built to bridge citizens, tourists, and local event coordinators in one accessible web platform. Whether you are reserving a free seat for a cultural night at Anahaw Amphitheater or organizing a coastal clean-up in Barangay Dalipuga, our platform streamlines discovery and attendance.</p>
+            <div class="about-stats-row">
+              <div class="about-stat">
+                <span class="about-stat-num">44</span>
+                <span class="about-stat-label">Covered Barangays</span>
+              </div>
+              <div class="about-stat">
+                <span class="about-stat-num">23+</span>
+                <span class="about-stat-label">Majestic Waterfalls</span>
+              </div>
+              <div class="about-stat">
+                <span class="about-stat-num">100%</span>
+                <span class="about-stat-label">Digital QR Passes</span>
+              </div>
+            </div>
+          </div>
+          <div class="about-media-grid">
+            <img src="images/diyandi_festival_panoramic_header.webp" alt="Kasadya sa Diyandi street dancers in Iligan City" class="about-img about-img-main" loading="lazy">
+            <img src="images/anahaw_amphitheater.webp" alt="Anahaw Amphitheater in Buhanginan Hills, Iligan City" class="about-img" loading="lazy">
+            <img src="images/diyandi_paramotor_show.webp" alt="Diyandi Paramotor & Aerial Display in Iligan City" class="about-img" loading="lazy">
+          </div>
+        </div>
+
+        <div class="about-how-section">
+          <div class="section-head">
+            <div class="section-head-title">
+              <span class="eyebrow-accent">Platform Guide</span>
+              <h2 class="h2">How the Portal Works</h2>
+            </div>
+          </div>
+          <div class="grid home-pillar-grid">
+            <div class="card home-pillar-card">
+              <span class="step-badge">01</span>
+              <h3 class="h3">For Citizens &amp; Visitors</h3>
+              <p class="muted">Explore upcoming activities by barangay or category, view venue maps and schedules, and book individual or group passes with instant QR reference codes.</p>
+            </div>
+            <div class="card home-pillar-card">
+              <span class="step-badge">02</span>
+              <h3 class="h3">For Event Coordinators</h3>
+              <p class="muted">Register with an official LGU Coordinator Key to publish barangay or city events, manage seating capacity, and export verified attendee manifests.</p>
+            </div>
+            <div class="card home-pillar-card">
+              <span class="step-badge">03</span>
+              <h3 class="h3">For City Administrators</h3>
+              <p class="muted">Supervise citywide event calendars, curate featured homepage highlights, and maintain official barangay directories and popular search tags.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card about-cta-banner">
+          <div>
+            <h2 class="h2">Ready to experience Iligan's vibrant community life?</h2>
+            <p class="muted">Browse our live calendar of cultural festivals, workshops, and eco-adventures today.</p>
+          </div>
+          <div class="about-cta-actions">
+            <a href="#/events" class="btn btn-secondary">Discover Events</a>
+            <a href="#/contact" class="btn btn-outline">Contact Tourism Office</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== View: Contact Us ===== -->
+    <section class="view" id="view-contact" aria-labelledby="contact-heading" hidden>
+      <div class="page-banner">
+        <div class="container">
+          <span class="eyebrow-accent">Get in Touch</span>
+          <h1 id="contact-heading" class="h1">Contact the Iligan City Event &amp; Tourism Desk</h1>
+          <p class="page-banner-sub">Have questions about an upcoming festival, need assistance with your digital pass, or applying for an LGU Coordinator Key? Reach out to our team.</p>
+        </div>
+      </div>
+
+      <div class="container section">
+        <div class="contact-grid">
+          <!-- Contact Information Column -->
+          <div class="contact-info-stack">
+            <div class="card contact-info-card">
+              <div class="contact-icon-box">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-7.6 7-13a7 7 0 1 0-14 0c0 5.4 7 13 7 13z"/><circle cx="12" cy="9" r="2.5"/></svg>
+              </div>
+              <div>
+                <h2 class="h4">City Hall &amp; Tourism Office</h2>
+                <p class="muted">City Hall Complex, Buhanginan Hills, Barangay Pala-o, Iligan City, Lanao del Norte 9200</p>
+              </div>
+            </div>
+
+            <div class="card contact-info-card">
+              <div class="contact-icon-box">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              </div>
+              <div>
+                <h2 class="h4">Email Channels</h2>
+                <p class="muted"><a href="mailto:tourism@iligancity.gov.ph">tourism@iligancity.gov.ph</a><br><a href="mailto:events@iligancity.gov.ph">events@iligancity.gov.ph</a></p>
+              </div>
+            </div>
+
+            <div class="card contact-info-card">
+              <div class="contact-icon-box">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              </div>
+              <div>
+                <h2 class="h4">Telephone &amp; Hotline</h2>
+                <p class="muted">Trunkline: (063) 221-4050<br>Mobile Desk: +63 (917) 845-4426</p>
+              </div>
+            </div>
+
+            <div class="card contact-info-card">
+              <div class="contact-icon-box">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+              </div>
+              <div>
+                <h2 class="h4">Public Service Hours</h2>
+                <p class="muted">Monday – Friday: 8:00 AM – 5:00 PM (PST)<br>Special Festival Desk: Open on weekends during Diyandi</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Interactive Contact Form Column -->
+          <div class="card contact-form-card">
+            <span class="eyebrow-accent">Send a Message</span>
+            <h2 class="h2">Submit an Inquiry or Request</h2>
+            <p class="muted">Fill out the form below and our Tourism &amp; Community Events Desk will respond within 1 business day.</p>
+            <div id="contact-alert"></div>
+            <form id="contact-form" novalidate>
+              <div class="form-grid">
+                <div class="field">
+                  <label for="cf-name">Full name</label>
+                  <input type="text" id="cf-name" placeholder="Juan Dela Cruz" required minlength="3">
+                </div>
+                <div class="field">
+                  <label for="cf-email">Email address</label>
+                  <input type="email" id="cf-email" placeholder="juan@example.com" required>
+                </div>
+                <div class="field">
+                  <label for="cf-topic">Inquiry topic</label>
+                  <select id="cf-topic" required>
+                    <option value="">Select a topic</option>
+                    <option value="Event Pass & Booking Support">Event Pass &amp; Booking Support</option>
+                    <option value="LGU Coordinator Authorization Key">Request LGU Coordinator Authorization Key</option>
+                    <option value="Barangay Event Partnership">Barangay Event Partnership</option>
+                    <option value="Tourism & Festival Schedule">Tourism &amp; Festival Schedule</option>
+                    <option value="General Feedback">General Feedback</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="cf-barangay">Barangay / Organization (optional)</label>
+                  <input type="text" id="cf-barangay" placeholder="e.g. Brgy. Tibanga Youth Council">
+                </div>
+                <div class="field span-2">
+                  <label for="cf-message">Message</label>
+                  <textarea id="cf-message" rows="4" required minlength="10" placeholder="How can the Iligan Community Event Portal team help you?"></textarea>
+                </div>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                  <span>Send Message</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== View: My bookings ===== -->
+    <section class="view" id="view-bookings" aria-labelledby="bookings-heading" hidden>
+      <div class="container section">
+        <div class="page-head">
+          <span class="eyebrow-accent">Attendee Dashboard</span>
+          <h1 id="bookings-heading" class="h1">My Bookings & Passes</h1>
+          <p class="muted">View your active reservations, presentation QR reference passes, and ticket histories.</p>
+        </div>
+        <div id="bookings-alert"></div>
+        <div id="bookings-list" class="stack"></div>
+      </div>
+    </section>
+
+    <!-- ===== View: Coordinator dashboard ===== -->
+    <section class="view" id="view-dashboard" aria-labelledby="dashboard-heading" hidden>
+      <div class="container section">
+        <div class="page-head page-head-row">
+          <div>
+            <span class="eyebrow-accent">LGU Coordinator Desk</span>
+            <h1 id="dashboard-heading" class="h1">Coordinator Dashboard</h1>
+            <p class="muted">Publish and supervise events you organize for the citizens of Iligan City.</p>
+          </div>
+          <button type="button" class="btn btn-primary" data-new-event>
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>Add New Event</span>
+          </button>
+        </div>
+        <div id="dashboard-alert"></div>
+        <div class="grid stats" id="dashboard-stats"></div>
+        <div id="dashboard-table"></div>
+      </div>
+    </section>
+
+    <!-- ===== View: Admin console ===== -->
+    <section class="view" id="view-admin" aria-labelledby="admin-heading" hidden>
+      <div class="container section">
+        <div class="page-head page-head-row">
+          <div>
+            <span class="eyebrow-accent">System Administration</span>
+            <h1 id="admin-heading" class="h1">Admin Console</h1>
+            <p class="muted">Supervise citywide events, manage homepage settings, and configure portal locations.</p>
+          </div>
+          <button type="button" class="btn btn-primary" data-new-event>
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>Add New Event</span>
+          </button>
+        </div>
+        <div id="admin-alert"></div>
+        <div class="tabs" role="tablist" aria-label="Admin sections">
+          <button type="button" class="tab" role="tab" id="tab-events" aria-controls="panel-events" aria-selected="true" data-tab="events">All Events</button>
+          <button type="button" class="tab" role="tab" id="tab-content" aria-controls="panel-content" aria-selected="false" data-tab="content" tabindex="-1">Homepage Content</button>
+          <button type="button" class="tab" role="tab" id="tab-barangays" aria-controls="panel-barangays" aria-selected="false" data-tab="barangays" tabindex="-1">Barangays</button>
+          <button type="button" class="tab" role="tab" id="tab-tags" aria-controls="panel-tags" aria-selected="false" data-tab="tags" tabindex="-1">Popular Tags</button>
+        </div>
+        <div class="tab-panel" role="tabpanel" id="panel-events" aria-labelledby="tab-events">
+          <div class="grid stats" id="admin-stats"></div>
+          <div id="admin-table"></div>
+        </div>
+        <div class="tab-panel" role="tabpanel" id="panel-content" aria-labelledby="tab-content" hidden>
+          <form class="card form-card" id="content-form" novalidate>
+            <h2 class="h3">Homepage Hero Settings</h2>
+            <div class="field">
+              <label for="c-title">Hero Title</label>
+              <input type="text" id="c-title" maxlength="140">
+            </div>
+            <div class="field">
+              <label for="c-subtitle">Hero Subtitle</label>
+              <textarea id="c-subtitle" rows="3" maxlength="300"></textarea>
+            </div>
+            <div class="field">
+              <label for="c-image">Hero Background Image (URL or path)</label>
+              <input type="text" id="c-image" placeholder="images/diyandi_festival_panoramic_header.jpg">
+            </div>
+            <div class="form-actions"><button type="submit" class="btn btn-primary">Save Homepage Content</button></div>
+          </form>
+        </div>
+        <div class="tab-panel" role="tabpanel" id="panel-barangays" aria-labelledby="tab-barangays" hidden>
+          <div class="card form-card">
+            <h2 class="h3">Manage Barangays</h2>
+            <form class="inline-form" id="barangay-form" novalidate>
+              <div class="field grow"><label for="new-barangay">New barangay name</label><input type="text" id="new-barangay" maxlength="100" placeholder="e.g. Mahayahay"></div>
+              <button type="submit" class="btn btn-primary">Add Barangay</button>
+            </form>
+            <ul class="pill-list" id="barangay-list"></ul>
+          </div>
+        </div>
+        <div class="tab-panel" role="tabpanel" id="panel-tags" aria-labelledby="tab-tags" hidden>
+          <div class="card form-card">
+            <h2 class="h3">Popular Search Tags</h2>
+            <p class="muted">Quick search tags displayed directly beneath the search input on the homepage.</p>
+            <form class="inline-form" id="tag-form" novalidate>
+              <div class="field grow"><label for="new-tag">New tag</label><input type="text" id="new-tag" maxlength="60" placeholder="e.g. Waterfalls"></div>
+              <button type="submit" class="btn btn-primary">Add Tag</button>
+            </form>
+            <ul class="pill-list" id="tag-list"></ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <img src="images/iligan_city_seal_circle.webp" alt="Seal" width="32" height="32" class="footer-logo">
+        <p>&copy; 2026 City Government of Iligan. Interactive Community Event Discovery and Booking Portal.</p>
+      </div>
+      <p class="muted-light">Tourism & Inquiries: <a href="mailto:tourism@iligancity.gov.ph">tourism@iligancity.gov.ph</a></p>
     </div>
+  </footer>
 
-    <div class="planning-help" style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:12px;padding:32px 40px;margin:40px 64px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px;">
-      <div>
-        <div style="font-size:20px;font-weight:700;color:#1E3A8A;margin-bottom:6px;">Need help planning your arrival?</div>
-        <div style="color:#1F2937;font-size:14px;max-width:600px;">Our community desk volunteers provide schedules, venue advice, parking tips, and public transit info.</div>
+  <!-- ===== Live region for toasts ===== -->
+  <div class="toast-region" id="toast-region" role="status" aria-live="polite"></div>
+
+  <!-- ===== Dialog: Sign In / Register (Redesigned & Interactive) ===== -->
+  <dialog class="modal modal-auth" id="dlg-auth" aria-labelledby="auth-title">
+    <div class="modal-auth-banner">
+      <div class="auth-badge-ring">
+        <img src="images/iligan_city_seal_circle.webp" alt="Iligan City" width="56" height="56" class="auth-seal">
       </div>
-      <button type="button" class="ald-btn-primary" onclick="window.openHelpModal()" style="display:inline-flex;align-items:center;gap:8px;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-        <span>Message Community Desk</span>
+      <h2 class="auth-header-title" id="auth-title">Welcome to Iligan Events</h2>
+      <p class="auth-header-sub" id="auth-sub">Sign in to discover community gatherings and manage your reservations.</p>
+      <button type="button" class="icon-btn auth-close-btn" data-close aria-label="Close dialog">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
       </button>
     </div>
 
-    <footer style="background:#FFFFFF;border-top:1px solid #E5E7EB;padding:40px 64px;width:100%;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px;color:#4B5563;font-size:13px;">
-      <div>
-        <strong style="color:#1E3A8A;font-size:15px;">Iligan City Community Events &amp; Festival Discovery Portal</strong>
-        <div style="margin-top:4px;">Equipping the community with direct and easy access to local events.</div>
-      </div>
-      <div style="display:flex;gap:20px;">
-        <a href="#view-discover" onclick="window.showWhatsOnNav();return false;" style="color:#1E3A8A;font-weight:500;">Home</a>
-        <a href="#upcoming-events-section" onclick="window.showAllEventsNav();return false;" style="color:#1E3A8A;font-weight:500;">Events</a>
-        <a href="#help" onclick="window.openHelpModal();return false;" style="color:#1E3A8A;font-weight:500;">Community Support</a>
-      </div>
-    </footer>
-  </div>
-
-  <div class="harbour-walk-event-details site-view" id="view-details">
-    <div class="visitor-navigation">
-      <div class="alderhaven-identity" onclick="window.switchView('discover')" style="cursor:pointer;">
-        <div class="local-emblem" style="background:#1E3A8A;">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/></svg>
-        </div>
-        <div class="wordmark">
-          <div class="locality" style="font-weight:800;color:#1E3A8A;">ILIGAN CITY</div>
-          <div class="office" style="color:#D97706;font-weight:700;">EVENT DETAILS</div>
-        </div>
-      </div>
-      <div class="explore-navigation">
-        <div class="active-link" onclick="window.showWhatsOnNav()" style="cursor:pointer;">What’s on</div>
-        <div class="navigation-link" onclick="window.showAllEventsNav()" style="cursor:pointer;">All Events</div>
-        <div class="navigation-link" onclick="window.openHelpModal()" style="cursor:pointer;">Visitor information</div>
-      </div>
-      <div class="visitor-actions" style="display:flex;align-items:center;gap:10px;">
-        <button type="button" class="theme-toggle-btn" onclick="window.toggleTheme()" title="Toggle Dark/Light Mode" aria-label="Toggle Dark/Light Mode">
-          <svg class="theme-icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-          <svg class="theme-icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-          <span class="theme-toggle-label">Theme</span>
-        </button>
-        <div class="action" onclick="window.handleMyBookingsClick()" style="cursor:pointer;">
-          <div class="label">My bookings <span class="nav-bookings-count"></span></div>
-        </div>
-        <button type="button" class="nav-auth-btn nav-login-btn" onclick="window.openLoginModal('login')">
-          <span>Sign In</span>
-        </button>
-        <button type="button" class="nav-register-btn nav-register-btn" onclick="window.openLoginModal('register')">
-          <span>Register</span>
-        </button>
-        <div class="nav-user-badge" onclick="window.openProfileModal()" style="display:none;">
-          <span class="nav-user-name-role">User</span>
-        </div>
-        <button type="button" class="nav-dash-btn" onclick="window.switchView('dashboard')" style="display:none;">
-          <span>Dashboard</span>
-        </button>
-        <button type="button" class="nav-logout-btn" onclick="window.handleLogout()" style="display:none;" title="Sign Out">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-          <span>Sign Out</span>
-        </button>
-      </div>
+    <!-- Animated Sliding Tab Switcher -->
+    <div class="auth-tabs-wrap">
+      <div class="auth-tab-slider" id="auth-tab-slider"></div>
+      <button type="button" class="auth-tab is-active" id="auth-tab-login" aria-selected="true" aria-controls="login-form" data-auth-tab="login">Sign In</button>
+      <button type="button" class="auth-tab" id="auth-tab-register" aria-selected="false" aria-controls="register-form" data-auth-tab="register">Create Account</button>
     </div>
-    <div class="event-content">
-      <div class="breadcrumb">
-        <div class="parent" onclick="window.showAllEventsNav()" style="cursor:pointer;color:#1E3A8A;font-weight:600;">← All Events</div>
-        <span style="color:#9CA3AF;margin:0 6px;">/</span>
-        <div class="category" id="details-breadcrumb-cat">Category</div>
-        <span style="color:#9CA3AF;margin:0 6px;">/</span>
-        <div class="current" id="details-breadcrumb-title" style="font-weight:700;color:#1F2937;">Event Title</div>
-      </div>
-      <div class="event-heading">
-        <div class="title-group">
-          <div class="category2" id="details-event-cat" style="color:#D97706;font-weight:700;">FESTIVAL · COMMUNITY EVENT</div>
-          <div class="title" id="details-event-title" style="color:#1E3A8A;font-weight:800;font-size:32px;">Event Title</div>
-          <div class="subtitle" id="details-event-subtitle" style="color:#4B5563;">
-            Official Community Experience in Iligan City
+
+    <div class="modal-body auth-body">
+      <div id="auth-alert"></div>
+
+      <!-- Sign In Form -->
+      <form id="login-form" role="tabpanel" aria-labelledby="auth-tab-login" novalidate>
+        <div class="field">
+          <label for="l-email">Email address</label>
+          <div class="input-icon-wrap">
+            <svg class="input-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <input type="email" id="l-email" autocomplete="email" placeholder="e.g. name@domain.com" required>
           </div>
         </div>
-        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-          <button type="button" id="btn-edit-event-details" class="ald-btn-outline" onclick="window.openEditEventModal()" style="display:inline-flex;align-items:center;gap:6px;border:1px solid #CBD5E1;border-radius:8px;padding:8px 14px;background:#FFFFFF;color:#1E3A8A;font-weight:600;font-size:14px;cursor:pointer;">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1E3A8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-            <span>Edit Event</span>
-          </button>
-          <div class="action" onclick="window.shareEvent()" style="cursor:pointer;border:1px solid #E5E7EB;border-radius:8px;padding:8px 14px;display:inline-flex;align-items:center;gap:6px;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1E3A8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
-            <div class="label" style="font-weight:600;color:#1E3A8A;">Share event</div>
-          </div>
-        </div>
-      </div>
-      <div class="coastal-gallery" style="width:100%;border-radius:14px;overflow:hidden;background:#E5E7EB;box-shadow:0 4px 16px rgba(0,0,0,0.08);position:relative;">
-        <img class="headland-walk" id="details-gallery-main" src="images/kasadya_sa_diyandi.jpg" alt="Event Photo" style="width:100%;height:400px;object-fit:cover;display:block;" />
-      </div>
-
-      <div class="experience-details" style="display:grid;grid-template-columns:minmax(0, 1.4fr) minmax(320px, 380px);gap:36px;margin-top:32px;align-items:start;width:100%;">
-        <div class="about-experience">
-          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:14px;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:12px;padding:16px 20px;margin-bottom:24px;box-shadow:0 1px 3px rgba(0,0,0,0.04);">
-            <div style="display:flex;align-items:center;gap:12px;">
-              <div style="width:38px;height:38px;border-radius:8px;background:#EFF6FF;display:flex;align-items:center;justify-content:center;color:#1E3A8A;flex-shrink:0;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-              </div>
-              <div style="min-width:0;">
-                <div style="font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Date</div>
-                <div id="details-quick-date" style="font-size:13px;font-weight:700;color:#1F2937;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">October 15, 2026</div>
-              </div>
-            </div>
-            <div style="display:flex;align-items:center;gap:12px;">
-              <div style="width:38px;height:38px;border-radius:8px;background:#FEF3C7;display:flex;align-items:center;justify-content:center;color:#D97706;flex-shrink:0;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-              </div>
-              <div style="min-width:0;">
-                <div style="font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Time</div>
-                <div id="details-quick-time" style="font-size:13px;font-weight:700;color:#1F2937;white-space:nowrap;">8:00 AM</div>
-              </div>
-            </div>
-            <div style="display:flex;align-items:center;gap:12px;">
-              <div style="width:38px;height:38px;border-radius:8px;background:#DCFCE7;display:flex;align-items:center;justify-content:center;color:#16A34A;flex-shrink:0;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-              </div>
-              <div style="min-width:0;">
-                <div style="font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Location</div>
-                <div id="details-quick-venue" style="font-size:13px;font-weight:700;color:#1F2937;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Anahaw Amphitheater</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="about-section" style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:12px;padding:28px;margin-bottom:24px;box-shadow:0 1px 3px rgba(0,0,0,0.04);">
-            <div class="heading" style="font-size:20px;font-weight:800;color:#1E3A8A;margin-bottom:12px;">About this community event</div>
-            <div class="description" id="details-full-description" style="color:#374151;font-size:15px;line-height:1.75;white-space:pre-line;">
-              Event description will load here...
-            </div>
-          </div>
-
-          <div class="included-section" style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:12px;padding:24px;margin-bottom:24px;box-shadow:0 1px 3px rgba(0,0,0,0.04);">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-              <span style="font-size:18px;">🎟️</span>
-              <div class="heading2" style="font-size:17px;font-weight:700;color:#1E3A8A;">What's included in your digital pass</div>
-            </div>
-            <div class="included-copy" id="details-inclusion-copy" style="color:#4B5563;font-size:14px;line-height:1.65;">
-              Official festival pass with QR code verification and reserved area access.
-            </div>
-          </div>
-
-          <div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:12px;padding:24px;box-shadow:0 1px 3px rgba(0,0,0,0.04);">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-              <span style="font-size:18px;">📍</span>
-              <div style="font-size:17px;font-weight:700;color:#1E3A8A;">Venue &amp; Arrival Instructions</div>
-            </div>
-            <div style="font-size:14px;color:#374151;line-height:1.6;">
-              <div style="font-weight:700;color:#1F2937;" id="details-venue-full-name">Anahaw Amphitheater, Buhanginan Hills</div>
-              <div style="color:#6B7280;margin-top:2px;" id="details-route-full-desc">Barangay Pala-o, Iligan City</div>
-              <div style="margin-top:12px;font-size:13px;color:#6B7280;background:#F9FAFB;padding:10px 14px;border-radius:8px;border:1px solid #E5E7EB;">
-                💡 <em>Tip:</em> Arrive at least 20 minutes prior to scheduled start time for smooth check-in and QR verification.
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div style="display:flex;flex-direction:column;gap:20px;position:sticky;top:24px;">
-          <div class="practical-information" style="border:1px solid #E5E7EB;border-radius:14px;padding:24px;background:#FFFFFF;box-shadow:0 4px 16px rgba(0,0,0,0.06);">
-            <div style="display:flex;justify-content:space-between;align-items:baseline;padding-bottom:16px;border-bottom:1px solid #F3F4F6;">
-              <div class="rate" style="display:flex;align-items:baseline;gap:6px;">
-                <div class="price" id="details-rate-price" style="font-size:28px;font-weight:900;color:#1E3A8A;letter-spacing:-0.5px;">FREE</div>
-                <div class="unit" id="details-rate-unit" style="color:#6B7280;font-size:13px;font-weight:500;">admission</div>
-              </div>
-              <div class="status">
-                <div class="label" id="details-spots-left-badge" style="background:#DCFCE7;color:#16A34A;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:700;display:inline-block;">Open Registration</div>
-              </div>
-            </div>
-
-            <div class="schedule-details" style="padding:16px 0;display:flex;flex-direction:column;gap:14px;">
-              <div style="display:flex;align-items:flex-start;gap:12px;">
-                <div style="color:#1E3A8A;margin-top:2px;flex-shrink:0;">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                </div>
-                <div>
-                  <div class="date" id="details-schedule-date" style="font-weight:700;color:#1F2937;font-size:14px;">Friday, October 2, 2026</div>
-                  <div class="time" id="details-schedule-time" style="color:#4B5563;font-size:13px;font-weight:600;margin-top:2px;">5:08 PM</div>
-                </div>
-              </div>
-
-              <div style="display:flex;align-items:flex-start;gap:12px;">
-                <div style="color:#D97706;margin-top:2px;flex-shrink:0;">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                </div>
-                <div>
-                  <div class="location" id="details-venue-name" style="font-weight:700;color:#1F2937;font-size:14px;line-height:1.3;">Anahaw Amphitheater, Buhanginan Hills</div>
-                  <div class="route" id="details-route-desc" style="color:#6B7280;font-size:12px;margin-top:2px;">Brgy. Pala-o</div>
-                </div>
-              </div>
-            </div>
-
-            <button type="button" class="ald-btn-primary" style="width:100%;height:46px;font-size:15px;font-weight:700;border-radius:8px;margin-top:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;" onclick="window.openCheckout()">
-              <span>Reserve a Spot / Book Pass</span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        <div class="field">
+          <label for="l-password">Password</label>
+          <div class="input-icon-wrap">
+            <svg class="input-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <input type="password" id="l-password" autocomplete="current-password" placeholder="Enter your password" required>
+            <button type="button" class="btn-toggle-pw" data-toggle-pw="l-password" aria-label="Toggle password visibility">
+              <svg class="icon-pw-eye" viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
             </button>
-
-            <div style="margin-top:16px;padding-top:14px;border-top:1px solid #F3F4F6;display:flex;flex-direction:column;gap:8px;font-size:12px;color:#4B5563;">
-              <div style="display:flex;align-items:center;gap:6px;">
-                <span style="color:#16A34A;font-weight:bold;">✓</span>
-                <span>Instant QR pass confirmation</span>
-              </div>
-              <div style="display:flex;align-items:center;gap:6px;">
-                <span style="color:#16A34A;font-weight:bold;">✓</span>
-                <span>Free cancellation anytime before event</span>
-              </div>
-              <div style="display:flex;align-items:center;gap:6px;">
-                <span style="color:#16A34A;font-weight:bold;">✓</span>
-                <span>Official Iligan City verified listing</span>
-              </div>
-            </div>
-
-            <img id="details-gallery-thumb" src="images/anahaw_amphitheater.jpg" alt="" style="display:none;" />
-          </div>
-
-          <div class="guide-profile" style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:12px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.04);">
-            <div class="section-heading" style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;margin-bottom:12px;letter-spacing:0.5px;">Organized by</div>
-            <div class="guide-card" style="display:flex;align-items:center;gap:12px;">
-              <div class="avatar" style="width:44px;height:44px;border-radius:50%;background:#1E3A8A;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;flex-shrink:0;">IC</div>
-              <div>
-                <div class="name" id="details-guide-name" style="font-weight:700;color:#1F2937;font-size:14px;">Iligan City Tourism Office</div>
-                <div class="role" id="details-guide-role" style="color:#6B7280;font-size:12px;margin-top:1px;">Official Event Coordinator</div>
-              </div>
-            </div>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="book-your-harbour-walk site-view" id="view-checkout">
-    <div class="visitor-navigation">
-      <div class="alderhaven-identity" onclick="window.switchView('discover')" style="cursor:pointer;">
-        <div class="local-emblem" style="background:#1E3A8A;">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/></svg>
-        </div>
-        <div class="wordmark">
-          <div class="locality" style="font-weight:800;color:#1E3A8A;">ILIGAN CITY</div>
-          <div class="office" style="color:#D97706;font-weight:700;">BOOKING CHECKOUT</div>
-        </div>
-      </div>
-      <div class="visitor-actions">
-        <div class="support" style="font-weight:600;color:#4B5563;">Official Civic Booking System</div>
-      </div>
-    </div>
-    <div class="booking-content" style="max-width:1000px;margin:0 auto;padding:32px 24px;">
-      <div class="back-action" onclick="window.switchView('details')" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;margin-bottom:20px;color:#1E3A8A;font-weight:600;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-        <div class="label">Back to event details</div>
-      </div>
-      <div class="booking-workspace" style="display:grid;grid-template-columns:1.5fr 1fr;gap:32px;">
-        <div class="form-container" style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:12px;padding:28px;">
-          <div style="font-size:22px;font-weight:800;color:#1E3A8A;margin-bottom:18px;">Reserve Your Digital Pass</div>
-          
-          <div style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;padding:16px;margin-bottom:24px;">
-            <div style="font-size:14px;font-weight:700;color:#1F2937;margin-bottom:12px;">Select Number of Tickets / Attendees</div>
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #E5E7EB;">
-              <div>
-                <div style="font-weight:600;color:#1F2937;">General Admission / Adult</div>
-                <div id="chk-adult-total" style="font-size:13px;color:#4B5563;">₱0.00</div>
-              </div>
-              <div style="display:flex;align-items:center;gap:12px;">
-                <button type="button" class="ald-btn-outline" style="width:36px;height:36px;padding:0;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:18px;" onclick="window.stepTicket('adult', -1)">-</button>
-                <span id="chk-adult-count" style="font-weight:700;font-size:16px;width:20px;text-align:center;">1</span>
-                <button type="button" class="ald-btn-outline" style="width:36px;height:36px;padding:0;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:18px;" onclick="window.stepTicket('adult', 1)">+</button>
-              </div>
-            </div>
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;">
-              <div>
-                <div style="font-weight:600;color:#1F2937;">Student / Youth</div>
-                <div id="chk-child-total" style="font-size:13px;color:#4B5563;">₱0.00</div>
-              </div>
-              <div style="display:flex;align-items:center;gap:12px;">
-                <button type="button" class="ald-btn-outline" style="width:36px;height:36px;padding:0;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:18px;" onclick="window.stepTicket('child', -1)">-</button>
-                <span id="chk-child-count" style="font-weight:700;font-size:16px;width:20px;text-align:center;">0</span>
-                <button type="button" class="ald-btn-outline" style="width:36px;height:36px;padding:0;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:18px;" onclick="window.stepTicket('child', 1)">+</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="ald-form-group">
-            <label class="ald-form-label" for="chk-first-name">First Name *</label>
-            <input type="text" id="chk-first-name" class="ald-form-input" placeholder="e.g. Juan" required />
-          </div>
-          <div class="ald-form-group">
-            <label class="ald-form-label" for="chk-last-name">Last Name *</label>
-            <input type="text" id="chk-last-name" class="ald-form-input" placeholder="e.g. dela Cruz" required />
-          </div>
-          <div class="ald-form-group">
-            <label class="ald-form-label" for="chk-email">Email Address *</label>
-            <input type="email" id="chk-email" class="ald-form-input" placeholder="e.g. juan@example.com" required />
-          </div>
-          <div class="ald-form-group">
-            <label class="ald-form-label" for="chk-phone">Contact Phone Number</label>
-            <input type="tel" id="chk-phone" class="ald-form-input" placeholder="e.g. 09181234567" />
-          </div>
-
-          <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-top:2px solid #E5E7EB;margin-top:16px;">
-            <div style="font-size:16px;font-weight:700;color:#1F2937;">Total to Confirm:</div>
-            <div id="chk-grand-total" style="font-size:22px;font-weight:800;color:#1E3A8A;">FREE</div>
-          </div>
-
-          <button type="button" class="ald-btn-primary" style="width:100%;height:48px;font-size:16px;" onclick="window.submitBooking()">Confirm Booking &amp; Generate Digital Pass</button>
-        </div>
-
-        <div class="order-summary" style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:12px;padding:24px;height:fit-content;">
-          <div style="font-size:16px;font-weight:700;color:#1E3A8A;margin-bottom:12px;">Event Summary</div>
-          <img id="chk-summary-img" src="images/kasadya_sa_diyandi.jpg" alt="Event" style="width:100%;height:160px;object-fit:cover;border-radius:8px;margin-bottom:12px;" />
-          <div id="chk-summary-title" style="font-size:16px;font-weight:700;color:#1F2937;margin-bottom:4px;">Event Title</div>
-          <div id="chk-summary-cat" style="font-size:12px;font-weight:600;color:#D97706;margin-bottom:8px;">FESTIVAL</div>
-          <div style="font-size:13px;color:#4B5563;line-height:1.6;">
-            <div>📅 <span id="chk-summary-date">October 15, 2026</span> · <span id="chk-summary-time">7:30 AM</span></div>
-            <div>📍 <span id="chk-summary-venue">Anahaw Amphitheater</span></div>
-            <div style="margin-top:8px;">🎟️ <span id="chk-summary-ticket-count">1 ticket</span></div>
-          </div>
-          <div style="border-top:1px solid #E5E7EB;margin-top:16px;padding-top:12px;display:flex;justify-content:space-between;align-items:center;">
-            <span style="font-weight:600;color:#1F2937;">Estimated:</span>
-            <span id="chk-summary-total" style="font-weight:800;color:#1E3A8A;font-size:18px;">FREE</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="harbour-walk-booking-confirmed site-view" id="view-confirmed">
-    <div class="visitor-navigation">
-      <div class="alderhaven-identity" onclick="window.switchView('discover')" style="cursor:pointer;">
-        <div class="local-emblem" style="background:#1E3A8A;">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/></svg>
-        </div>
-        <div class="wordmark">
-          <div class="locality" style="font-weight:800;color:#1E3A8A;">ILIGAN CITY</div>
-          <div class="office" style="color:#D97706;font-weight:700;">PASS CONFIRMED</div>
-        </div>
-      </div>
-      <div class="visitor-actions">
-        <button type="button" class="ald-btn-primary" onclick="window.switchView('discover')" style="height:38px;padding:0 16px;font-size:13px;">Return to Discovery</button>
-      </div>
-    </div>
-    <div class="confirmation-content" style="max-width:800px;margin:0 auto;padding:40px 24px;text-align:center;">
-      <div style="width:64px;height:64px;border-radius:50%;background:#DCFCE7;color:#16A34A;display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;">
-        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-      </div>
-      <h1 style="font-size:28px;font-weight:800;color:#1E3A8A;margin-bottom:8px;">You’re Booked! Pass Confirmed</h1>
-      <p id="cnf-email-msg" style="color:#4B5563;font-size:15px;max-width:600px;margin:0 auto 28px auto;">
-        We have verified your registration and generated your digital access pass.
-      </p>
-
-      <div class="digital-ticket-pass-card" style="background:#FFFFFF;border:2px dashed #1E3A8A;border-radius:16px;padding:32px;text-align:left;display:grid;grid-template-columns:2fr 1.2fr;gap:24px;box-shadow:0 8px 24px rgba(0,0,0,0.06);margin-bottom:28px;">
-        <div>
-          <div style="font-size:12px;font-weight:700;color:#D97706;text-transform:uppercase;letter-spacing:0.5px;">OFFICIAL ILIGAN COMMUNITY PASS</div>
-          <div id="cnf-event-title" style="font-size:20px;font-weight:800;color:#1E3A8A;margin:4px 0 12px 0;">Event Title</div>
-          <div style="font-size:14px;color:#1F2937;line-height:1.7;">
-            <div>📅 <strong>Date:</strong> <span id="cnf-event-date">October 15, 2026</span></div>
-            <div>⏰ <strong>Time:</strong> <span id="cnf-event-time">7:30 AM</span></div>
-            <div>📍 <strong>Venue:</strong> <span id="cnf-event-venue">Anahaw Amphitheater</span></div>
-            <div>🏷️ <strong>Booking Reference:</strong> <span id="cnf-reference" style="font-weight:800;color:#D97706;">ILG-2026-8F42</span></div>
-            <div>💰 <strong>Total Paid:</strong> <span id="cnf-total-paid" style="font-weight:700;color:#16A34A;">FREE</span></div>
-          </div>
-          <div id="cnf-attendees-list" style="margin-top:14px;padding-top:10px;border-top:1px solid #E5E7EB;font-size:13px;color:#4B5563;">
-          </div>
-        </div>
-        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;border-left:1px dashed #E5E7EB;padding-left:20px;">
-          <div id="cnf-qr-code-box" style="background:#FFFFFF;padding:10px;border:1px solid #E5E7EB;border-radius:8px;"></div>
-          <div style="font-size:11px;font-weight:600;color:#6B7280;margin-top:8px;text-align:center;">Scan at gate for instant check-in</div>
-        </div>
-      </div>
-
-      <div style="display:flex;justify-content:center;gap:14px;flex-wrap:wrap;">
-        <button type="button" class="ald-btn-primary" onclick="window.printPass()" style="display:inline-flex;align-items:center;gap:8px;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-          <span>Print / Save Pass</span>
+        <button type="submit" class="btn btn-primary btn-block btn-auth-submit">
+          <span>Sign In</span>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
-        <button type="button" class="ald-btn-outline" onclick="window.openMyBookingsModal()">View in My Bookings</button>
-        <button type="button" class="ald-btn-outline" onclick="window.switchView('discover')">Explore More Events</button>
-      </div>
-    </div>
-  </div>
+        <p class="auth-switch-prompt">Don't have an account? <button type="button" class="btn-link" onclick="window.switchAuthTab('register')">Register here</button></p>
+      </form>
 
-  <div class="tourism-office-bookings-dashboard site-view" id="view-dashboard">
-    <div class="office-navigation" style="background:#1E3A8A;">
-      <div class="navigation-group">
-        <div class="alderhaven-identity" onclick="window.switchView('discover')" style="cursor:pointer;">
-          <div class="local-emblem" style="background:#FFFFFF;">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1E3A8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/></svg>
-          </div>
-          <div class="wordmark">
-            <div class="locality" style="color:#FFFFFF;font-weight:800;">ILIGAN CITY</div>
-            <div class="office" style="color:#FEF3C7;font-weight:700;">COORDINATOR DESK</div>
+      <!-- Register Form -->
+      <form id="register-form" role="tabpanel" aria-labelledby="auth-tab-register" hidden novalidate>
+        <div class="field">
+          <label for="r-name">Full name</label>
+          <div class="input-icon-wrap">
+            <svg class="input-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <input type="text" id="r-name" autocomplete="name" placeholder="First and last name" required minlength="3">
           </div>
         </div>
-        <div class="workspace">
-          <div class="section-label" style="color:#BFDBFE;font-size:11px;font-weight:700;margin-bottom:10px;letter-spacing:1px;">WORKSPACE</div>
-          <div class="dash-sidebar-nav-item active" id="dash-nav-bookings-btn" onclick="window.setDashboardTab('bookings')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"></path><path d="M13 5v2"></path><path d="M13 17v2"></path><path d="M13 11v2"></path></svg>
-            <span class="dash-sidebar-label">Bookings Registry</span>
-          </div>
-          <div class="dash-sidebar-nav-item" id="dash-nav-events-btn" onclick="window.setDashboardTab('events')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-            <span class="dash-sidebar-label">Events Management</span>
-          </div>
-          <div class="dash-sidebar-nav-item" id="dash-nav-hero-btn" onclick="window.openHeroBannerModal()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-            <span class="dash-sidebar-label">Hero Banner Settings</span>
-          </div>
-          <div class="dash-sidebar-nav-item" id="dash-nav-portal-btn" onclick="window.switchView('discover')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>
-            <span class="dash-sidebar-label">Return to Portal</span>
+        <div class="field">
+          <label for="r-email">Email address</label>
+          <div class="input-icon-wrap">
+            <svg class="input-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <input type="email" id="r-email" autocomplete="email" placeholder="name@domain.com" required>
           </div>
         </div>
-      </div>
-      <div class="staff-account" style="padding:16px;border-top:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:space-between;gap:8px;">
-        <div class="profile" style="display:flex;align-items:center;gap:10px;">
-          <div class="avatar" style="width:40px;height:40px;border-radius:50%;background:#D97706;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-weight:700;">TC</div>
-          <div class="staff-identity">
-            <div class="name" style="color:#FFFFFF;font-weight:700;font-size:14px;">Tourism Office</div>
-            <div class="role" style="color:#BFDBFE;font-size:12px;">Event Coordinator</div>
+        <div class="field">
+          <label for="r-phone">Mobile number</label>
+          <div class="input-icon-wrap">
+            <svg class="input-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <input type="tel" id="r-phone" autocomplete="tel" placeholder="0917 123 4567">
           </div>
         </div>
-        <button type="button" onclick="window.promptLogout()" style="background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.25);border-radius:6px;color:#FFFFFF;padding:6px 10px;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:4px;" title="Sign Out">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-          <span>Sign Out</span>
+        <div class="field">
+          <label for="r-password">Password (min. 6 characters)</label>
+          <div class="input-icon-wrap">
+            <svg class="input-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <input type="password" id="r-password" autocomplete="new-password" placeholder="Create a secure password" required minlength="6">
+            <button type="button" class="btn-toggle-pw" data-toggle-pw="r-password" aria-label="Toggle password visibility">
+              <svg class="icon-pw-eye" viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Interactive Role Switcher Cards -->
+        <div class="field">
+          <span class="label">Select Account Type</span>
+          <div class="role-selector" role="radiogroup" aria-label="Account Type">
+            <label class="role-card is-selected" id="role-card-user">
+              <input type="radio" name="r-role-radio" value="user" checked>
+              <div class="role-card-content">
+                <svg class="role-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <div class="role-card-title">Citizen / Tourist</div>
+                <div class="role-card-sub">Discover & reserve passes</div>
+              </div>
+            </label>
+            <label class="role-card" id="role-card-organizer">
+              <input type="radio" name="r-role-radio" value="organizer">
+              <div class="role-card-content">
+                <svg class="role-icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <div class="role-card-title">LGU Coordinator</div>
+                <div class="role-card-sub">Host & publish city events</div>
+              </div>
+            </label>
+          </div>
+          <!-- Hidden select kept for seamless JS API compatibility -->
+          <select id="r-role" class="visually-hidden">
+            <option value="user" selected>Citizen / Visitor</option>
+            <option value="organizer">Event Coordinator / LGU Official</option>
+          </select>
+        </div>
+
+        <!-- Coordinator Authorization Key (Revealed with animation) -->
+        <div class="field role-key-box" id="r-key-wrap" hidden>
+          <label for="r-key">Official LGU Authorization Key</label>
+          <div class="input-icon-wrap">
+            <svg class="input-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 2l-2 2m-1.5 1.5L12 11l-4-4-6 6 4 4 6-6 5.5-5.5z"/></svg>
+            <input type="password" id="r-key" autocomplete="off" placeholder="e.g. ILIGAN-COORD-2026">
+          </div>
+          <p class="hint">Ask the Iligan City Tourism Office for the authorized coordinator registration key.</p>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block btn-auth-submit">
+          <span>Create Account</span>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
-      </div>
-    </div>
-    
-    <div class="bookings-workspace" style="flex:1;background:#F9FAFB;padding:32px;">
-      <div class="office-top-bar" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
-        <div class="breadcrumb" style="font-size:18px;font-weight:800;color:#1E3A8A;">Coordinator &amp; Admin Workspace</div>
-        <div class="workspace-controls" style="display:flex;align-items:center;gap:12px;">
-          <button type="button" class="ald-btn-primary" onclick="window.openAddEventModal()" style="height:38px;padding:0 16px;font-size:13px;display:inline-flex;align-items:center;gap:6px;">
-            <span>+ Add New Event</span>
-          </button>
-          <button type="button" class="ald-btn-outline" onclick="window.openHeroBannerModal()" style="height:38px;padding:0 14px;font-size:13px;">
-            <span>Banner Settings</span>
-          </button>
-        </div>
-      </div>
-
-      <div class="monthly-metrics" style="display:grid;grid-template-columns:repeat(4, 1fr);gap:16px;margin-bottom:28px;">
-        <div class="booking-metric" style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:10px;padding:20px;">
-          <div class="metric-heading" style="color:#6B7280;font-size:13px;font-weight:600;">Total Bookings</div>
-          <div class="value2" id="dash-metric-bookings" style="font-size:28px;font-weight:800;color:#1E3A8A;margin-top:6px;">0</div>
-        </div>
-        <div class="booking-metric" style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:10px;padding:20px;">
-          <div class="metric-heading" style="color:#6B7280;font-size:13px;font-weight:600;">Attendees Booked</div>
-          <div class="value2" id="dash-metric-attendees" style="font-size:28px;font-weight:800;color:#1E3A8A;margin-top:6px;">0</div>
-        </div>
-        <div class="booking-metric" style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:10px;padding:20px;">
-          <div class="metric-heading" style="color:#6B7280;font-size:13px;font-weight:600;">Total Revenue / Value</div>
-          <div class="value2" id="dash-metric-revenue" style="font-size:28px;font-weight:800;color:#1E3A8A;margin-top:6px;">₱0</div>
-        </div>
-        <div class="booking-metric" style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:10px;padding:20px;">
-          <div class="metric-heading" style="color:#6B7280;font-size:13px;font-weight:600;">Pending Actions</div>
-          <div class="value2" id="dash-metric-pending" style="font-size:28px;font-weight:800;color:#1E3A8A;margin-top:6px;">0</div>
-        </div>
-      </div>
-
-      <div id="dash-tab-bookings-view">
-        <div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:12px;overflow:hidden;">
-          <div style="padding:20px 24px;border-bottom:1px solid #E5E7EB;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;">
-            <div style="font-size:18px;font-weight:700;color:#1E3A8A;">Citizen Bookings Registry</div>
-            <div style="display:flex;gap:10px;">
-              <input type="text" placeholder="Search attendee, email, ref..." oninput="window.handleDashboardSearch(this.value)" style="border:1px solid #E5E7EB;border-radius:6px;padding:8px 12px;font-size:13px;outline:none;width:240px;" />
-              <button type="button" class="ald-btn-outline" onclick="window.exportBookingsCSV()" style="height:36px;padding:0 14px;font-size:13px;">Export CSV</button>
-            </div>
-          </div>
-          <div id="dash-bookings-table-rows"></div>
-        </div>
-      </div>
-
-      <div id="dash-tab-events-view" style="display:none;">
-        <div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:12px;overflow:hidden;">
-          <div style="padding:20px 24px;border-bottom:1px solid #E5E7EB;display:flex;justify-content:space-between;align-items:center;">
-            <div style="font-size:18px;font-weight:700;color:#1E3A8A;">Community Events Catalog</div>
-            <button type="button" class="ald-btn-primary" onclick="window.openAddEventModal()" style="height:36px;padding:0 14px;font-size:13px;">+ Post New Event</button>
-          </div>
-          <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr 2fr;background:#F9FAFB;padding:12px 24px;font-size:12px;font-weight:700;color:#4B5563;border-bottom:1px solid #E5E7EB;gap:12px;">
-            <div>EVENT TITLE &amp; VENUE</div>
-            <div>CATEGORY</div>
-            <div>DATE</div>
-            <div>CAPACITY</div>
-            <div>FEATURED</div>
-            <div style="text-align:right;">ACTIONS</div>
-          </div>
-          <div id="dash-events-table-rows"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="ald-modal-overlay" id="modal-login" onclick="if(event.target===this)window.closeModal('modal-login')">
-    <div class="ald-modal-dialog" style="max-width:580px;width:95%;">
-      <button type="button" class="ald-modal-close" onclick="window.closeModal('modal-login')">&times;</button>
-      
-      <div class="auth-modal-tabs">
-        <button type="button" class="auth-tab-btn active" id="tab-btn-auth-login" onclick="window.switchLoginTab('login')">Sign In</button>
-        <button type="button" class="auth-tab-btn" id="tab-btn-auth-register" onclick="window.switchLoginTab('register')">Create Account</button>
-      </div>
-
-      <div class="auth-demo-chips-box">
-        <div class="auth-demo-chips-title">⚡ 1-Click Fast Demo Sign In:</div>
-        <div class="auth-demo-chips">
-          <button type="button" class="demo-chip" onclick="window.demoLogin('citizen')">👤 Citizen (Juan)</button>
-          <button type="button" class="demo-chip" onclick="window.demoLogin('amina')">👤 Citizen (Amina)</button>
-          <button type="button" class="demo-chip" onclick="window.demoLogin('coordinator')">📋 Coordinator (Tourism)</button>
-          <button type="button" class="demo-chip" onclick="window.demoLogin('admin')">🏛️ Admin (LGU)</button>
-        </div>
-      </div>
-
-      <form id="form-auth-login" onsubmit="window.submitLogin(event)">
-        <div class="ald-form-group">
-          <label class="ald-form-label" for="login-email">Email Address *</label>
-          <input type="email" id="login-email" class="ald-form-input" placeholder="e.g. juan.delacruz@yahoo.com" required />
-        </div>
-        <div class="ald-form-group">
-          <label class="ald-form-label" for="login-password">Password *</label>
-          <input type="password" id="login-password" class="ald-form-input" placeholder="••••••••" required />
-        </div>
-        <button type="submit" class="ald-btn-primary" style="width:100%;height:44px;font-size:15px;margin-top:10px;">Sign In to Portal</button>
-      </form>
-
-      <form id="form-auth-register" style="display:none;" onsubmit="window.submitRegister(event)">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-          <div class="ald-form-group">
-            <label class="ald-form-label" for="reg-name">Full Name *</label>
-            <input type="text" id="reg-name" class="ald-form-input" placeholder="e.g. Juan dela Cruz" required />
-          </div>
-          <div class="ald-form-group">
-            <label class="ald-form-label" for="reg-email">Email Address *</label>
-            <input type="email" id="reg-email" class="ald-form-input" placeholder="e.g. juan@domain.com" required />
-          </div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-          <div class="ald-form-group">
-            <label class="ald-form-label" for="reg-phone">Phone Number</label>
-            <input type="tel" id="reg-phone" class="ald-form-input" placeholder="e.g. 09181234567" />
-          </div>
-          <div class="ald-form-group">
-            <label class="ald-form-label" for="reg-role">Role / Account Type</label>
-            <select id="reg-role" class="ald-form-select" onchange="window.toggleCoordinatorKeyField(this.value)">
-              <option value="user">Citizen / Public Attendee</option>
-              <option value="organizer">Event Coordinator (LGU / Community)</option>
-            </select>
-          </div>
-        </div>
-        <div class="ald-form-group" id="reg-coord-key-group" style="display:none;">
-          <label class="ald-form-label" for="reg-coord-key">Official LGU Coordinator Key (e.g. ILIGAN-COORD-2026)</label>
-          <input type="text" id="reg-coord-key" class="ald-form-input" placeholder="ILIGAN-COORD-2026" />
-        </div>
-        <div class="ald-form-group">
-          <label class="ald-form-label" for="reg-password">Password (at least 6 characters) *</label>
-          <input type="password" id="reg-password" class="ald-form-input" placeholder="••••••••" required />
-        </div>
-        <button type="submit" class="ald-btn-primary" style="width:100%;height:44px;font-size:15px;margin-top:10px;">Create Free Account</button>
+        <p class="auth-switch-prompt">Already have an account? <button type="button" class="btn-link" onclick="window.switchAuthTab('login')">Sign in here</button></p>
       </form>
     </div>
-  </div>
+  </dialog>
 
-  <div class="ald-modal-overlay" id="modal-profile" onclick="if(event.target===this)window.closeModal('modal-profile')">
-    <div class="ald-modal-dialog" style="max-width:620px;width:95%;">
-      <button type="button" class="ald-modal-close" onclick="window.closeModal('modal-profile')">&times;</button>
-      <div style="font-size:20px;font-weight:800;color:#1E3A8A;margin-bottom:16px;">Citizen &amp; User Profile</div>
-      
-      <div style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;padding:16px;margin-bottom:20px;">
-        <div style="font-size:12px;font-weight:700;color:#D97706;text-transform:uppercase;">Account Status</div>
-        <div id="prof-role-display" style="font-size:16px;font-weight:700;color:#1E3A8A;margin:2px 0 6px 0;">Citizen Attendee</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px;color:#4B5563;margin-top:4px;">
-          <div>Email: <strong id="prof-email-display">user@example.com</strong></div>
-          <div>Active Booked Passes: <strong id="prof-bookings-count" style="color:#16A34A;">0</strong></div>
-        </div>
-      </div>
-
-      <form onsubmit="window.submitUpdateProfile(event)">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-          <div class="ald-form-group">
-            <label class="ald-form-label" for="prof-name-input">Full Name *</label>
-            <input type="text" id="prof-name-input" class="ald-form-input" required />
-          </div>
-          <div class="ald-form-group">
-            <label class="ald-form-label" for="prof-phone-input">Contact Phone</label>
-            <input type="tel" id="prof-phone-input" class="ald-form-input" />
-          </div>
-        </div>
-        <div style="display:flex;gap:10px;margin-top:20px;justify-content:flex-end;align-items:center;">
-          <button type="button" class="ald-btn-outline" style="color:#DC2626;border-color:#FCA5A5;margin-right:auto;font-weight:600;" onclick="window.closeModal('modal-profile');window.promptLogout();">Sign Out</button>
-          <button type="button" class="ald-btn-outline" style="min-width:100px;" onclick="window.closeModal('modal-profile')">Close</button>
-          <button type="submit" class="ald-btn-primary" style="min-width:140px;">Save Changes</button>
-        </div>
-      </form>
+  <!-- ===== Dialog: Event Details ===== -->
+  <dialog class="modal modal-lg" id="dlg-event" aria-labelledby="event-title">
+    <div class="modal-head">
+      <h2 class="h3" id="event-title">Event details</h2>
+      <button type="button" class="icon-btn" data-close aria-label="Close dialog"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
-  </div>
+    <div class="modal-body" id="event-body"></div>
+  </dialog>
 
-  <div class="ald-modal-overlay" id="modal-my-bookings" onclick="if(event.target===this)window.closeModal('modal-my-bookings')">
-    <div class="ald-modal-dialog" style="max-width:880px;width:95%;">
-      <button type="button" class="ald-modal-close" onclick="window.closeModal('modal-my-bookings')">&times;</button>
-      <div style="font-size:22px;font-weight:800;color:#1E3A8A;margin-bottom:4px;">My Booked Passes</div>
-      <p style="color:#4B5563;font-size:14px;margin-bottom:20px;">Here are your confirmed and registered community passes in Iligan City.</p>
-      
-      <div id="my-bookings-list" style="display:flex;flex-direction:column;gap:14px;"></div>
+  <!-- ===== Dialog: Booking Workflow ===== -->
+  <dialog class="modal" id="dlg-book" aria-labelledby="book-title">
+    <div class="modal-head">
+      <h2 class="h3" id="book-title">Book Event Pass</h2>
+      <button type="button" class="icon-btn" data-close aria-label="Close dialog"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
-  </div>
+    <div class="modal-body" id="book-body"></div>
+  </dialog>
 
-  <div class="ald-modal-overlay" id="modal-pass-details" onclick="if(event.target===this)window.closeModal('modal-pass-details')">
-    <div class="ald-modal-dialog" style="max-width:620px;width:95%;">
-      <button type="button" class="ald-modal-close" onclick="window.closeModal('modal-pass-details')">&times;</button>
-      <div style="font-size:12px;font-weight:700;color:#D97706;letter-spacing:0.5px;">ILIGAN DIGITAL ACCESS PASS</div>
-      <div id="pass-modal-title" style="font-size:18px;font-weight:800;color:#1E3A8A;margin:4px 0 16px 0;">Event Title</div>
-      
-      <div style="display:grid;grid-template-columns:180px 1fr;gap:20px;align-items:center;margin-bottom:20px;text-align:left;">
-        <div id="pass-modal-qr-box" style="display:flex;justify-content:center;align-items:center;background:#F9FAFB;border:1px solid #E5E7EB;border-radius:10px;padding:12px;min-height:160px;"></div>
-        
-        <div style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:10px;padding:16px;font-size:13px;line-height:1.7;">
-          <div><strong>Pass Holder:</strong> <span id="pass-modal-holder">Juan dela Cruz</span></div>
-          <div><strong>Reference:</strong> <span id="pass-modal-ref" style="font-weight:700;color:#D97706;">ILG-2026-8F42</span></div>
-          <div><strong>Date:</strong> <span id="pass-modal-date">October 15, 2026</span></div>
-          <div><strong>Admission:</strong> <span id="pass-modal-count">1 General Admission</span></div>
-        </div>
-      </div>
-
-      <div style="display:flex;gap:12px;justify-content:flex-end;">
-        <button type="button" class="ald-btn-outline" style="min-width:110px;" onclick="window.closeModal('modal-pass-details')">Done</button>
-        <button type="button" class="ald-btn-primary" style="min-width:140px;" onclick="window.printPass()">Print / Save</button>
-      </div>
+  <!-- ===== Dialog: Add / Edit Event ===== -->
+  <dialog class="modal modal-lg" id="dlg-event-form" aria-labelledby="ef-title">
+    <div class="modal-head">
+      <h2 class="h3" id="ef-title">Add New Event</h2>
+      <button type="button" class="icon-btn" data-close aria-label="Close dialog"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
-  </div>
+    <form class="modal-body" id="event-form" novalidate>
+      <div id="ef-alert"></div>
+      <input type="hidden" id="ef-id">
+      <div class="form-grid">
+        <div class="field span-2">
+          <label for="ef-title-input">Event title</label>
+          <input type="text" id="ef-title-input" maxlength="200" required aria-describedby="ef-dup" placeholder="e.g. Kasadya sa Diyandi Street Dancing Competition">
+          <div id="ef-dup"></div>
+        </div>
+        <div class="field span-2">
+          <label for="ef-description">Event overview and instructions</label>
+          <textarea id="ef-description" rows="4" required placeholder="Provide an engaging description so attendees know what to expect..."></textarea>
+        </div>
+        <div class="field">
+          <label for="ef-category">Category</label>
+          <input type="text" id="ef-category" list="category-options" required placeholder="e.g. Festival, Eco-Tourism">
+          <datalist id="category-options"></datalist>
+        </div>
+        <div class="field">
+          <label for="ef-barangay">Barangay</label>
+          <select id="ef-barangay" required></select>
+        </div>
+        <div class="field span-2">
+          <label for="ef-venue">Venue or landmark</label>
+          <input type="text" id="ef-venue" maxlength="150" required placeholder="e.g. Anahaw Amphitheater, Buhanginan Hills">
+        </div>
+        <div class="field">
+          <label for="ef-date">Event date</label>
+          <input type="date" id="ef-date" required>
+        </div>
+        <div class="field">
+          <label for="ef-time">Start time</label>
+          <input type="time" id="ef-time" required>
+        </div>
+        <div class="field">
+          <label for="ef-price">Ticket price (PHP, 0 for free)</label>
+          <input type="number" id="ef-price" min="0" step="0.01" value="0" required>
+        </div>
+        <div class="field">
+          <label for="ef-slots">Total seating slots</label>
+          <input type="number" id="ef-slots" min="1" step="1" required placeholder="e.g. 150">
+        </div>
+        <div class="field span-2">
+          <label for="ef-organizer">Organizer or sponsoring office</label>
+          <input type="text" id="ef-organizer" maxlength="100" placeholder="e.g. Iligan City Tourism Office">
+        </div>
+        <div class="field span-2">
+          <label for="ef-image">Banner image URL or path</label>
+          <input type="text" id="ef-image" placeholder="images/kasadya_sa_diyandi.jpg">
+          <img class="img-preview" id="ef-preview" alt="Banner preview" hidden>
+        </div>
+        <label class="check span-2"><input type="checkbox" id="ef-featured"> <span>Feature this event on the homepage highlights</span></label>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-ghost" data-close>Discard Changes</button>
+        <button type="submit" class="btn btn-primary" id="ef-submit">Publish Event</button>
+      </div>
+    </form>
+  </dialog>
 
-  <div class="ald-modal-overlay" id="modal-confirm-destructive" onclick="if(event.target===this)window.closeModal('modal-confirm-destructive')">
-    <div class="ald-modal-dialog ald-modal-destructive">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-        <div style="width:36px;height:36px;border-radius:50%;background:#FEE2E2;color:#DC2626;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:bold;">⚠️</div>
-        <div id="destructive-modal-title" style="font-size:18px;font-weight:800;color:#DC2626;">Confirm Destructive Action</div>
-      </div>
-      <div id="destructive-modal-desc" style="color:#1F2937;font-size:14px;line-height:1.6;margin-bottom:16px;">
-        Are you sure you want to proceed with this destructive action?
-      </div>
-      
-      <div id="destructive-input-container" style="margin-bottom:18px;display:none;">
-        <label class="ald-form-label" for="confirm-destructive-input">To confirm, type <strong>DELETE</strong> below:</label>
-        <input type="text" id="confirm-destructive-input" class="ald-form-input" placeholder="DELETE" style="font-weight:bold;letter-spacing:1px;" />
-      </div>
-
-      <div style="display:flex;gap:10px;justify-content:flex-end;">
-        <button type="button" class="ald-btn-outline" onclick="window.closeModal('modal-confirm-destructive')">Cancel</button>
-        <button type="button" class="btn-danger-confirm" id="destructive-confirm-btn">Confirm Deletion</button>
-      </div>
+  <!-- ===== Dialog: Attendees ===== -->
+  <dialog class="modal modal-lg" id="dlg-attendees" aria-labelledby="att-title">
+    <div class="modal-head">
+      <h2 class="h3" id="att-title">Attendees</h2>
+      <button type="button" class="icon-btn" data-close aria-label="Close dialog"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
-  </div>
+    <div class="modal-body" id="att-body"></div>
+  </dialog>
 
-  <div class="ald-modal-overlay" id="modal-confirm-logout" onclick="if(event.target===this)window.closeModal('modal-confirm-logout')">
-    <div class="ald-modal-dialog ald-modal-destructive" style="max-width:480px;width:95%;">
-      <button type="button" class="ald-modal-close" onclick="window.closeModal('modal-confirm-logout')">&times;</button>
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
-        <div style="width:40px;height:40px;border-radius:50%;background:#FEE2E2;color:#DC2626;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-        </div>
-        <div>
-          <div style="font-size:18px;font-weight:800;color:#1E3A8A;" class="logout-modal-title">Are you sure you want to log out?</div>
-          <div style="font-size:12px;font-weight:600;color:#6B7280;" class="logout-modal-subtitle">Confirm Session Sign Out</div>
-        </div>
+  <!-- ===== Dialog: Profile ===== -->
+  <dialog class="modal" id="dlg-profile" aria-labelledby="profile-title">
+    <div class="modal-head">
+      <h2 class="h3" id="profile-title">My Profile</h2>
+      <button type="button" class="icon-btn" data-close aria-label="Close dialog"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+    <form class="modal-body" id="profile-form" novalidate>
+      <div id="profile-alert"></div>
+      <div class="field"><label for="p-email">Email address</label><input type="email" id="p-email" readonly></div>
+      <div class="field"><label for="p-name">Full name</label><input type="text" id="p-name" required minlength="3"></div>
+      <div class="field"><label for="p-phone">Mobile number</label><input type="tel" id="p-phone"></div>
+      <div class="field"><label for="p-password">New password (leave blank to keep current)</label><input type="password" id="p-password" autocomplete="new-password" minlength="6"></div>
+      <p class="muted" id="p-stats"></p>
+      <div class="form-actions">
+        <button type="button" class="btn btn-ghost" data-close>Close</button>
+        <button type="submit" class="btn btn-primary">Save Profile</button>
       </div>
-      <div style="color:#1F2937;font-size:14px;line-height:1.6;margin-bottom:20px;" class="logout-modal-desc" id="logout-modal-desc-text">
-        Are you sure you want to log out? You will need to sign in again to book passes, manage registered events, or access coordinator tools.
+    </form>
+  </dialog>
+
+  <!-- ===== Dialog: Confirm Destructive Action ===== -->
+  <dialog class="modal modal-sm" id="dlg-confirm" role="alertdialog" aria-labelledby="confirm-title" aria-describedby="confirm-message">
+    <div class="modal-head">
+      <h2 class="h3" id="confirm-title">Are you sure?</h2>
+    </div>
+    <div class="modal-body">
+      <p id="confirm-message"></p>
+      <div class="field" id="confirm-type-wrap" hidden>
+        <label for="confirm-type" id="confirm-type-label"></label>
+        <input type="text" id="confirm-type" autocomplete="off">
       </div>
-      <div style="display:flex;gap:10px;justify-content:flex-end;">
-        <button type="button" class="ald-btn-outline" style="min-width:100px;" onclick="window.closeModal('modal-confirm-logout')">Cancel</button>
-        <button type="button" class="btn-danger-confirm" style="min-width:120px;" onclick="window.confirmLogout()">Log Out</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="ald-modal-overlay" id="modal-add-event" onclick="if(event.target===this)window.closeModal('modal-add-event')">
-    <div class="ald-modal-dialog" style="max-width:920px;width:95%;">
-      <button type="button" class="ald-modal-close" onclick="window.closeModal('modal-add-event')">&times;</button>
-      <div style="font-size:20px;font-weight:800;color:#1E3A8A;margin-bottom:12px;">Add New Community Event</div>
-      
-      <div id="add-evt-feedback-warning" class="ald-feedback-warning"></div>
-
-      <form onsubmit="window.submitAddEvent(event)">
-        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(380px, 1fr));gap:14px 24px;">
-          <div>
-            <div class="ald-form-group">
-              <label class="ald-form-label" for="add-evt-title">Event Title *</label>
-              <input type="text" id="add-evt-title" class="ald-form-input" placeholder="e.g. Diyandi Festival Street Dance" oninput="window.checkDuplicateEventTitle(this.value)" required />
-            </div>
-            
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-              <div class="ald-form-group">
-                <label class="ald-form-label" for="add-evt-cat">Category *</label>
-                <select id="add-evt-cat" class="ald-form-select">
-                  <option value="Festival">Festival</option>
-                  <option value="Eco-Tourism">Eco-Tourism</option>
-                  <option value="Arts & Culture">Arts &amp; Culture</option>
-                  <option value="Sports">Sports</option>
-                  <option value="LGU Public Service">LGU Public Service</option>
-                  <option value="Guided tours">Guided tours</option>
-                </select>
-              </div>
-              <div class="ald-form-group">
-                <label class="ald-form-label" for="add-evt-brgy">Barangay Location *</label>
-                <select id="add-evt-brgy" class="ald-form-select">
-                  <option value="Pala-o">Pala-o</option>
-                  <option value="Poblacion">Poblacion</option>
-                  <option value="Tubod">Tubod</option>
-                  <option value="Buru-un">Buru-un</option>
-                  <option value="Maria Cristina">Maria Cristina</option>
-                  <option value="Santiago">Santiago</option>
-                  <option value="Ditucalan">Ditucalan</option>
-                  <option value="Kiwalan">Kiwalan</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="ald-form-group">
-              <label class="ald-form-label" for="add-evt-venue">Venue Name *</label>
-              <input type="text" id="add-evt-venue" class="ald-form-input" placeholder="e.g. Anahaw Amphitheater, Buhanginan Hills" required />
-            </div>
-
-            <div class="ald-form-group">
-              <label class="ald-form-label" for="add-evt-image">Image URL or Local Path</label>
-              <input type="text" id="add-evt-image" class="ald-form-input" placeholder="e.g. images/kasadya_sa_diyandi.jpg" />
-            </div>
-          </div>
-
-          <div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-              <div class="ald-form-group">
-                <label class="ald-form-label" for="add-evt-date">Date *</label>
-                <input type="date" id="add-evt-date" class="ald-form-input" required />
-              </div>
-              <div class="ald-form-group">
-                <label class="ald-form-label" for="add-evt-time">Time</label>
-                <input type="time" id="add-evt-time" class="ald-form-input" value="08:00" />
-              </div>
-            </div>
-
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-              <div class="ald-form-group">
-                <label class="ald-form-label" for="add-evt-price">Price (₱, 0 for Free)</label>
-                <input type="number" step="0.01" id="add-evt-price" class="ald-form-input" value="0" />
-              </div>
-              <div class="ald-form-group">
-                <label class="ald-form-label" for="add-evt-slots">Capacity / Available Slots</label>
-                <input type="number" id="add-evt-slots" class="ald-form-input" value="200" />
-              </div>
-            </div>
-
-            <div class="ald-form-group">
-              <label class="ald-form-label" for="add-evt-desc">Description</label>
-              <textarea id="add-evt-desc" class="ald-form-textarea" rows="4" placeholder="Provide details about the event schedule, program, and attractions..."></textarea>
-            </div>
-          </div>
-        </div>
-
-        <div style="display:flex;gap:12px;margin-top:20px;justify-content:flex-end;">
-          <button type="button" class="ald-btn-outline" style="min-width:110px;" onclick="window.closeModal('modal-add-event')">Cancel</button>
-          <button type="submit" class="ald-btn-primary" style="min-width:160px;">Publish Event</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <div class="ald-modal-overlay" id="modal-edit-event" onclick="if(event.target===this)window.closeModal('modal-edit-event')">
-    <div class="ald-modal-dialog" style="max-width:920px;width:95%;">
-      <button type="button" class="ald-modal-close" onclick="window.closeModal('modal-edit-event')">&times;</button>
-      <div style="font-size:20px;font-weight:800;color:#1E3A8A;margin-bottom:12px;">Edit Community Event</div>
-      
-      <div id="edit-evt-feedback-warning" class="ald-feedback-warning" style="display:none;"></div>
-
-      <form onsubmit="window.submitEditEvent(event)">
-        <input type="hidden" id="edit-evt-id" value="" />
-
-        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(380px, 1fr));gap:14px 24px;">
-          <div>
-            <div class="ald-form-group">
-              <label class="ald-form-label" for="edit-evt-title">Event Title / Name *</label>
-              <input type="text" id="edit-evt-title" class="ald-form-input" placeholder="e.g. Alderhaven Autumn Harvest Market & Cider Press" required />
-            </div>
-            
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-              <div class="ald-form-group">
-                <label class="ald-form-label" for="edit-evt-cat">Category *</label>
-                <select id="edit-evt-cat" class="ald-form-select">
-                  <option value="Festival">Festival</option>
-                  <option value="Eco-Tourism">Eco-Tourism</option>
-                  <option value="Arts & Culture">Arts &amp; Culture</option>
-                  <option value="Sports">Sports</option>
-                  <option value="LGU Public Service">LGU Public Service</option>
-                  <option value="Guided tours">Guided tours</option>
-                  <option value="Food & Harvest">Food &amp; Harvest</option>
-                </select>
-              </div>
-              <div class="ald-form-group">
-                <label class="ald-form-label" for="edit-evt-brgy">Barangay Location *</label>
-                <select id="edit-evt-brgy" class="ald-form-select">
-                  <option value="Pala-o">Pala-o</option>
-                  <option value="Poblacion">Poblacion</option>
-                  <option value="Tubod">Tubod</option>
-                  <option value="Buru-un">Buru-un</option>
-                  <option value="Maria Cristina">Maria Cristina</option>
-                  <option value="Santiago">Santiago</option>
-                  <option value="Ditucalan">Ditucalan</option>
-                  <option value="Kiwalan">Kiwalan</option>
-                  <option value="Village Centre">Village Centre</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="ald-form-group">
-              <label class="ald-form-label" for="edit-evt-venue">Venue Name *</label>
-              <input type="text" id="edit-evt-venue" class="ald-form-input" placeholder="e.g. Cobbled Market Square" required />
-            </div>
-
-            <div class="ald-form-group">
-              <label class="ald-form-label" for="edit-evt-image">Photo URL or Local Path</label>
-              <input type="text" id="edit-evt-image" class="ald-form-input" placeholder="e.g. images/kasadya_sa_diyandi.jpg" list="edit-evt-photo-presets" oninput="window.previewEditEventPhoto(this.value)" />
-              <datalist id="edit-evt-photo-presets">
-                <option value="images/kasadya_sa_diyandi.jpg">Kasadya sa Diyandi</option>
-                <option value="images/itchyworms_crowd_anahaw.jpg">Itchyworms Live Concert</option>
-                <option value="images/anahaw_amphitheater.jpg">Anahaw Amphitheater Panorama</option>
-                <option value="images/diyandi_paramotor_show.jpg">Paramotor Show</option>
-                <option value="images/civic_military_parade.jpg">Civic Military Parade</option>
-                <option value="images/miss_iligan_2026.jpg">Miss Iligan Coronation</option>
-                <option value="images/harana_sessions.jpg">Harana Sessions</option>
-                <option value="images/rico_blanco_iligan.jpg">Rico Blanco Live</option>
-                <option value="images/diyandi_festival_panoramic_header.png">Diyandi Festival Header</option>
-                <option value="https://upload.wikimedia.org/wikipedia/commons/0/05/Maria_Cristina_Falls.jpg">Maria Cristina Falls</option>
-                <option value="https://upload.wikimedia.org/wikipedia/commons/8/8a/Tinago_Falls.jpg">Tinago Falls</option>
-              </datalist>
-              <div style="display:flex;align-items:center;gap:10px;margin-top:8px;">
-                <img id="edit-evt-photo-preview" src="images/kasadya_sa_diyandi.jpg" alt="Preview" style="width:64px;height:42px;object-fit:cover;border-radius:6px;border:1px solid #E5E7EB;" />
-                <span style="font-size:12px;color:#6B7280;">Live photo preview (type URL/path or pick from recommendations)</span>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-              <div class="ald-form-group">
-                <label class="ald-form-label" for="edit-evt-date">Date *</label>
-                <input type="date" id="edit-evt-date" class="ald-form-input" required />
-              </div>
-              <div class="ald-form-group">
-                <label class="ald-form-label" for="edit-evt-time">Time</label>
-                <input type="time" id="edit-evt-time" class="ald-form-input" value="08:00" />
-              </div>
-            </div>
-
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-              <div class="ald-form-group">
-                <label class="ald-form-label" for="edit-evt-price">Price (₱, 0 for Free)</label>
-                <input type="number" step="0.01" id="edit-evt-price" class="ald-form-input" value="0" />
-              </div>
-              <div class="ald-form-group">
-                <label class="ald-form-label" for="edit-evt-slots">Capacity / Available Slots</label>
-                <input type="number" id="edit-evt-slots" class="ald-form-input" value="200" />
-              </div>
-            </div>
-
-            <div class="ald-form-group">
-              <label class="ald-form-label" for="edit-evt-desc">Description</label>
-              <textarea id="edit-evt-desc" class="ald-form-textarea" rows="4" placeholder="Provide details about the event schedule, program, and attractions..."></textarea>
-            </div>
-          </div>
-        </div>
-
-        <div style="display:flex;gap:12px;margin-top:20px;justify-content:flex-end;">
-          <button type="button" class="ald-btn-outline" style="min-width:110px;" onclick="window.closeModal('modal-edit-event')">Cancel</button>
-          <button type="submit" class="ald-btn-primary" style="min-width:160px;">Save Changes</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <div class="ald-modal-overlay" id="modal-hero-banner" onclick="if(event.target===this)window.closeModal('modal-hero-banner')">
-    <div class="ald-modal-dialog" style="max-width:760px;width:95%;">
-      <button type="button" class="ald-modal-close" onclick="window.closeModal('modal-hero-banner')">&times;</button>
-      <div style="font-size:20px;font-weight:800;color:#1E3A8A;margin-bottom:14px;">Hero Presentation Manager</div>
-      
-      <form onsubmit="window.submitHeroBannerUpdate(event)">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-          <div class="ald-form-group">
-            <label class="ald-form-label" for="hero-banner-url-input">Hero Banner Image Path / URL</label>
-            <input type="text" id="hero-banner-url-input" class="ald-form-input" value="images/anahaw_amphitheater.jpg" placeholder="images/anahaw_amphitheater.jpg" />
-            <div style="font-size:12px;color:#6B7280;margin-top:4px;">Presets: images/anahaw_amphitheater.jpg, images/diyandi_festival_panoramic_header.png</div>
-          </div>
-          <div class="ald-form-group">
-            <label class="ald-form-label" for="hero-title-input">Headline Title</label>
-            <input type="text" id="hero-title-input" class="ald-form-input" value="Discover, Gather & Celebrate in Iligan City" />
-          </div>
-        </div>
-        <div class="ald-form-group">
-          <label class="ald-form-label" for="hero-subtitle-input">Subtitle / Introduction</label>
-          <textarea id="hero-subtitle-input" class="ald-form-textarea" rows="2">Equipping our community with direct and easy access to local gatherings, cultural festivals, eco-tourism caravans, and civic occasions across Iligan City.</textarea>
-        </div>
-        <div style="display:flex;gap:12px;margin-top:20px;justify-content:flex-end;">
-          <button type="button" class="ald-btn-outline" style="min-width:110px;" onclick="window.closeModal('modal-hero-banner')">Cancel</button>
-          <button type="submit" class="ald-btn-primary" style="min-width:160px;">Apply Hero Banner</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <div class="ald-modal-overlay" id="modal-help-team" onclick="if(event.target===this)window.closeModal('modal-help-team')">
-    <div class="ald-modal-dialog" style="max-width:760px;width:95%;">
-      <button type="button" class="ald-modal-close" onclick="window.closeModal('modal-help-team')">&times;</button>
-      <div style="font-size:20px;font-weight:800;color:#1E3A8A;margin-bottom:8px;">Community &amp; Visitor Desk</div>
-      <p style="color:#4B5563;font-size:14px;margin-bottom:16px;">
-        We are here to help you enjoy Iligan City events safely and smoothly.
-      </p>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;">
-        <div style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:10px;padding:16px;font-size:13px;line-height:1.7;">
-          <div>📍 <strong>Tourism Office:</strong> Buhanginan Hills, Pala-o, Iligan City</div>
-          <div>📞 <strong>Contact:</strong> 0922 334 4556 / (063) 221-3423</div>
-          <div>✉️ <strong>Email:</strong> tourism@iligancity.gov.ph</div>
-          <div>⏰ <strong>Hours:</strong> Mon–Sat 8:00 AM – 5:00 PM</div>
-        </div>
-
-        <form onsubmit="window.submitVisitorQuestion(event)">
-          <div class="ald-form-group">
-            <label class="ald-form-label" for="help-inquiry-msg">Your Inquiry / Message</label>
-            <textarea id="help-inquiry-msg" class="ald-form-textarea" rows="4" placeholder="Ask about venue accessibility, festival parade routes, parking, or passes..." required></textarea>
-          </div>
-          <button type="submit" class="ald-btn-primary" style="width:100%;height:42px;">Send to Community Desk</button>
-        </form>
+      <div class="form-actions">
+        <button type="button" class="btn btn-ghost" id="confirm-cancel">Keep It</button>
+        <button type="button" class="btn btn-danger" id="confirm-ok">Confirm</button>
       </div>
     </div>
-  </div>
-
-  <div class="ald-toast-container" id="ald-toast-container"></div>
-
-  <script src="app.js?v=20261016_logout_modal3"></script>
+  </dialog>
 </body>
 </html>

@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS `users` (
     `name` VARCHAR(100) NOT NULL COMMENT 'Full name of the user',
     `email` VARCHAR(150) NOT NULL UNIQUE COMMENT 'Unique contact email',
     `phone` VARCHAR(30) NULL COMMENT 'Mobile number for SMS updates',
-    `role` ENUM('user', 'organizer') NOT NULL DEFAULT 'user' COMMENT 'Role determines access permissions (Citizen vs Coordinator)',
+    `role` ENUM('user', 'organizer', 'admin') NOT NULL DEFAULT 'user' COMMENT 'Role determines access permissions (Citizen vs Coordinator vs Administrator)',
     `password` VARCHAR(255) NOT NULL DEFAULT 'password123' COMMENT 'Secure password or hash',
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
