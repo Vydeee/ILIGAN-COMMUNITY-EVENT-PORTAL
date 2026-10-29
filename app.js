@@ -1,17 +1,8 @@
-/* =========================================================
-   Iligan Community Event Portal — Front-End Application
-   Vanilla ES6+, Native HTML5/CSS3. No external frameworks.
-   Includes:
-     - Top Hero Carousel with 5s Interval & Progress Bar
-     - Spacious, Uncluttered Event Cards with Pinned Actions
-     - Interactive, Animated Authentication Modal
-     - Safe DOM construction using textContent to prevent XSS
-     - Role-Based Dashboards & Native Modals
-   ========================================================= */
+// Iligan Community Event Portal - main frontend script
 (() => {
   'use strict';
 
-  /* ---------- Constants & State ---------- */
+  // --- config & app state ---
   const API_URL = 'api.php';
   const PAGE_SIZE = 9;
   const USER_STORAGE_KEY = 'iligan_current_user';
@@ -87,7 +78,7 @@
     carouselSlides: [...DEFAULT_CAROUSEL_SLIDES]
   };
 
-  /* ---------- DOM Helpers ---------- */
+  // --- dom & icon helpers ---
   const find = (selector, root = document) => root.querySelector(selector);
   const findAll = (selector, root = document) => [...root.querySelectorAll(selector)];
 
@@ -108,7 +99,6 @@
   }
   const clear = (node) => { node.replaceChildren(); return node; };
 
-  /* Native line-style SVG icons */
   const ICONS = {
     calendar: '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
     clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
@@ -138,7 +128,7 @@
     return template.content.firstElementChild;
   }
 
-  /* ---------- Formatting ---------- */
+  // --- date & price helpers ---
   const todayDate = () => new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
   const toNumber = (value) => Number(value) || 0;
   const isFree = (event) => toNumber(event.price) <= 0;
@@ -181,7 +171,7 @@
     return image;
   }
 
-  /* ---------- API Client ---------- */
+  // --- api request helper ---
   async function api(action, { params = {}, body = null } = {}) {
     const url = new URL(API_URL, location.href);
     url.searchParams.set('action', action);
@@ -206,7 +196,7 @@
     }
   }
 
-  /* ---------- UI Kit: Alerts, Toasts, Confirm ---------- */
+  // --- alerts, toasts & modals ---
   function alertBox(type, title, text, { dismissible = true, actions = [] } = {}) {
     const box = createElement('div', { class: `alert alert-${type}`, role: type === 'error' ? 'alert' : 'status' },
       icon({ info: 'info', warning: 'warning', success: 'check', error: 'error' }[type]),
@@ -310,14 +300,11 @@
     return select;
   }
 
-  /* =========================================================
-     TOP HERO CAROUSEL IMPLEMENTATION
-     ========================================================= */
+  // --- hero spotlight carousel ---
   function initHeroCarousel() {
     const track = find('#carousel-track'), dots = find('#carousel-dots');
     if (!track) return;
 
-    // Build slides (Split Spotlight Hero Carousel)
     clear(track); clear(dots);
     const totalSlides = state.carouselSlides.length;
     state.carouselSlides.forEach((slide, index) => {
@@ -379,7 +366,6 @@
             createElement('span', { class: 'carousel-media-tag' }, icon('star', 'icon-small'), 'Featured Event'))));
       track.append(slideNode);
 
-      // Dot button
       const dot = createElement('button', {
         type: 'button',
         class: `carousel-dot ${index === 0 ? 'is-active' : ''}`,
@@ -392,12 +378,10 @@
     find('#carousel-previous').onclick = () => prevCarouselSlide();
     find('#carousel-next').onclick = () => nextCarouselSlide();
 
-    // Pause on hover
     const carousel = find('#hero-carousel');
     carousel.addEventListener('mouseenter', pauseCarousel);
     carousel.addEventListener('mouseleave', resumeCarousel);
 
-    // Touch Swipe Support
     let touchStartX = 0;
     carousel.addEventListener('touchstart', (browserEvent) => { touchStartX = browserEvent.changedTouches[0].screenX; }, { passive: true });
     carousel.addEventListener('touchend', (browserEvent) => {
@@ -464,9 +448,7 @@
     startCarouselTimer();
   }
 
-  /* =========================================================
-     LANDING PAGE SCROLLSPY NAVIGATION (ALL ROLES)
-     ========================================================= */
+  // --- landing page scrollspy ---
   const LANDING_ROUTES = ['home', 'events', 'about', 'contact'];
   let syncHomeScrollspy = () => {};
   let lockScrollspy = () => {};
@@ -495,7 +477,6 @@
   function initHomeScrollspy() {
     const header = find('#cs-navigation');
 
-    // Keep --header-height CSS custom property synced with sticky header
     const updateHeaderHeight = () => {
       if (header) {
         const height = Math.round(header.getBoundingClientRect().height);
@@ -530,7 +511,6 @@
       const headerHeight = header ? header.getBoundingClientRect().height : 70;
       const triggerLine = headerHeight + 120;
 
-      // If scrolled near the very bottom of the page, highlight the last landing section (Contact Us)
       const scrolledToBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 40;
       let currentRoute = sections[0].routeKey;
 
@@ -567,9 +547,7 @@
     }, { passive: true });
   }
 
-  /* =========================================================
-     AUTH & INTERACTIVE MODAL CONTROLS
-     ========================================================= */
+  // --- login & registration ---
   function setUser(user) {
     if (state.user?.id !== user?.id) state.bookings = [];
     state.user = user;
@@ -632,7 +610,6 @@
     find('#dlg-auth').addEventListener('cancel', (event) => { if (!state.user) event.preventDefault(); });
     find('#auth-panel-switch').onclick = () => switchAuthTab(find('#login-form').hidden ? 'login' : 'register');
 
-    // Password visibility toggles
     findAll('[data-toggle-password]').forEach((button) => {
       button.addEventListener('click', () => {
         const targetInput = find(`#${button.dataset.togglePassword}`);
@@ -643,7 +620,6 @@
       });
     });
 
-    // Role switcher cards
     findAll('.role-card').forEach((card) => {
       card.addEventListener('click', () => {
         findAll('.role-card').forEach((roleCard) => roleCard.classList.remove('is-selected'));
@@ -705,10 +681,7 @@
       toast('You have been signed out.', { type: 'success' });
     });
 
-    /* =========================================================
-       [DEV ONLY] QUICK LOGIN HELPER (EASY TO REMOVE)
-       Delete this entire block to remove quick login behavior.
-       ========================================================= */
+    // --- quick role switcher (dev testing) ---
     const quickLogin = find('#test-login');
     if (quickLogin) {
       const quickLoginButton = find('#test-login-toggle');
@@ -755,10 +728,9 @@
         }
       });
     }
-    /* [/DEV ONLY QUICK LOGIN] */
   }
 
-  /* ---------- Profile ---------- */
+  // --- account profile ---
   async function openProfile() {
     find('#account-menu').hidePopover();
     closeMobileMenu();
@@ -786,7 +758,7 @@
     });
   }
 
-  /* ---------- Data Loading ---------- */
+  // --- initial data fetching ---
   async function loadSettings() {
     const [barangayResponse, tagResponse, settingsResponse] = await Promise.all([api('get_barangays'), api('get_hero_tags'), api('get_settings')]);
     if (barangayResponse.ok) state.barangays = barangayResponse.data.barangays;
@@ -812,7 +784,6 @@
     state.events = response.data;
     state.eventsLoaded = true;
 
-    // Curate premier featured carousel slides from active events
     const validFeatured = state.events.filter((event) =>
       event.status === 'active' &&
       toNumber(event.is_featured) &&
@@ -847,7 +818,7 @@
     if (state.user?.role === 'user' && location.hash === '#/citizen') renderCitizenDashboard();
   }
 
-  /* ---------- Filters & Search ---------- */
+  // --- search & event filters ---
   function renderHeroTags() {
     const host = find('#hero-tags');
     if (!host) return;
@@ -988,15 +959,12 @@
     find('#load-more').addEventListener('click', () => { state.page += 1; renderEvents(); });
   }
 
-  /* =========================================================
-     REDESIGNED EVENT CARD (SPACIOUS, UNCLUTTERED, ELEGANT)
-     ========================================================= */
+  // --- event cards & grid rendering ---
   function eventCard(event) {
     const headingId = `ev-title-${event.id}`;
     const dateParts = parseDateParts(event.event_date);
     const slots = toNumber(event.available_slots);
 
-    // Subtle capacity status
     let capacityNode = null;
     if (isPast(event)) {
       capacityNode = createElement('span', { class: 'capacity-status is-full' }, 'Event Concluded');
@@ -1016,11 +984,9 @@
       class: 'card event-card',
       'aria-labelledby': headingId,
       onclick: (browserEvent) => {
-        // Prevent trigger if clicking an internal button specifically
         if (!browserEvent.target.closest('button')) openEventDetails(event.id);
       }
     },
-      // 1. Media Header with floating category pill and calendar tile
       createElement('div', { class: 'event-media' },
         createEventImage(event),
         createElement('span', { class: 'card-category-badge', text: event.category }),
@@ -1030,11 +996,9 @@
         toNumber(event.is_featured) ? createElement('span', { class: 'card-featured-tag' }, icon('star', 'icon-small'), 'Featured') : null
       ),
 
-      // 2. Event Body with Breathing Room & Uncluttered Layout
       createElement('div', { class: 'event-body' },
         createElement('h3', { class: 'event-name', id: headingId, text: event.title }),
 
-        // Clean highlight rows (Coordinator, Venue and Time)
         createElement('div', { class: 'event-highlights' },
           createElement('div', { class: 'highlight-row' },
             icon('user', 'icon-small'),
@@ -1047,10 +1011,8 @@
             createElement('span', { class: 'highlight-text', text: formatTime(event.event_time) }))
         ),
 
-        // Clean capacity indicator
         capacityNode,
 
-        // 3. Pinned Bottom Footer Taking Advantage of Space
         createElement('div', { class: 'event-footer' },
           createElement('div', { class: 'price-lockup' },
             createElement('span', { class: 'price-label', text: 'Admission' }),
@@ -1077,10 +1039,8 @@
 
   function renderEvents() {
     const today = todayDate();
-    // 1. Prioritize active events marked as featured by administrators
     let featured = state.events.filter((event) => event.status === 'active' && toNumber(event.is_featured));
 
-    // Sort featured events: upcoming dates first, followed by others, ordered chronologically
     featured.sort((a, b) => {
       const aUpcoming = a.event_date >= today ? 1 : 0;
       const bUpcoming = b.event_date >= today ? 1 : 0;
@@ -1088,7 +1048,6 @@
       return (a.event_date + (a.event_time || '')).localeCompare(b.event_date + (b.event_time || ''));
     });
 
-    // Fallback: If no event has been manually marked featured, display upcoming active events
     if (!featured.length) {
       featured = state.events.filter((event) => event.status === 'active' && event.event_date >= today);
       featured.sort((a, b) => (a.event_date + (a.event_time || '')).localeCompare(b.event_date + (b.event_time || '')));
@@ -1127,7 +1086,7 @@
     find('#load-more').hidden = shown.length >= list.length;
   }
 
-  /* ---------- Event Details Modal ---------- */
+  // --- event details modal ---
   function openEventDetails(id) {
     const event = state.events.find((event) => event.id == id);
     if (!event) return;
@@ -1191,7 +1150,7 @@
     find('#event-dialog').showModal();
   }
 
-  /* ---------- Booking Pass Workflow ---------- */
+  // --- booking & qr pass flow ---
   function openBooking(event) {
     if (!canBook(event)) return toast('This event is no longer accepting reservations.', { type: 'error' });
     const user = state.user, maximum = Math.min(10, toNumber(event.available_slots));
@@ -1288,7 +1247,7 @@
     if (!find('#booking-dialog').open) find('#booking-dialog').showModal();
   }
 
-  /* ---------- My Bookings View ---------- */
+  // --- my bookings tab ---
   async function loadCitizenDashboard() {
     const user = state.user;
     clearAlert('#citizen-alert');
@@ -1386,7 +1345,7 @@
     await loadBookings(); loadEvents();
   }
 
-  /* ---------- Coordinator & Admin Dashboards ---------- */
+  // --- coordinator & admin dashboards ---
   const statCard = (value, label) => createElement('div', { class: 'stat' }, createElement('span', { class: 'stat-value', text: value }), createElement('span', { class: 'stat-label', text: label }));
   const tablePaginationState = {};
 
@@ -1659,7 +1618,7 @@
           createElement('td', {}, createElement('span', { class: `badge ${booking.status === 'confirmed' ? 'badge-green' : 'badge-red'}`, text: booking.status }))))))));
   }
 
-  /* ---------- Event Creation & Editing Form ---------- */
+  // --- create / edit event form ---
   function openEventForm(event = null) {
     if (!state.user || !['organizer', 'admin'].includes(state.user.role)) return toast('Sign in as a coordinator to publish events.', { type: 'error' });
     if (event && !event.can_manage) {
@@ -1743,7 +1702,7 @@
     });
   }
 
-  /* ---------- Admin Console ---------- */
+  // --- admin settings & directories ---
   function renderPills(selector, items, onDelete, label) {
     const host = clear(find(selector));
     if (!items.length) return host.append(createElement('li', { class: 'muted', text: `No ${label} configured yet.` }));
@@ -1798,7 +1757,7 @@
     });
   }
 
-  /* ---------- Contact Form ---------- */
+  // --- contact form ---
   function bindContact() {
     const form = find('#contact-form');
     if (!form) return;
@@ -1823,9 +1782,7 @@
     });
   }
 
-  /* =========================================================
-     CS-NAVIGATION CONTROLLER (Adapted from Navigation.js)
-     ========================================================= */
+  // --- top navbar & mobile menu ---
   let closeMobileMenu = () => { };
 
   function initCsNavigation() {
@@ -1945,7 +1902,6 @@
           if (dropdown) toggleDropdown(dropdown);
           return;
         }
-        // Close mobile menu & dropdowns when a navigation link is clicked
         if (event.target.closest('a[data-route]')) {
           closeMobileMenu();
         }
@@ -2068,7 +2024,7 @@
       } }, 'Mark Resolved') : createElement('span', { class: 'badge badge-green', text: 'Resolved' }))));
   }
 
-  /* ---------- Global Nav & Routing ---------- */
+  // --- hash router & page switching ---
   function bindGlobal() {
     document.addEventListener('click', (browserEvent) => {
       const close = browserEvent.target.closest('[data-close]');
@@ -2151,7 +2107,7 @@
     if (name === 'admin') renderAdminLists();
   }
 
-  /* ---------- App Initialization ---------- */
+  // --- app startup ---
   async function startApp() {
     initCsNavigation();
     initHeroCarousel();

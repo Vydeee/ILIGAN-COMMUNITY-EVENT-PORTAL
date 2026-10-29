@@ -1,3 +1,4 @@
+-- --- core tables (users, events, bookings) ---
 CREATE DATABASE IF NOT EXISTS `iligan_events_db` 
 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -51,6 +52,7 @@ CREATE TABLE IF NOT EXISTS `bookings` (
         REFERENCES `events` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- --- seed data ---
 INSERT INTO `users` (`name`, `email`, `phone`, `role`, `password`) VALUES
 ('Mohammad Saumay', 'amina.alonto@gmail.com', '09171234567', 'user', 'password123'),
 ('Juan dela Cruz', 'juan.delacruz@yahoo.com', '09189876543', 'user', 'password123'),
@@ -339,6 +341,7 @@ VALUES
 ('ILG-2026-8F42', 1, 'Juan dela Cruz', 'juan.delacruz@yahoo.com', '09189876543', 1, 'confirmed', NOW() - INTERVAL 2 HOUR)
 ON DUPLICATE KEY UPDATE `status` = VALUES(`status`);
 
+-- --- portal settings, inquiries & barangay lists ---
 CREATE TABLE IF NOT EXISTS `site_settings` (
     `setting_key` VARCHAR(64) PRIMARY KEY,
     `setting_value` TEXT NOT NULL,
@@ -364,9 +367,6 @@ CREATE TABLE IF NOT EXISTS inquiries (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Complete the location and search-tag tables on existing installations.
--- Source: https://psa.gov.ph/classification/psgc/barangays/1030900000
--- Pala-o is the portal display spelling of PSA Palao.
 USE iligan_events_db;
 CREATE TABLE IF NOT EXISTS barangays (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(100) NOT NULL UNIQUE) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 CREATE TABLE IF NOT EXISTS hero_tags (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(100) NOT NULL UNIQUE) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -418,7 +418,6 @@ INSERT IGNORE INTO barangays (name) VALUES
 INSERT IGNORE INTO hero_tags (name) VALUES ('Poblacion'),('Tubod'),('Pala-o'),('Buru-un'),('Ditucalan'),('Maria Cristina');
 INSERT IGNORE INTO users (name,email,role,password) VALUES ('Portal Administrator','admin@iligancity.gov.ph','admin','password123');
 
--- Assign events to their designated sector coordinators for open promotion and access protection
 UPDATE events SET coordinator_id=(SELECT id FROM users WHERE email='tourism@iligancity.gov.ph' LIMIT 1) WHERE id IN (1, 12, 13, 14, 21, 23, 27);
 UPDATE events SET coordinator_id=(SELECT id FROM users WHERE email='ecotourism@iligancity.gov.ph' LIMIT 1) WHERE id IN (2, 6, 8, 28, 106);
 UPDATE events SET coordinator_id=(SELECT id FROM users WHERE email='affairs@iligancity.gov.ph' LIMIT 1) WHERE id IN (3, 24);
@@ -427,8 +426,6 @@ UPDATE events SET coordinator_id=(SELECT id FROM users WHERE email='arts.guild@i
 UPDATE events SET coordinator_id=(SELECT id FROM users WHERE email='santiago.tourism@iligancity.gov.ph' LIMIT 1) WHERE id IN (7, 26, 104);
 UPDATE events SET coordinator_id=(SELECT id FROM users WHERE email='tourism@iligancity.gov.ph' LIMIT 1) WHERE coordinator_id IS NULL;
 
--- Add separate classroom coordinator accounts and clearly marked sample listings.
--- Existing accounts, passwords, listings, ownership, and bookings are preserved.
 USE iligan_events_db;
 START TRANSACTION;
 INSERT IGNORE INTO users (name,email,role,password) VALUES ('Pala-o Community Events','palao.coordinator@example.test','organizer','$2y$10$uhtdUhhwjRlqrd6QFRL.iuVfC/r7nxSJrFzcAuatvm2wx9qdv086W');

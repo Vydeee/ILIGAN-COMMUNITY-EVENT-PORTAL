@@ -21,12 +21,9 @@
       to the portal.</noscript></div>
   <a class="skip-link" href="#main">Skip to main content</a>
 
-  <!-- ============================================ -->
-  <!--                 Navigation                   -->
-  <!-- ============================================ -->
+  <!-- top navbar -->
   <header id="cs-navigation">
     <div class="cs-container">
-      <!-- Nav Logo -->
       <a href="#/home" class="cs-logo" aria-label="Iligan Community Event Portal, back to home">
         <img class="cs-logo-img" src="images/iligan_city_seal_circle.webp" alt="Iligan City Official Seal" width="44"
           height="44" decoding="async">
@@ -38,7 +35,6 @@
 
       <!-- Navigation List -->
       <nav class="cs-nav" aria-label=" main navigation">
-        <!-- Mobile Nav Toggle -->
         <button type="button" class="cs-toggle" id="cs-toggle" aria-expanded="false" aria-controls="cs-ul-wrapper"
           aria-label="mobile menu toggle">
           <span class="cs-box" aria-hidden="true">
@@ -48,7 +44,6 @@
           </span>
         </button>
 
-        <!-- Wrapper for mobile slide/scale menu -->
         <div class="cs-ul-wrapper" id="cs-ul-wrapper">
           <ul id="cs-expanded" class="cs-ul">
             <li class="cs-li">
@@ -72,7 +67,6 @@
               </a>
             </li>
 
-            <!-- Role-Based Dropdown (Visible when signed in) -->
             <li class="cs-li cs-dropdown" data-role="user organizer admin" hidden>
               <button type="button" class="cs-li-link cs-dropdown-toggle" id="cs-portal-dropdown-btn"
                 aria-haspopup="menu" aria-expanded="false">
@@ -100,7 +94,6 @@
             </li>
           </ul>
 
-          <!-- Auth Actions inside Nav (visible in desktop header & mobile drawer) -->
           <div class="cs-nav-actions" id="guest-navigation">
             <button type="button" class="button button-plain cs-btn-signin" data-open-auth="login">Sign In</button>
             <button type="button" class="cs-button-solid" data-open-auth="register">Create Account</button>
@@ -146,19 +139,16 @@
 
   <main id="main" tabindex="-1">
 
-    <!-- ===== View: Home ===== -->
+    <!-- home section -->
     <section class="view landing-scrollspy-section" id="view-home" data-landing-section="home"
       aria-labelledby="home-heading">
       <h1 class="visually-hidden" id="home-heading">Iligan City Community Events</h1>
 
-      <!-- Top Carousel Section -->
       <section class="hero-carousel" id="hero-carousel" aria-roledescription="carousel"
         aria-label="Featured Community Highlights">
         <div class="carousel-track" id="carousel-track">
-          <!-- Slides populated dynamically via app.js -->
         </div>
 
-        <!-- Carousel navigation arrows -->
         <button type="button" class="carousel-arrow prev" id="carousel-previous" aria-label="Previous slide">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <polyline points="15 18 9 12 15 6" />
@@ -170,7 +160,6 @@
           </svg>
         </button>
 
-        <!-- Carousel footer with dots and animated progress bar -->
         <div class="carousel-bottom">
           <div class="carousel-dots" id="carousel-dots" role="tablist" aria-label="Choose slide to display"></div>
           <div class="carousel-progress" aria-hidden="true">
@@ -180,7 +169,6 @@
       </section>
 
       <div class="container section" id="home-civic-highlights" data-scrollspy-section="home-civic-highlights">
-        <!-- Civic Portal Highlights Section (Editorial Split Showcase) -->
         <div class="home-pillars">
           <div class="editorial-showcase">
             <div class="editorial-lead">
@@ -267,7 +255,7 @@
         </div>
       </div>
 
-      <!-- ===== Why This Portal Matters (Dark Contrast Section) ===== -->
+      <!-- why this portal matters -->
       <section class="why-matters-section" id="home-why-matters" data-scrollspy-section="home-why-matters"
         aria-labelledby="why-matters-heading">
         <div class="container why-matters-grid">
@@ -320,11 +308,10 @@
       </section>
     </section>
 
-    <!-- ===== View: Discover events ===== -->
+    <!-- discover events section -->
     <section class="view landing-scrollspy-section" id="view-events" data-landing-section="events"
       aria-labelledby="events-heading">
       <div class="container section discover-events-shell">
-        <!-- Discover Section Header -->
         <div class="discover-header">
           <div class="discover-header-copy">
             <span class="line-eyebrow">Live Community Directory</span>
@@ -333,7 +320,6 @@
           <p class="results-badge" id="results-count" aria-live="polite"></p>
         </div>
 
-        <!-- Unified Discovery Command Bar (Filters + Category Pills) -->
         <div class="discover-command-card">
           <form class="filters discover-filters-grid" id="filters" aria-label="Filter events">
             <div class="field discover-search-field">
@@ -392,7 +378,6 @@
 
         <div id="events-alert"></div>
 
-        <!-- Featured Events Highlights (Handpicked For You - 3 Curated Cards) -->
         <div id="featured-section" class="discover-featured-section" hidden>
           <div class="discover-subhead">
             <div class="section-head-title">
@@ -404,7 +389,6 @@
           <div class="grid cards" id="featured-grid"></div>
         </div>
 
-        <!-- All Upcoming Events Directory -->
         <div class="discover-directory-block">
           <div class="discover-subhead" id="events-results-heading">
             <div class="section-head-title">
@@ -413,7 +397,6 @@
             </div>
           </div>
 
-          <!-- Events Grid -->
           <div class="grid cards" id="events-grid" aria-live="polite"></div>
 
           <div class="center">
@@ -428,7 +411,7 @@
       </div>
     </section>
 
-    <!-- ===== View: About Us ===== -->
+    <!-- about us section -->
     <section class="view landing-scrollspy-section" id="view-about" data-landing-section="about"
       aria-labelledby="about-heading">
       <div class="page-banner">
@@ -539,7 +522,7 @@
       </div>
     </section>
 
-    <!-- ===== View: Contact Us ===== -->
+    <!-- contact us section -->
     <section class="view landing-scrollspy-section" id="view-contact" data-landing-section="contact"
       aria-labelledby="contact-heading">
       <div class="page-banner">
@@ -551,7 +534,6 @@
 
       <div class="container section">
         <div class="contact-grid">
-          <!-- Contact Information Column -->
           <div class="contact-info-stack">
             <div class="card contact-info-card">
               <div class="contact-icon-box">
@@ -609,7 +591,6 @@
             </div>
           </div>
 
-          <!-- Interactive Contact Form Column -->
           <div class="card contact-form-card">
             <span class="eyebrow-accent">Send a Message</span>
             <h2 class="h2">Submit an Inquiry or Request</h2>
@@ -661,7 +642,7 @@
       </div>
     </section>
 
-    <!-- ===== View: Citizen dashboard ===== -->
+    <!-- citizen dashboard -->
     <section class="view" id="view-citizen" aria-labelledby="citizen-heading" hidden>
       <div class="container section">
         <div class="page-head page-head-row">
@@ -692,7 +673,7 @@
       </div>
     </section>
 
-    <!-- ===== View: My bookings ===== -->
+    <!-- my bookings & passes -->
     <section class="view" id="view-bookings" aria-labelledby="bookings-heading" hidden>
       <div class="container section">
         <div class="page-head">
@@ -705,7 +686,7 @@
       </div>
     </section>
 
-    <!-- ===== View: Coordinator dashboard ===== -->
+    <!-- coordinator dashboard -->
     <section class="view" id="view-dashboard" aria-labelledby="dashboard-heading" hidden>
       <div class="container section">
         <div class="page-head page-head-row">
@@ -754,7 +735,7 @@
       </div>
     </section>
 
-    <!-- ===== View: Admin console ===== -->
+    <!-- admin console -->
     <section class="view" id="view-admin" aria-labelledby="admin-heading" hidden>
       <div class="container section">
         <div class="page-head page-head-row">
@@ -942,10 +923,10 @@
     </div>
   </footer>
 
-  <!-- ===== Live region for toasts ===== -->
+  <!-- toast notifications -->
   <div class="toast-region" id="toast-region" popover="manual" role="region" aria-label="Notifications"></div>
 
-  <!-- ===== Dialog: Sign In / Register (Redesigned & Interactive) ===== -->
+  <!-- login & register modal -->
   <dialog class="dialog account-dialog" id="dlg-auth" aria-labelledby="auth-title">
     <aside class="account-dialog-banner" aria-label="Iligan Community Event Portal">
       <div class="auth-brand"><img src="images/iligan_city_seal_circle.webp" alt="" width="40" height="40"><span>Iligan
@@ -966,7 +947,6 @@
       <div class="dialog-content auth-body">
         <div id="auth-alert"></div>
 
-        <!-- Sign In Form -->
         <form id="login-form" aria-labelledby="auth-title" novalidate>
           <div class="field">
             <label for="login-email">Email address</label>
@@ -1004,7 +984,6 @@
           </button>
         </form>
 
-        <!-- Register Form -->
         <form id="register-form" aria-labelledby="auth-title" hidden novalidate>
           <div class="field">
             <label for="register-name">Full name</label>
@@ -1056,7 +1035,6 @@
             </div>
           </div>
 
-          <!-- Interactive Role Switcher Cards -->
           <div class="field">
             <span class="label">Select Account Type</span>
             <div class="role-selector" role="radiogroup" aria-label="Account Type">
@@ -1082,11 +1060,9 @@
                 </div>
               </label>
             </div>
-            <!-- Hidden select kept for seamless JS API compatibility -->
             <input type="hidden" id="register-role" value="user">
           </div>
 
-          <!-- Coordinator Authorization Key (Revealed with animation) -->
           <div class="field role-key-box" id="coordinator-key-field" hidden>
             <label for="coordinator-key">Official LGU Authorization Key</label>
             <div class="input-icon-wrap">
@@ -1109,10 +1085,6 @@
         </form>
       </div>
 
-      <!-- =========================================================
-         [DEV ONLY] QUICK LOGIN (EASY TO REMOVE LATER)
-         To remove: simply delete this <div class="test-login"> container.
-         ========================================================= -->
       <div class="test-login" id="test-login" title="Quick Coordinator Switcher (Dev Testing)">
         <span class="test-login-toggle" id="test-login-toggle" role="button" tabindex="0"
           aria-label="Toggle quick login options">
@@ -1133,11 +1105,10 @@
             title="Sign in as Citizen (Mohammad Saumay)">Citizen</button>
         </div>
       </div>
-      <!-- [/DEV ONLY QUICK LOGIN] -->
     </div>
   </dialog>
 
-  <!-- ===== Dialog: Event Details ===== -->
+  <!-- event details modal -->
   <dialog class="dialog dialog-large" id="event-dialog" aria-labelledby="event-title">
     <div class="dialog-header">
       <h2 class="h3" id="event-title">Event details</h2>
@@ -1149,7 +1120,7 @@
     <div class="dialog-content" id="event-body"></div>
   </dialog>
 
-  <!-- ===== Dialog: Booking Workflow ===== -->
+  <!-- booking modal -->
   <dialog class="dialog" id="booking-dialog" aria-labelledby="booking-title">
     <div class="dialog-header">
       <h2 class="h3" id="booking-title">Book Event Pass</h2>
@@ -1161,7 +1132,7 @@
     <div class="dialog-content" id="booking-content"></div>
   </dialog>
 
-  <!-- ===== Dialog: Add / Edit Event ===== -->
+  <!-- create / edit event modal -->
   <dialog class="dialog dialog-large" id="event-form-dialog" aria-labelledby="event-form-heading">
     <div class="dialog-header">
       <h2 class="h3" id="event-form-heading">Add New Event</h2>
@@ -1234,7 +1205,7 @@
     </form>
   </dialog>
 
-  <!-- ===== Dialog: Attendees ===== -->
+  <!-- attendee roster modal -->
   <dialog class="dialog dialog-large" id="attendees-dialog" aria-labelledby="attendees-title">
     <div class="dialog-header">
       <h2 class="h3" id="attendees-title">Attendees</h2>
@@ -1246,7 +1217,7 @@
     <div class="dialog-content" id="attendees-content"></div>
   </dialog>
 
-  <!-- ===== Dialog: Profile ===== -->
+  <!-- account profile modal -->
   <dialog class="dialog" id="profile-dialog" aria-labelledby="profile-title">
     <div class="dialog-header">
       <h2 class="h3" id="profile-title">My Profile</h2>
@@ -1272,7 +1243,7 @@
     </form>
   </dialog>
 
-  <!-- ===== Dialog: Confirm Destructive Action ===== -->
+  <!-- confirmation modal -->
   <dialog class="dialog dialog-small" id="dlg-confirm" role="alertdialog" aria-labelledby="confirm-title"
     aria-describedby="confirm-message">
     <div class="dialog-header">

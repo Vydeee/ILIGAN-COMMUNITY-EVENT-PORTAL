@@ -22,6 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
+// --- database connection ---
 $databaseHost = getenv('ILIGAN_DB_HOST') ?: '127.0.0.1';
 $databaseName = getenv('ILIGAN_DB_NAME') ?: 'iligan_events_db';
 $databaseUser = getenv('ILIGAN_DB_USER') ?: 'root';
@@ -51,6 +52,7 @@ $request = is_array($json) ? array_merge($_POST, $json) : $_POST;
 
 $action = $_GET['action'] ?? $request['action'] ?? '';
 
+// --- auth & response helpers ---
 function sendJsonResponse($success, $message, $data = null, $helpText = null, $statusCode = 200) {
     http_response_code($statusCode);
     $response = [
@@ -86,14 +88,14 @@ function requireBookingOwner($database, $booking) {
     }
 }
 
-// Portal data is available only to a verified server session.
 if (!in_array($action, ['login', 'register', 'logout'], true) && !getAuthenticatedUser($database)) {
     sendJsonResponse(false, 'Please sign in or create an account to access the portal.', null, 'Sign in to continue.', 401);
 }
 
 switch ($action) {
 
-    case 'register':
+    // --- auth endpoints ---
+  case 'register':
         $name = trim($request['name'] ?? '');
         $email = trim($request['email'] ?? '');
         $phone = trim($request['phone'] ?? '');
@@ -206,7 +208,8 @@ switch ($action) {
         sendJsonResponse(true, 'Signed out successfully.', null, 'You have been signed out.');
         break;
 
-    case 'check_event_exists':
+    // --- events & bookings ---
+  case 'check_event_exists':
         $title = trim($_GET['title'] ?? $request['title'] ?? '');
 
         if (empty($title)) {
@@ -642,7 +645,8 @@ switch ($action) {
         }
         break;
 
-    case 'create_event':
+    // --- coordinator & admin event management ---
+  case 'create_event':
         $user = getAuthenticatedUser($database);
         if (!$user || !in_array($user['role'], ['organizer', 'admin'])) {
             sendJsonResponse(
@@ -996,7 +1000,8 @@ switch ($action) {
         }
         break;
 
-    case 'get_hero_tags':
+    // --- portal settings & directories ---
+  case 'get_hero_tags':
         try {
             $statement = $database->query("SELECT id, name FROM hero_tags ORDER BY name ASC");
             $tags = $statement->fetchAll();
@@ -1162,7 +1167,8 @@ switch ($action) {
         sendJsonResponse(true, 'Hero banner updated successfully!', $settings);
         break;
 
-    case 'send_inquiry':
+    // --- support inquiries & user profile ---
+  case 'send_inquiry':
         $name = trim($request['name'] ?? '');
         $email = trim($request['email'] ?? '');
         $topic = trim($request['topic'] ?? '');
