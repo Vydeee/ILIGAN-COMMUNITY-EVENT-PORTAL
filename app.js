@@ -12,21 +12,22 @@
   'use strict';
 
   /* ---------- Constants & State ---------- */
-  const API = 'api.php';
+  const API_URL = 'api.php';
   const PAGE_SIZE = 9;
-  const USER_KEY = 'iligan_current_user';
+  const USER_STORAGE_KEY = 'iligan_current_user';
   const CAROUSEL_INTERVAL_MS = 5000;
-  const ROLE_LABEL = { user: 'Citizen', organizer: 'Coordinator', admin: 'Administrator' };
+  const ROLE_NAMES = { user: 'Citizen', organizer: 'Coordinator', admin: 'Administrator' };
   const DEFAULT_CATEGORIES = ['Festival', 'Eco-Tourism', 'Arts & Culture', 'Sports', 'LGU Public Service', 'Community', 'Guided tours', 'Workshops', 'Heritage'];
-  
+
   const ROUTES = {
-    home:      { title: 'Home' },
-    events:    { title: 'Discover Events' },
-    about:     { title: 'About Us' },
-    contact:   { title: 'Contact Us' },
-    bookings:  { title: 'My Bookings', roles: ['user', 'organizer', 'admin'] },
+    home: { title: 'Home' },
+    events: { title: 'Discover Events' },
+    about: { title: 'About Us' },
+    contact: { title: 'Contact Us' },
+    citizen: { title: 'Citizen Dashboard', roles: ['user'] },
+    bookings: { title: 'My Bookings', roles: ['user', 'organizer', 'admin'] },
     dashboard: { title: 'Coordinator Dashboard', roles: ['organizer'] },
-    admin:     { title: 'Admin Console', roles: ['admin'] }
+    admin: { title: 'Admin Console', roles: ['admin'] }
   };
 
   const DEFAULT_CAROUSEL_SLIDES = [
@@ -86,21 +87,21 @@
   };
 
   /* ---------- DOM Helpers ---------- */
-  const $ = (sel, root = document) => root.querySelector(sel);
-  const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+  const find = (selector, root = document) => root.querySelector(selector);
+  const findAll = (selector, root = document) => [...root.querySelectorAll(selector)];
 
-  function el(tag, props = {}, ...kids) {
+  function createElement(tag, attributes = {}, ...children) {
     const node = document.createElement(tag);
-    for (const [key, val] of Object.entries(props || {})) {
-      if (val == null || val === false) continue;
-      if (key === 'class') node.className = val;
-      else if (key === 'text') node.textContent = val;
-      else if (key.startsWith('on') && typeof val === 'function') node.addEventListener(key.slice(2), val);
-      else node.setAttribute(key, val === true ? '' : val);
+    for (const [key, value] of Object.entries(attributes || {})) {
+      if (value == null || value === false) continue;
+      if (key === 'class') node.className = value;
+      else if (key === 'text') node.textContent = value;
+      else if (key.startsWith('on') && typeof value === 'function') node.addEventListener(key.slice(2), value);
+      else node.setAttribute(key, value === true ? '' : value);
     }
-    for (const kid of kids.flat()) {
-      if (kid == null || kid === false) continue;
-      node.append(kid.nodeType ? kid : document.createTextNode(String(kid)));
+    for (const child of children.flat()) {
+      if (child == null || child === false) continue;
+      node.append(child.nodeType ? child : document.createTextNode(String(child)));
     }
     return node;
   }
@@ -123,67 +124,73 @@
     star: '<path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/>',
     inbox: '<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5.1 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.5-6.9A2 2 0 0 0 16.7 4H7.3a2 2 0 0 0-1.8 1.1z"/>',
     search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
+    arrowLeft: '<line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>',
     arrowRight: '<line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>'
   };
-  function icon(name, extra = '') {
-    const t = document.createElement('template');
-    t.innerHTML = `<svg class="icon ${extra}" viewBox="0 0 24 24" aria-hidden="true">${ICONS[name] || ''}</svg>`;
-    return t.content.firstElementChild;
+  function icon(name, className = '') {
+    const template = document.createElement('template');
+    template.innerHTML = `<svg class="icon ${className}" viewBox="0 0 24 24" aria-hidden="true">${ICONS[name] || ''}</svg>`;
+    return template.content.firstElementChild;
   }
 
   /* ---------- Formatting ---------- */
-  const todayISO = () => new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
-  const num = (v) => Number(v) || 0;
-  const isFree = (ev) => num(ev.price) <= 0;
-  const peso = (n) => (num(n) <= 0 ? 'FREE' : '₱' + num(n).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
-  const fmtDate = (iso) => new Date(iso + 'T00:00:00').toLocaleDateString('en-PH', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
-  const parseDateParts = (iso) => {
-    const d = new Date(iso + 'T00:00:00');
+  const todayDate = () => new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+  const toNumber = (value) => Number(value) || 0;
+  const isFree = (event) => toNumber(event.price) <= 0;
+  const formatPrice = (amount) => (toNumber(amount) <= 0 ? 'FREE' : '₱' + toNumber(amount).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+  const formatDate = (dateText) => new Date(dateText + 'T00:00:00').toLocaleDateString('en-PH', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+  const parseDateParts = (dateText) => {
+    const date = new Date(dateText + 'T00:00:00');
     return {
-      month: d.toLocaleDateString('en-US', { month: 'short' }).toUpperCase(),
-      day: d.getDate()
+      month: date.toLocaleDateString('en-US', { month: 'short' }).toUpperCase(),
+      day: date.getDate()
     };
   };
-  function fmtTime(t) {
-    const [h, m] = String(t || '00:00').split(':');
-    const d = new Date(); d.setHours(+h, +m, 0, 0);
-    return d.toLocaleTimeString('en-PH', { hour: 'numeric', minute: '2-digit' });
+  function formatTime(time) {
+    const [hour, minute] = String(time || '00:00').split(':');
+    const date = new Date(); date.setHours(+hour, +minute, 0, 0);
+    return date.toLocaleTimeString('en-PH', { hour: 'numeric', minute: '2-digit' });
   }
-  const isPast = (ev) => ev.event_date < todayISO();
-  const seatsTaken = (ev) => Math.max(0, num(ev.total_slots) - num(ev.available_slots));
-  const canBook = (ev) => ev.status === 'active' && num(ev.available_slots) > 0 && !isPast(ev);
-  const debounce = (fn, ms = 350) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
+  const isPast = (event) => event.event_date < todayDate();
+  const seatsTaken = (event) => Math.max(0, toNumber(event.total_slots) - toNumber(event.available_slots));
+  function formatLocation(event) {
+    const venue = (event.venue_name || '').trim();
+    const barangay = (event.barangay || '').trim();
+    if (!venue || !barangay) return venue || barangay;
+    const lastPart = venue.split(',').pop().trim();
+    return lastPart.toLowerCase() === barangay.toLowerCase() ? venue : `${venue}, ${barangay}`;
+  }
+  const canBook = (event) => event.status === 'active' && toNumber(event.available_slots) > 0 && !isPast(event);
+  const debounce = (callback, delay = 350) => { let timer; return (...argumentsList) => { clearTimeout(timer); timer = setTimeout(() => callback(...argumentsList), delay); }; };
 
-  const PLACEHOLDER_IMG = 'data:image/svg+xml,' + encodeURIComponent(
+  const DEFAULT_EVENT_IMAGE = 'data:image/svg+xml,' + encodeURIComponent(
     '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450">' +
     '<rect width="800" height="450" fill="#EBF0FF"/>' +
     '<g fill="none" stroke="#1E3A8A" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" transform="translate(340 140)">' +
     '<rect x="0" y="12" width="120" height="110" rx="12"/><path d="M0 48h120M32 0v28M88 0v28"/></g>' +
     '<text x="400" y="330" text-anchor="middle" font-family="Arial,sans-serif" font-size="28" font-weight="700" fill="#1E3A8A">Iligan City Event</text></svg>');
 
-  function bannerImg(ev) {
-    const img = el('img', { src: ev.image_url || PLACEHOLDER_IMG, alt: `${ev.title} event banner`, loading: 'lazy', width: 800, height: 450 });
-    img.addEventListener('error', () => { if (img.src !== PLACEHOLDER_IMG) img.src = PLACEHOLDER_IMG; });
-    return img;
+  function createEventImage(event) {
+    const image = createElement('img', { src: event.image_url || DEFAULT_EVENT_IMAGE, alt: `${event.title} event banner`, loading: 'lazy', width: 800, height: 450 });
+    image.addEventListener('error', () => { if (image.src !== DEFAULT_EVENT_IMAGE) image.src = DEFAULT_EVENT_IMAGE; });
+    return image;
   }
 
   /* ---------- API Client ---------- */
   async function api(action, { params = {}, body = null } = {}) {
-    const url = new URL(API, location.href);
+    const url = new URL(API_URL, location.href);
     url.searchParams.set('action', action);
-    for (const [k, v] of Object.entries(params)) if (v !== '' && v != null) url.searchParams.set(k, v);
-    const init = { headers: {} };
+    for (const [key, value] of Object.entries(params)) if (value !== '' && value != null) url.searchParams.set(key, value);
+    const requestOptions = { headers: {} };
     if (body) {
-      init.method = 'POST';
-      init.headers['Content-Type'] = 'application/json';
-      init.body = JSON.stringify({ ...(state.user ? { user_id: state.user.id } : {}), ...body });
-    } else if (state.user) {
-      url.searchParams.set('user_id', state.user.id);
+      requestOptions.method = 'POST';
+      requestOptions.headers['Content-Type'] = 'application/json';
+      requestOptions.body = JSON.stringify(body);
     }
     try {
-      const res = await fetch(url, init);
-      const json = await res.json();
-      return { ok: !!json.success, message: json.message || '', tip: json.actionable_tip || '', data: json.data };
+      const response = await fetch(url, requestOptions);
+      const json = await response.json();
+      return { ok: !!json.success, status: response.status, message: json.message || '', tip: json.actionable_tip || '', data: json.data };
     } catch {
       return { ok: false, message: 'We could not reach the server.', tip: 'Make sure Apache and MySQL are running in XAMPP, then try again.', data: null };
     }
@@ -191,92 +198,92 @@
 
   /* ---------- UI Kit: Alerts, Toasts, Confirm ---------- */
   function alertBox(type, title, text, { dismissible = true, actions = [] } = {}) {
-    const box = el('div', { class: `alert alert-${type}`, role: type === 'error' ? 'alert' : 'status' },
+    const box = createElement('div', { class: `alert alert-${type}`, role: type === 'error' ? 'alert' : 'status' },
       icon({ info: 'info', warning: 'warning', success: 'check', error: 'error' }[type]),
-      el('div', { class: 'alert-body' },
-        title && el('p', { class: 'alert-title', text: title }),
-        text && el('p', { class: 'alert-text', text }),
-        actions.length ? el('div', { class: 'form-actions' }, actions) : null),
-      dismissible && el('button', { type: 'button', class: 'icon-btn alert-close', 'aria-label': 'Dismiss message', onclick: () => box.remove() }, icon('x', 'icon-sm')));
+      createElement('div', { class: 'alert-body' },
+        title && createElement('p', { class: 'alert-title', text: title }),
+        text && createElement('p', { class: 'alert-text', text }),
+        actions.length ? createElement('div', { class: 'form-actions' }, actions) : null),
+      dismissible && createElement('button', { type: 'button', class: 'icon-button alert-close', 'aria-label': 'Dismiss message', onclick: () => box.remove() }, icon('x', 'icon-small')));
     return box;
   }
-  function showAlert(target, type, title, text, opts) {
-    const host = typeof target === 'string' ? $(target) : target;
-    clear(host).append(alertBox(type, title, text, opts));
+  function showAlert(target, type, title, text, options) {
+    const host = typeof target === 'string' ? find(target) : target;
+    clear(host).append(alertBox(type, title, text, options));
   }
-  const clearAlert = (target) => clear(typeof target === 'string' ? $(target) : target);
-  const showApiError = (target, res) => showAlert(target, 'error', res.message || 'Something went wrong.', res.tip);
+  const clearAlert = (target) => clear(typeof target === 'string' ? find(target) : target);
+  const showApiError = (target, response) => showAlert(target, 'error', response.message || 'Something went wrong.', response.tip);
 
   function toast(message, { type = 'info', actionLabel = '', onAction = null, duration = 5000 } = {}) {
-    const node = el('div', { class: `toast toast-${type}` }, el('p', { class: 'toast-text', text: message }));
+    const node = createElement('div', { class: `toast toast-${type}` }, createElement('p', { class: 'toast-text', text: message }));
     const remove = () => node.remove();
-    if (actionLabel) node.append(el('button', { type: 'button', class: 'btn btn-ghost', onclick: () => { remove(); onAction && onAction(); } }, actionLabel));
-    node.append(el('button', { type: 'button', class: 'icon-btn', 'aria-label': 'Dismiss notification', onclick: remove }, icon('x', 'icon-sm')));
-    $('#toast-region').append(node);
+    if (actionLabel) node.append(createElement('button', { type: 'button', class: 'button button-plain', onclick: () => { remove(); onAction && onAction(); } }, actionLabel));
+    node.append(createElement('button', { type: 'button', class: 'icon-button', 'aria-label': 'Dismiss notification', onclick: remove }, icon('x', 'icon-small')));
+    find('#toast-region').append(node);
     setTimeout(remove, duration);
   }
 
-  async function withLoading(btn, task) {
-    btn.classList.add('is-loading'); btn.disabled = true;
-    try { return await task(); } finally { btn.classList.remove('is-loading'); btn.disabled = false; }
+  async function withLoading(button, task) {
+    button.classList.add('is-loading'); button.disabled = true;
+    try { return await task(); } finally { button.classList.remove('is-loading'); button.disabled = false; }
   }
 
   function confirmAction({ title, message, confirmLabel = 'Confirm', cancelLabel = 'Keep It', requireText = '' }) {
     return new Promise((resolve) => {
-      const dlg = $('#dlg-confirm'), ok = $('#confirm-ok'), cancel = $('#confirm-cancel'), input = $('#confirm-type');
-      $('#confirm-title').textContent = title;
-      $('#confirm-message').textContent = message;
-      ok.textContent = confirmLabel; cancel.textContent = cancelLabel;
-      $('#confirm-type-wrap').hidden = !requireText;
-      input.value = ''; ok.disabled = !!requireText;
-      if (requireText) $('#confirm-type-label').textContent = `Type "${requireText}" in capital letters to confirm:`;
-      input.oninput = () => { ok.disabled = input.value !== requireText; };
+      const dialog = find('#dlg-confirm'), confirmButton = find('#confirm-button'), cancel = find('#confirm-cancel'), input = find('#confirmation-text');
+      find('#confirm-title').textContent = title;
+      find('#confirm-message').textContent = message;
+      confirmButton.textContent = confirmLabel; cancel.textContent = cancelLabel;
+      find('#confirmation-text-field').hidden = !requireText;
+      input.value = ''; confirmButton.disabled = !!requireText;
+      if (requireText) find('#confirmation-text-label').textContent = `Type "${requireText}" in capital letters to confirm:`;
+      input.oninput = () => { confirmButton.disabled = input.value !== requireText; };
       let result = false;
-      ok.onclick = () => { result = true; dlg.close(); };
-      cancel.onclick = () => dlg.close();
-      dlg.addEventListener('close', () => resolve(result), { once: true });
-      dlg.showModal();
+      confirmButton.onclick = () => { result = true; dialog.close(); };
+      cancel.onclick = () => dialog.close();
+      dialog.addEventListener('close', () => resolve(result), { once: true });
+      dialog.showModal();
       (requireText ? input : cancel).focus();
     });
   }
 
-  function setFieldError(input, msg) {
+  function setFieldError(input, message) {
     clearFieldError(input);
     const id = `${input.id}-err`;
     input.setAttribute('aria-invalid', 'true');
     input.setAttribute('aria-describedby', [input.getAttribute('aria-describedby'), id].filter(Boolean).join(' '));
-    input.parentElement.append(el('p', { class: 'field-error', id, text: msg }));
+    input.parentElement.append(createElement('p', { class: 'field-error', id, text: message }));
   }
   function clearFieldError(input) {
     input.removeAttribute('aria-invalid');
     const id = `${input.id}-err`;
-    $(`#${id}`)?.remove();
-    const d = (input.getAttribute('aria-describedby') || '').split(' ').filter((x) => x && x !== id).join(' ');
-    d ? input.setAttribute('aria-describedby', d) : input.removeAttribute('aria-describedby');
+    find(`#${id}`)?.remove();
+    const descriptionIds = (input.getAttribute('aria-describedby') || '').split(' ').filter((descriptionId) => descriptionId && descriptionId !== id).join(' ');
+    descriptionIds ? input.setAttribute('aria-describedby', descriptionIds) : input.removeAttribute('aria-describedby');
   }
   function applyRules(form, rules) {
-    $$('input,select,textarea', form).forEach(clearFieldError);
-    const bad = rules.filter(([, msg]) => msg);
-    bad.forEach(([input, msg]) => setFieldError(input, msg));
-    bad[0]?.[0].focus();
-    return bad.length === 0;
+    findAll('input,select,textarea', form).forEach(clearFieldError);
+    const errors = rules.filter(([, message]) => message);
+    errors.forEach(([input, message]) => setFieldError(input, message));
+    errors[0]?.[0].focus();
+    return errors.length === 0;
   }
-  const emailOk = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+  const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
   function initTabs(tablist, onSelect) {
-    const tabs = $$('[role="tab"]', tablist);
+    const tabs = findAll('[role="tab"]', tablist);
     const select = (tab, focus = false) => {
-      tabs.forEach((t) => { const on = t === tab; t.setAttribute('aria-selected', on); t.tabIndex = on ? 0 : -1; });
+      tabs.forEach((tabItem) => { const isActive = tabItem === tab; tabItem.setAttribute('aria-selected', isActive); tabItem.tabIndex = isActive ? 0 : -1; });
       if (focus) tab.focus();
       onSelect(tab);
     };
-    tabs.forEach((tab, i) => {
+    tabs.forEach((tab, index) => {
       tab.addEventListener('click', () => select(tab));
-      tab.addEventListener('keydown', (e) => {
-        const step = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
-        if (step) { e.preventDefault(); select(tabs[(i + step + tabs.length) % tabs.length], true); }
-        if (e.key === 'Home') { e.preventDefault(); select(tabs[0], true); }
-        if (e.key === 'End') { e.preventDefault(); select(tabs[tabs.length - 1], true); }
+      tab.addEventListener('keydown', (browserEvent) => {
+        const step = { ArrowRight: 1, ArrowLeft: -1 }[browserEvent.key];
+        if (step) { browserEvent.preventDefault(); select(tabs[(index + step + tabs.length) % tabs.length], true); }
+        if (browserEvent.key === 'Home') { browserEvent.preventDefault(); select(tabs[0], true); }
+        if (browserEvent.key === 'End') { browserEvent.preventDefault(); select(tabs[tabs.length - 1], true); }
       });
     });
     return select;
@@ -286,66 +293,66 @@
      TOP HERO CAROUSEL IMPLEMENTATION
      ========================================================= */
   function initHeroCarousel() {
-    const track = $('#carousel-track'), dots = $('#carousel-dots');
+    const track = find('#carousel-track'), dots = find('#carousel-dots');
     if (!track) return;
 
     // Build slides
     clear(track); clear(dots);
-    state.carouselSlides.forEach((slide, idx) => {
-      const bgImg = el('img', { class: 'carousel-bg', src: slide.image, alt: slide.title, loading: idx === 0 ? 'eager' : 'lazy' });
-      bgImg.addEventListener('error', () => { bgImg.src = 'images/kasadya_sa_diyandi.jpg'; });
+    state.carouselSlides.forEach((slide, index) => {
+      const backgroundImage = createElement('img', { class: 'carousel-background', src: slide.image, alt: slide.title, loading: index === 0 ? 'eager' : 'lazy' });
+      backgroundImage.addEventListener('error', () => { backgroundImage.src = 'images/kasadya_sa_diyandi.jpg'; });
 
-      const slideNode = el('div', { class: `carousel-slide ${idx === 0 ? 'is-active' : ''}`, 'data-slide': idx },
-        bgImg,
-        el('div', { class: 'carousel-scrim' }),
-        el('div', { class: 'container' },
-          el('div', { class: 'carousel-content' },
-            el('span', { class: 'carousel-badge', text: slide.badge || 'Community Highlight' }),
-            el('h2', { class: 'carousel-title', text: slide.title }),
-            el('p', { class: 'carousel-sub', text: slide.subtitle }),
-            slide.meta && el('div', { class: 'carousel-meta-row' },
-              el('span', { class: 'carousel-meta-item' }, icon('pin', 'icon-sm'), slide.meta)),
-            el('div', { class: 'carousel-actions' },
-              el('button', {
+      const slideNode = createElement('div', { class: `carousel-slide ${index === 0 ? 'is-active' : ''}`, 'data-slide': index },
+        backgroundImage,
+        createElement('div', { class: 'carousel-scrim' }),
+        createElement('div', { class: 'container' },
+          createElement('div', { class: 'carousel-content' },
+            createElement('span', { class: 'carousel-badge', text: slide.badge || 'Community Highlight' }),
+            createElement('h2', { class: 'carousel-title', text: slide.title }),
+            createElement('p', { class: 'carousel-subtitle', text: slide.subtitle }),
+            slide.meta && createElement('div', { class: 'carousel-meta-row' },
+              createElement('span', { class: 'carousel-meta-item' }, icon('pin', 'icon-small'), slide.meta)),
+            createElement('div', { class: 'carousel-actions' },
+              createElement('button', {
                 type: 'button',
-                class: 'btn carousel-btn-primary',
+                class: 'button carousel-button-primary',
                 onclick: () => {
                   if (slide.eventId) openEventDetails(slide.eventId);
                   else location.hash = '#/events';
                 }
-              }, icon('ticket', 'icon-sm'), slide.actionText || 'Book Pass'),
-              el('button', {
+              }, icon('ticket', 'icon-small'), slide.actionText || 'Book Pass'),
+              createElement('button', {
                 type: 'button',
-                class: 'btn carousel-btn-glass',
+                class: 'button carousel-button-transparent',
                 onclick: () => { location.hash = '#/events'; }
               }, 'Browse All Events')))));
       track.append(slideNode);
 
       // Dot button
-      const dot = el('button', {
+      const dot = createElement('button', {
         type: 'button',
-        class: `carousel-dot ${idx === 0 ? 'is-active' : ''}`,
-        'aria-label': `Go to slide ${idx + 1}: ${slide.title}`,
-        onclick: () => setCarouselSlide(idx)
+        class: `carousel-dot ${index === 0 ? 'is-active' : ''}`,
+        'aria-label': `Go to slide ${index + 1}: ${slide.title}`,
+        onclick: () => setCarouselSlide(index)
       });
       dots.append(dot);
     });
 
-    $('#carousel-prev').onclick = () => prevCarouselSlide();
-    $('#carousel-next').onclick = () => nextCarouselSlide();
+    find('#carousel-previous').onclick = () => prevCarouselSlide();
+    find('#carousel-next').onclick = () => nextCarouselSlide();
 
     // Pause on hover
-    const carouselEl = $('#hero-carousel');
-    carouselEl.addEventListener('mouseenter', pauseCarousel);
-    carouselEl.addEventListener('mouseleave', resumeCarousel);
+    const carousel = find('#hero-carousel');
+    carousel.addEventListener('mouseenter', pauseCarousel);
+    carousel.addEventListener('mouseleave', resumeCarousel);
 
     // Touch Swipe Support
     let touchStartX = 0;
-    carouselEl.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
-    carouselEl.addEventListener('touchend', (e) => {
-      const diff = e.changedTouches[0].screenX - touchStartX;
-      if (diff > 50) prevCarouselSlide();
-      else if (diff < -50) nextCarouselSlide();
+    carousel.addEventListener('touchstart', (browserEvent) => { touchStartX = browserEvent.changedTouches[0].screenX; }, { passive: true });
+    carousel.addEventListener('touchend', (browserEvent) => {
+      const swipeDistance = browserEvent.changedTouches[0].screenX - touchStartX;
+      if (swipeDistance > 50) prevCarouselSlide();
+      else if (swipeDistance < -50) nextCarouselSlide();
     }, { passive: true });
 
     startCarouselTimer();
@@ -354,12 +361,12 @@
   function setCarouselSlide(index) {
     const total = state.carouselSlides.length;
     state.carouselIndex = (index + total) % total;
-    
-    $$('.carousel-slide', $('#carousel-track')).forEach((s, idx) => {
-      s.classList.toggle('is-active', idx === state.carouselIndex);
+
+    findAll('.carousel-slide', find('#carousel-track')).forEach((slide, index) => {
+      slide.classList.toggle('is-active', index === state.carouselIndex);
     });
-    $$('.carousel-dot', $('#carousel-dots')).forEach((d, idx) => {
-      d.classList.toggle('is-active', idx === state.carouselIndex);
+    findAll('.carousel-dot', find('#carousel-dots')).forEach((dot, index) => {
+      dot.classList.toggle('is-active', index === state.carouselIndex);
     });
 
     startCarouselTimer();
@@ -378,13 +385,13 @@
     if (state.carouselAnimFrame) cancelAnimationFrame(state.carouselAnimFrame);
 
     state.carouselProgressStart = performance.now();
-    const pBar = $('#carousel-progress-bar');
+    const progressBar = find('#carousel-progress-bar');
 
     function stepProgress(now) {
       if (!state.carouselProgressStart) return;
       const elapsed = now - state.carouselProgressStart;
-      const pct = Math.min(100, (elapsed / CAROUSEL_INTERVAL_MS) * 100);
-      if (pBar) pBar.style.width = `${pct}%`;
+      const percent = Math.min(100, (elapsed / CAROUSEL_INTERVAL_MS) * 100);
+      if (progressBar) progressBar.style.width = `${percent}%`;
       if (elapsed < CAROUSEL_INTERVAL_MS) {
         state.carouselAnimFrame = requestAnimationFrame(stepProgress);
       }
@@ -410,40 +417,41 @@
      AUTH & INTERACTIVE MODAL CONTROLS
      ========================================================= */
   function loadUser() {
-    try { state.user = JSON.parse(localStorage.getItem(USER_KEY)); } catch { state.user = null; }
+    try { state.user = JSON.parse(localStorage.getItem(USER_STORAGE_KEY)); } catch { state.user = null; }
   }
   function setUser(user) {
+    if (state.user?.id !== user?.id) state.bookings = [];
     state.user = user;
-    user ? localStorage.setItem(USER_KEY, JSON.stringify(user)) : localStorage.removeItem(USER_KEY);
-    applyAuthUI();
+    user ? localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user)) : localStorage.removeItem(USER_STORAGE_KEY);
+    updateAccountDisplay();
   }
-  function applyAuthUI() {
-    const u = state.user;
-    $('#nav-guest').hidden = !!u;
-    $('#nav-user').hidden = !u;
-    $$('[data-role]').forEach((n) => { n.hidden = !(u && n.dataset.role.split(' ').includes(u.role)); });
-    if (u) {
-      $('#user-name').textContent = u.name;
-      $('#user-avatar').textContent = (u.name || 'U').trim().charAt(0).toUpperCase();
-      $('#user-role').textContent = ROLE_LABEL[u.role] || 'Citizen';
+  function updateAccountDisplay() {
+    const user = state.user;
+    find('#guest-navigation').hidden = !!user;
+    find('#account-navigation').hidden = !user;
+    findAll('[data-role]').forEach((element) => { element.hidden = !(user && element.dataset.role.split(' ').includes(user.role)); });
+    if (user) {
+      find('#user-name').textContent = user.name;
+      find('#user-avatar').textContent = (user.name || 'U').trim().charAt(0).toUpperCase();
+      find('#user-role').textContent = ROLE_NAMES[user.role] || 'Citizen';
     }
   }
-  function homeRouteFor(user) { return { organizer: '#/dashboard', admin: '#/admin' }[user.role] || '#/home'; }
+  function getUserHome(user) { return { user: '#/citizen', organizer: '#/dashboard', admin: '#/admin' }[user.role] || '#/home'; }
 
   function switchAuthTab(tab) {
     const isLogin = tab === 'login';
-    const wrap = $('.auth-tabs-wrap');
+    const wrap = find('.auth-tabs-wrap');
     if (wrap) wrap.classList.toggle('is-register', !isLogin);
 
-    $('#login-form').hidden = !isLogin;
-    $('#register-form').hidden = isLogin;
-    $('#auth-title').textContent = isLogin ? 'Welcome Back' : 'Create Your Account';
-    $('#auth-sub').textContent = isLogin 
+    find('#login-form').hidden = !isLogin;
+    find('#register-form').hidden = isLogin;
+    find('#auth-title').textContent = isLogin ? 'Welcome Back' : 'Create Your Account';
+    find('#auth-description').textContent = isLogin
       ? 'Sign in to access your digital passes and registered events.'
       : 'Join our community portal to reserve slots or publish official city events.';
 
-    $('#auth-tab-login').classList.toggle('is-active', isLogin);
-    $('#auth-tab-register').classList.toggle('is-active', !isLogin);
+    find('#auth-tab-login').classList.toggle('is-active', isLogin);
+    find('#auth-tab-register').classList.toggle('is-active', !isLogin);
     clearAlert('#auth-alert');
   }
   window.switchAuthTab = switchAuthTab;
@@ -451,86 +459,88 @@
   function openAuth(tab = 'login', notice = '') {
     switchAuthTab(tab);
     if (notice) showAlert('#auth-alert', 'info', notice);
-    const dlg = $('#dlg-auth');
-    if (!dlg.open) dlg.showModal();
-    (tab === 'login' ? $('#l-email') : $('#r-name')).focus();
+    const dialog = find('#dlg-auth');
+    if (!dialog.open) dialog.showModal();
+    (tab === 'login' ? find('#login-email') : find('#register-name')).focus();
   }
 
-  async function onAuthSuccess(res, form) {
-    setUser(res.data.user);
-    $('#dlg-auth').close();
+  async function finishSignIn(response, form) {
+    setUser(response.data.user);
+    find('#dlg-auth').close();
     form.reset();
-    toast(res.message, { type: 'success' });
+    toast(response.message, { type: 'success' });
     await loadEvents();
-    const target = homeRouteFor(state.user);
+    const target = getUserHome(state.user);
     if (location.hash === target) route(); else location.hash = target;
   }
 
   function bindAuth() {
-    $('#auth-tab-login').onclick = () => switchAuthTab('login');
-    $('#auth-tab-register').onclick = () => switchAuthTab('register');
+    find('#auth-tab-login').onclick = () => switchAuthTab('login');
+    find('#auth-tab-register').onclick = () => switchAuthTab('register');
 
     // Password visibility toggles
-    $$('[data-toggle-pw]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const targetInput = $(`#${btn.dataset.togglePw}`);
+    findAll('[data-toggle-password]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const targetInput = find(`#${button.dataset.togglePassword}`);
         if (!targetInput) return;
-        const isPw = targetInput.type === 'password';
-        targetInput.type = isPw ? 'text' : 'password';
-        btn.setAttribute('aria-label', isPw ? 'Hide password' : 'Show password');
+        const isPassword = targetInput.type === 'password';
+        targetInput.type = isPassword ? 'text' : 'password';
+        button.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
       });
     });
 
     // Role switcher cards
-    $$('.role-card').forEach((card) => {
+    findAll('.role-card').forEach((card) => {
       card.addEventListener('click', () => {
-        $$('.role-card').forEach((c) => c.classList.remove('is-selected'));
+        findAll('.role-card').forEach((roleCard) => roleCard.classList.remove('is-selected'));
         card.classList.add('is-selected');
-        const radio = $('input[type="radio"]', card);
+        const radio = find('input[type="radio"]', card);
         if (radio) {
           radio.checked = true;
-          $('#r-role').value = radio.value;
-          $('#r-key-wrap').hidden = radio.value !== 'organizer';
+          find('#register-role').value = radio.value;
+          find('#coordinator-key-field').hidden = radio.value !== 'organizer';
         }
       });
     });
 
-    $('#login-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const f = e.currentTarget, email = $('#l-email'), pw = $('#l-password');
-      if (!applyRules(f, [[email, emailOk(email.value.trim()) ? '' : 'Enter a valid email address.'], [pw, pw.value ? '' : 'Enter your password.']])) return;
-      const res = await withLoading($('button[type=submit]', f), () => api('login', { body: { email: email.value.trim(), password: pw.value } }));
-      res.ok ? onAuthSuccess(res, f) : showApiError('#auth-alert', res);
+    find('#login-form').addEventListener('submit', async (browserEvent) => {
+      browserEvent.preventDefault();
+      const form = browserEvent.currentTarget, email = find('#login-email'), password = find('#login-password');
+      if (!applyRules(form, [[email, isValidEmail(email.value.trim()) ? '' : 'Enter a valid email address.'], [password, password.value ? '' : 'Enter your password.']])) return;
+      const response = await withLoading(find('button[type=submit]', form), () => api('login', { body: { email: email.value.trim(), password: password.value } }));
+      response.ok ? finishSignIn(response, form) : showApiError('#auth-alert', response);
     });
 
-    $('#register-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const f = e.currentTarget;
-      const name = $('#r-name'), email = $('#r-email'), pw = $('#r-password'), role = $('#r-role'), key = $('#r-key');
-      const isCoord = role.value === 'organizer';
-      if (!applyRules(f, [
+    find('#register-form').addEventListener('submit', async (browserEvent) => {
+      browserEvent.preventDefault();
+      const form = browserEvent.currentTarget;
+      const name = find('#register-name'), email = find('#register-email'), password = find('#register-password'), role = find('#register-role'), key = find('#coordinator-key');
+      const isCoordinator = role.value === 'organizer';
+      if (!applyRules(form, [
         [name, name.value.trim().length >= 3 ? '' : 'Enter your full name (at least 3 characters).'],
-        [email, emailOk(email.value.trim()) ? '' : 'Enter a valid email address.'],
-        [pw, pw.value.length >= 6 ? '' : 'Password must be at least 6 characters.'],
-        [key, !isCoord || key.value.trim() ? '' : 'The LGU authorization key is required for coordinators.']
+        [email, isValidEmail(email.value.trim()) ? '' : 'Enter a valid email address.'],
+        [password, password.value.length >= 6 ? '' : 'Password must be at least 6 characters.'],
+        [key, !isCoordinator || key.value.trim() ? '' : 'The LGU authorization key is required for coordinators.']
       ])) return;
-      const res = await withLoading($('button[type=submit]', f), () => api('register', { body: {
-        name: name.value.trim(), email: email.value.trim(), phone: $('#r-phone').value.trim(),
-        password: pw.value, role: role.value, coordinator_key: key.value.trim()
-      } }));
-      if (res.ok) { f.reset(); $('#r-key-wrap').hidden = true; onAuthSuccess(res, f); } else showApiError('#auth-alert', res);
+      const response = await withLoading(find('button[type=submit]', form), () => api('register', {
+        body: {
+          name: name.value.trim(), email: email.value.trim(), phone: find('#register-phone').value.trim(),
+          password: password.value, role: role.value, coordinator_key: key.value.trim()
+        }
+      }));
+      if (response.ok) { form.reset(); find('#coordinator-key-field').hidden = true; finishSignIn(response, form); } else showApiError('#auth-alert', response);
     });
 
-    $('#btn-logout').addEventListener('click', async () => {
-      const u = state.user;
-      const roleTitle = u ? (ROLE_LABEL[u.role] || 'Citizen') : 'Citizen';
-      const yes = await confirmAction({
+    find('#sign-out-button').addEventListener('click', async () => {
+      const user = state.user;
+      const roleTitle = user ? (ROLE_NAMES[user.role] || 'Citizen') : 'Citizen';
+      const confirmed = await confirmAction({
         title: 'Are you sure you want to log out?',
-        message: `You are currently signed in as ${u?.name || 'a user'} (${roleTitle}). You can sign back in anytime to view your passes and manage your account.`,
+        message: `You are currently signed in as ${user?.name || 'a user'} (${roleTitle}). You can sign back in anytime to view your passes and manage your account.`,
         confirmLabel: 'Yes, Sign Out',
         cancelLabel: 'Stay Signed In'
       });
-      if (!yes) return;
+      if (!confirmed) return;
       await api('logout', { body: {} });
       setUser(null);
       state.bookings = [];
@@ -538,81 +548,129 @@
       await loadEvents();
       if (location.hash === '#/home') route(); else location.hash = '#/home';
     });
+
+    /* =========================================================
+       [DEV ONLY] QUICK LOGIN HELPER (EASY TO REMOVE)
+       Delete this entire block to remove quick login behavior.
+       ========================================================= */
+    const quickLogin = find('#test-login');
+    if (quickLogin) {
+      const quickLoginButton = find('#test-login-toggle');
+      if (quickLoginButton) {
+        quickLoginButton.addEventListener('click', (browserEvent) => {
+          browserEvent.stopPropagation();
+          quickLogin.classList.toggle('is-open');
+        });
+        quickLoginButton.addEventListener('keydown', (browserEvent) => {
+          if (browserEvent.key === 'Enter' || browserEvent.key === ' ') {
+            browserEvent.preventDefault();
+            quickLogin.classList.toggle('is-open');
+          }
+        });
+      }
+
+      findAll('[data-test-role]', quickLogin).forEach((button) => {
+        button.addEventListener('click', async (browserEvent) => {
+          browserEvent.preventDefault();
+          browserEvent.stopPropagation();
+          const role = button.dataset.testRole;
+          const accounts = {
+            admin: { email: 'admin@iligancity.gov.ph', password: 'password123' },
+            organizer: { email: 'tourism@iligancity.gov.ph', password: 'password123' },
+            citizen: { email: 'amina.alonto@gmail.com', password: 'password123' }
+          };
+          const account = accounts[role];
+          if (!account) return;
+          switchAuthTab('login');
+          find('#login-email').value = account.email;
+          find('#login-password').value = account.password;
+          quickLogin.classList.remove('is-open');
+          find('#login-form').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+        });
+      });
+
+      document.addEventListener('click', (browserEvent) => {
+        if (!quickLogin.contains(browserEvent.target)) {
+          quickLogin.classList.remove('is-open');
+        }
+      });
+    }
+    /* [/DEV ONLY QUICK LOGIN] */
   }
 
   /* ---------- Profile ---------- */
   async function openProfile() {
-    const dlg = $('#dlg-profile');
+    const dialog = find('#profile-dialog');
     clearAlert('#profile-alert');
-    $('#p-password').value = '';
-    dlg.showModal();
-    const res = await api('get_profile');
-    if (!res.ok) return showApiError('#profile-alert', res);
-    const p = res.data;
-    $('#p-email').value = p.email; $('#p-name').value = p.name; $('#p-phone').value = p.phone || '';
-    $('#p-stats').textContent = `${ROLE_LABEL[p.role] || 'Citizen'} Account · ${p.total_bookings} Total Booking${p.total_bookings === 1 ? '' : 's'} · Registered on ${new Date(p.created_at.replace(' ', 'T')).toLocaleDateString('en-PH', { year: 'numeric', month: 'long' })}`;
+    find('#profile-password').value = '';
+    dialog.showModal();
+    const response = await api('get_profile');
+    if (!response.ok) return showApiError('#profile-alert', response);
+    const profile = response.data;
+    find('#profile-email').value = profile.email; find('#profile-name').value = profile.name; find('#profile-phone').value = profile.phone || '';
+    find('#profile-stats').textContent = `${ROLE_NAMES[profile.role] || 'Citizen'} Account · ${profile.total_bookings} Total Booking${profile.total_bookings === 1 ? '' : 's'} · Registered on ${new Date(profile.created_at.replace(' ', 'T')).toLocaleDateString('en-PH', { year: 'numeric', month: 'long' })}`;
   }
   function bindProfile() {
-    $('#open-profile').addEventListener('click', openProfile);
-    $('#profile-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const f = e.currentTarget, name = $('#p-name'), pw = $('#p-password');
-      if (!applyRules(f, [[name, name.value.trim().length >= 3 ? '' : 'Enter at least 3 characters.'], [pw, !pw.value || pw.value.length >= 6 ? '' : 'Password must be at least 6 characters.']])) return;
-      const res = await withLoading($('button[type=submit]', f), () => api('update_profile', { body: { name: name.value.trim(), phone: $('#p-phone').value.trim(), new_password: pw.value } }));
-      if (!res.ok) return showApiError('#profile-alert', res);
-      setUser({ ...state.user, name: res.data.name, phone: res.data.phone });
-      showAlert('#profile-alert', 'success', res.message);
-      pw.value = '';
+    find('#open-profile').addEventListener('click', openProfile);
+    find('#profile-form').addEventListener('submit', async (browserEvent) => {
+      browserEvent.preventDefault();
+      const form = browserEvent.currentTarget, name = find('#profile-name'), password = find('#profile-password');
+      if (!applyRules(form, [[name, name.value.trim().length >= 3 ? '' : 'Enter at least 3 characters.'], [password, !password.value || password.value.length >= 6 ? '' : 'Password must be at least 6 characters.']])) return;
+      const response = await withLoading(find('button[type=submit]', form), () => api('update_profile', { body: { name: name.value.trim(), phone: find('#profile-phone').value.trim(), new_password: password.value } }));
+      if (!response.ok) return showApiError('#profile-alert', response);
+      setUser({ ...state.user, name: response.data.name, phone: response.data.phone });
+      showAlert('#profile-alert', 'success', response.message);
+      password.value = '';
     });
   }
 
   /* ---------- Data Loading ---------- */
-  async function loadMeta() {
-    const [b, t, s] = await Promise.all([api('get_barangays'), api('get_hero_tags'), api('get_settings')]);
-    if (b.ok) state.barangays = b.data.barangays;
-    if (t.ok) state.tags = t.data.tags;
-    if (s.ok) state.settings = s.data;
+  async function loadSettings() {
+    const [barangayResponse, tagResponse, settingsResponse] = await Promise.all([api('get_barangays'), api('get_hero_tags'), api('get_settings')]);
+    if (barangayResponse.ok) state.barangays = barangayResponse.data.barangays;
+    if (tagResponse.ok) state.tags = tagResponse.data.tags;
+    if (settingsResponse.ok) state.settings = settingsResponse.data;
     fillBarangaySelects(); renderHeroTags();
   }
 
   async function loadEvents() {
-    const grid = $('#events-grid');
+    const grid = find('#events-grid');
     if (!state.eventsLoaded) {
-      clear(grid).append(...Array.from({ length: 6 }, () => el('div', { class: 'skeleton', 'aria-hidden': 'true' })));
+      clear(grid).append(...Array.from({ length: 6 }, () => createElement('div', { class: 'skeleton', 'aria-hidden': 'true' })));
     }
     const isStaff = state.user && ['organizer', 'admin'].includes(state.user.role);
-    const res = await api('get_events', { params: isStaff ? { role: 'organizer' } : {} });
-    if (!res.ok) {
+    const response = await api('get_events', { params: isStaff ? { role: 'organizer' } : {} });
+    if (!response.ok) {
       state.events = [];
       clear(grid);
-      showAlert('#events-alert', 'error', res.message, res.tip, { dismissible: false, actions: [el('button', { type: 'button', class: 'btn btn-outline btn-sm', onclick: loadEvents }, 'Try Again')] });
+      showAlert('#events-alert', 'error', response.message, response.tip, { dismissible: false, actions: [createElement('button', { type: 'button', class: 'button button-outline button-small', onclick: loadEvents }, 'Try Again')] });
       return;
     }
     clearAlert('#events-alert');
-    state.events = res.data;
+    state.events = response.data;
     state.eventsLoaded = true;
 
     // Curate up to 4 premier featured carousel slides from active events
-    const validFeatured = state.events.filter((e) =>
-      e.status === 'active' &&
-      num(e.is_featured) &&
-      e.image_url &&
-      !e.image_url.includes('meow-assets') &&
-      !e.image_url.includes('alderhaven') &&
-      !e.title.toLowerCase().includes('alderhaven') &&
-      e.description &&
-      e.description.trim().length > 25
+    const validFeatured = state.events.filter((event) =>
+      event.status === 'active' &&
+      toNumber(event.is_featured) &&
+      event.image_url &&
+      !event.image_url.includes('meow-assets') &&
+      !event.image_url.includes('alderhaven') &&
+      !event.title.toLowerCase().includes('alderhaven') &&
+      event.description &&
+      event.description.trim().length > 25
     ).slice(0, 4);
 
     if (validFeatured.length >= 2) {
-      state.carouselSlides = validFeatured.map((e) => ({
-        title: e.title,
-        subtitle: (e.description || '').replace(/\s+/g, ' ').slice(0, 140) + (e.description.length > 140 ? '...' : ''),
-        badge: e.category,
-        meta: `${fmtDate(e.event_date)} · ${e.venue_name}`,
-        image: e.image_url,
-        actionText: isFree(e) ? 'Reserve Free Pass' : 'Book Pass',
-        eventId: e.id
+      state.carouselSlides = validFeatured.map((event) => ({
+        title: event.title,
+        subtitle: (event.description || '').replace(/\s+/g, ' ').slice(0, 140) + (event.description.length > 140 ? '...' : ''),
+        badge: event.category,
+        meta: `${formatDate(event.event_date)} · ${event.venue_name}`,
+        image: event.image_url,
+        actionText: isFree(event) ? 'Reserve Free Pass' : 'Book Pass',
+        eventId: event.id
       }));
     } else {
       state.carouselSlides = [...DEFAULT_CAROUSEL_SLIDES];
@@ -623,200 +681,201 @@
     renderEvents();
     renderCategoryOptions();
     refreshStaffViews();
+    if (state.user?.role === 'user' && location.hash === '#/citizen') renderCitizenDashboard();
   }
 
   /* ---------- Filters & Search ---------- */
   function renderHeroTags() {
-    const host = clear($('#hero-tags'));
+    const host = clear(find('#hero-tags'));
     if (!state.tags.length) return;
-    host.append(el('span', { class: 'tag-label', text: 'Popular:' }), ...state.tags.map((t) =>
-      el('button', { type: 'button', class: 'tag-btn', onclick: () => applyTag(t.name) }, t.name)));
+    host.append(createElement('span', { class: 'tag-label', text: 'Popular:' }), ...state.tags.map((tag) =>
+      createElement('button', { type: 'button', class: 'tag-button', onclick: () => applyTag(tag.name) }, tag.name)));
   }
   function applyTag(name) {
-    const isBrgy = state.barangays.some((b) => b.name === name);
+    const isBarangay = state.barangays.some((barangay) => barangay.name === name);
     resetFilters(false);
-    if (isBrgy) {
+    if (isBarangay) {
       state.filters.barangay = name;
-      $('#f-barangay').value = name;
+      find('#filter-barangay').value = name;
     } else {
       state.filters.search = name;
-      $('#search-input').value = name;
-      if ($('#discover-search-input')) $('#discover-search-input').value = name;
+      find('#search-input').value = name;
+      if (find('#discover-search-input')) find('#discover-search-input').value = name;
     }
     state.page = 1;
     renderEvents();
     location.hash = '#/events';
   }
   function fillBarangaySelects() {
-    const names = state.barangays.map((b) => b.name);
-    const f = $('#f-barangay'), cur = f.value;
-    clear(f).append(el('option', { value: '' }, 'All barangays'), ...names.map((n) => el('option', { value: n }, n)));
-    f.value = cur;
-    const ef = $('#ef-barangay');
-    clear(ef).append(el('option', { value: '' }, 'Select a barangay'), ...names.map((n) => el('option', { value: n }, n)));
+    const names = state.barangays.map((barangay) => barangay.name);
+    const barangayFilter = find('#filter-barangay'), selectedValue = barangayFilter.value;
+    clear(barangayFilter).append(createElement('option', { value: '' }, 'All barangays'), ...names.map((name) => createElement('option', { value: name }, name)));
+    barangayFilter.value = selectedValue;
+    const eventBarangay = find('#event-form-barangay');
+    clear(eventBarangay).append(createElement('option', { value: '' }, 'Select a barangay'), ...names.map((name) => createElement('option', { value: name }, name)));
   }
   function renderCategoryOptions() {
-    const cats = [...new Set([...DEFAULT_CATEGORIES, ...state.events.map((e) => e.category)])].sort();
-    clear($('#category-options')).append(...cats.map((c) => el('option', { value: c })));
+    const categories = [...new Set([...DEFAULT_CATEGORIES, ...state.events.map((event) => event.category)])].sort();
+    clear(find('#category-options')).append(...categories.map((category) => createElement('option', { value: category })));
   }
   function buildCategoryChips() {
-    const cats = [...new Set(state.events.filter((e) => e.status === 'active').map((e) => e.category))].sort();
-    const host = clear($('#category-chips'));
-    ['All', ...cats].forEach((c) => host.append(el('button', {
-      type: 'button', class: 'chip', 'aria-pressed': String(state.filters.category === c),
-      onclick: () => { state.filters.category = c; state.page = 1; buildCategoryChips(); renderEvents(); }
-    }, c === 'All' ? 'All Events' : c)));
+    const categories = [...new Set(state.events.filter((event) => event.status === 'active').map((event) => event.category))].sort();
+    const host = clear(find('#category-chips'));
+    ['All', ...categories].forEach((category) => host.append(createElement('button', {
+      type: 'button', class: 'chip', 'aria-pressed': String(state.filters.category === category),
+      onclick: () => { state.filters.category = category; state.page = 1; buildCategoryChips(); renderEvents(); }
+    }, category === 'All' ? 'All Events' : category)));
   }
   function resetFilters(render = true) {
     state.filters = { search: '', category: 'All', barangay: '', price: '', date: '', sort: 'date', past: false };
-    $('#search-input').value = '';
-    if ($('#discover-search-input')) $('#discover-search-input').value = '';
-    $('#f-barangay').value = ''; $('#f-price').value = ''; $('#f-date').value = ''; $('#f-sort').value = 'date'; $('#f-past').checked = false;
+    find('#search-input').value = '';
+    if (find('#discover-search-input')) find('#discover-search-input').value = '';
+    find('#filter-barangay').value = ''; find('#filter-price').value = ''; find('#filter-date').value = ''; find('#filter-sort').value = 'date'; find('#filter-past').checked = false;
     state.page = 1; buildCategoryChips();
     if (render) renderEvents();
   }
   function filteredEvents() {
-    const f = state.filters, q = f.search.trim().toLowerCase(), today = todayISO();
-    const list = state.events.filter((e) => {
-      if (e.status !== 'active') return false;
-      if (!f.past && e.event_date < today) return false;
-      if (f.category !== 'All' && e.category !== f.category) return false;
-      if (f.barangay && e.barangay !== f.barangay) return false;
-      if (f.price === 'free' && !isFree(e)) return false;
-      if (f.price === 'paid' && isFree(e)) return false;
-      if (f.date && e.event_date < f.date) return false;
-      if (q && ![e.title, e.description, e.venue_name, e.barangay, e.category, e.organizer_name].join(' ').toLowerCase().includes(q)) return false;
+    const filters = state.filters, searchText = filters.search.trim().toLowerCase(), today = todayDate();
+    const list = state.events.filter((event) => {
+      if (event.status !== 'active') return false;
+      if (!filters.past && event.event_date < today) return false;
+      if (filters.category !== 'All' && event.category !== filters.category) return false;
+      if (filters.barangay && event.barangay !== filters.barangay) return false;
+      if (filters.price === 'free' && !isFree(event)) return false;
+      if (filters.price === 'paid' && isFree(event)) return false;
+      if (filters.date && event.event_date < filters.date) return false;
+      if (searchText && ![event.title, event.description, event.venue_name, event.barangay, event.category, event.organizer_name].join(' ').toLowerCase().includes(searchText)) return false;
       return true;
     });
     const sorters = {
-      date: (a, b) => (a.event_date + a.event_time).localeCompare(b.event_date + b.event_time),
-      'price-asc': (a, b) => num(a.price) - num(b.price),
-      'price-desc': (a, b) => num(b.price) - num(a.price),
-      slots: (a, b) => num(b.available_slots) - num(a.available_slots)
+      date: (firstEvent, secondEvent) => (firstEvent.event_date + firstEvent.event_time).localeCompare(secondEvent.event_date + secondEvent.event_time),
+      'price-asc': (firstEvent, secondEvent) => toNumber(firstEvent.price) - toNumber(secondEvent.price),
+      'price-desc': (firstEvent, secondEvent) => toNumber(secondEvent.price) - toNumber(firstEvent.price),
+      slots: (firstEvent, secondEvent) => toNumber(secondEvent.available_slots) - toNumber(firstEvent.available_slots)
     };
-    return list.sort(sorters[f.sort]);
+    return list.sort(sorters[filters.sort]);
   }
-  const filtersActive = () => { const f = state.filters; return !!(f.search || f.category !== 'All' || f.barangay || f.price || f.date || f.past); };
+  const filtersActive = () => { const filters = state.filters; return !!(filters.search || filters.category !== 'All' || filters.barangay || filters.price || filters.date || filters.past); };
 
   function bindFilters() {
-    $('#hero-search').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const val = $('#search-input').value;
-      state.filters.search = val;
-      if ($('#discover-search-input')) $('#discover-search-input').value = val;
+    find('#hero-search').addEventListener('submit', (browserEvent) => {
+      browserEvent.preventDefault();
+      const value = find('#search-input').value;
+      state.filters.search = value;
+      if (find('#discover-search-input')) find('#discover-search-input').value = value;
       state.page = 1;
       renderEvents();
       location.hash = '#/events';
     });
-    $('#search-input').addEventListener('input', debounce(() => {
-      const val = $('#search-input').value;
-      state.filters.search = val;
-      if ($('#discover-search-input')) $('#discover-search-input').value = val;
+    find('#search-input').addEventListener('input', debounce(() => {
+      const value = find('#search-input').value;
+      state.filters.search = value;
+      if (find('#discover-search-input')) find('#discover-search-input').value = value;
       state.page = 1;
       renderEvents();
     }, 300));
-    if ($('#discover-search-form')) {
-      $('#discover-search-form').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const val = $('#discover-search-input').value;
-        state.filters.search = val;
-        $('#search-input').value = val;
+    if (find('#discover-search-form')) {
+      find('#discover-search-form').addEventListener('submit', (browserEvent) => {
+        browserEvent.preventDefault();
+        const value = find('#discover-search-input').value;
+        state.filters.search = value;
+        find('#search-input').value = value;
         state.page = 1;
         renderEvents();
-        $('#all-events-head').scrollIntoView({ behavior: 'smooth' });
+        find('#events-results-heading').scrollIntoView({ behavior: 'smooth' });
       });
     }
-    if ($('#discover-search-input')) {
-      $('#discover-search-input').addEventListener('input', debounce(() => {
-        const val = $('#discover-search-input').value;
-        state.filters.search = val;
-        $('#search-input').value = val;
+    if (find('#discover-search-input')) {
+      find('#discover-search-input').addEventListener('input', debounce(() => {
+        const value = find('#discover-search-input').value;
+        state.filters.search = value;
+        find('#search-input').value = value;
         state.page = 1;
         renderEvents();
       }, 300));
     }
-    const map = { 'f-barangay': 'barangay', 'f-price': 'price', 'f-date': 'date', 'f-sort': 'sort' };
-    Object.entries(map).forEach(([id, key]) => $(`#${id}`).addEventListener('change', (e) => { state.filters[key] = e.target.value; state.page = 1; renderEvents(); }));
-    $('#f-past').addEventListener('change', (e) => { state.filters.past = e.target.checked; state.page = 1; renderEvents(); });
-    $('#f-reset').addEventListener('click', () => resetFilters());
-    $('#filters').addEventListener('submit', (e) => e.preventDefault());
-    $('#load-more').addEventListener('click', () => { state.page += 1; renderEvents(); });
+    const filterFields = { 'filter-barangay': 'barangay', 'filter-price': 'price', 'filter-date': 'date', 'filter-sort': 'sort' };
+    Object.entries(filterFields).forEach(([id, key]) => find(`#${id}`).addEventListener('change', (browserEvent) => { state.filters[key] = browserEvent.target.value; state.page = 1; renderEvents(); }));
+    find('#filter-past').addEventListener('change', (browserEvent) => { state.filters.past = browserEvent.target.checked; state.page = 1; renderEvents(); });
+    find('#filter-reset').addEventListener('click', () => resetFilters());
+    find('#filters').addEventListener('submit', (browserEvent) => browserEvent.preventDefault());
+    find('#load-more').addEventListener('click', () => { state.page += 1; renderEvents(); });
   }
 
   /* =========================================================
      REDESIGNED EVENT CARD (SPACIOUS, UNCLUTTERED, ELEGANT)
      ========================================================= */
-  function eventCard(ev) {
-    const hid = `ev-title-${ev.id}`;
-    const dateParts = parseDateParts(ev.event_date);
-    const slots = num(ev.available_slots);
+  function eventCard(event) {
+    const headingId = `ev-title-${event.id}`;
+    const dateParts = parseDateParts(event.event_date);
+    const slots = toNumber(event.available_slots);
 
     // Subtle capacity status
     let capacityNode = null;
-    if (isPast(ev)) {
-      capacityNode = el('span', { class: 'capacity-status is-full' }, 'Event Concluded');
+    if (isPast(event)) {
+      capacityNode = createElement('span', { class: 'capacity-status is-full' }, 'Event Concluded');
     } else if (slots <= 0) {
-      capacityNode = el('span', { class: 'capacity-status is-full' }, 'Sold Out');
+      capacityNode = createElement('span', { class: 'capacity-status is-full' }, 'Sold Out');
     } else if (slots <= 10) {
-      capacityNode = el('span', { class: 'capacity-status is-warning' },
-        el('span', { class: 'pulse-dot' }), `Only ${slots} slots left`);
+      capacityNode = createElement('span', { class: 'capacity-status is-warning' },
+        createElement('span', { class: 'pulse-dot' }), `Only ${slots} slots left`);
     } else {
-      capacityNode = el('span', { class: 'capacity-status is-available' },
-        el('span', { class: 'pulse-dot' }), `${slots} slots available`);
+      capacityNode = createElement('span', { class: 'capacity-status is-available' },
+        createElement('span', { class: 'pulse-dot' }), `${slots} slots available`);
     }
 
-    const card = el('article', {
+    const card = createElement('article', {
       class: 'card event-card',
-      'aria-labelledby': hid,
-      onclick: (e) => {
+      'aria-labelledby': headingId,
+      onclick: (browserEvent) => {
         // Prevent trigger if clicking an internal button specifically
-        if (!e.target.closest('button')) openEventDetails(ev.id);
+        if (!browserEvent.target.closest('button')) openEventDetails(event.id);
       }
     },
       // 1. Media Header with floating category pill and calendar tile
-      el('div', { class: 'event-media' },
-        bannerImg(ev),
-        el('span', { class: 'card-category-badge', text: ev.category }),
-        el('div', { class: 'card-date-tile', 'aria-label': fmtDate(ev.event_date) },
-          el('span', { class: 'date-month', text: dateParts.month }),
-          el('span', { class: 'date-day', text: dateParts.day })),
-        num(ev.is_featured) ? el('span', { class: 'card-featured-tag' }, icon('star', 'icon-sm'), 'Featured') : null
+      createElement('div', { class: 'event-media' },
+        createEventImage(event),
+        createElement('span', { class: 'card-category-badge', text: event.category }),
+        createElement('div', { class: 'card-date-tile', 'aria-label': formatDate(event.event_date) },
+          createElement('span', { class: 'date-month', text: dateParts.month }),
+          createElement('span', { class: 'date-day', text: dateParts.day })),
+        toNumber(event.is_featured) ? createElement('span', { class: 'card-featured-tag' }, icon('star', 'icon-small'), 'Featured') : null
       ),
 
       // 2. Event Body with Breathing Room & Uncluttered Layout
-      el('div', { class: 'event-body' },
-        el('div', { class: 'event-location-pill' },
-          icon('pin', 'icon-sm'),
-          el('span', { text: `Brgy. ${ev.barangay}` })),
-        el('h3', { class: 'event-name', id: hid, text: ev.title }),
-        
+      createElement('div', { class: 'event-body' },
+        createElement('div', { class: 'event-location-pill' },
+          icon('pin', 'icon-small'),
+          createElement('span', { text: `Brgy. ${event.barangay}` })),
+        createElement('h3', { class: 'event-name', id: headingId, text: event.title }),
+
         // Clean highlight rows (Venue and Time)
-        el('div', { class: 'event-highlights' },
-          el('div', { class: 'highlight-row' },
-            icon('pin', 'icon-sm'),
-            el('span', { class: 'highlight-text', text: ev.venue_name })),
-          el('div', { class: 'highlight-row' },
-            icon('clock', 'icon-sm'),
-            el('span', { class: 'highlight-text', text: fmtTime(ev.event_time) }))
+        createElement('div', { class: 'event-highlights' },
+          createElement('div', { class: 'highlight-row' },
+            icon('pin', 'icon-small'),
+            createElement('span', { class: 'highlight-text', text: event.venue_name })),
+          createElement('div', { class: 'highlight-row' },
+            icon('clock', 'icon-small'),
+            createElement('span', { class: 'highlight-text', text: formatTime(event.event_time) }))
         ),
 
         // Clean capacity indicator
         capacityNode,
 
         // 3. Pinned Bottom Footer Taking Advantage of Space
-        el('div', { class: 'event-foot' },
-          el('div', { class: 'price-lockup' },
-            el('span', { class: 'price-label', text: 'Admission' }),
-            el('span', { class: `price-val ${isFree(ev) ? 'is-free' : ''}`, text: peso(ev.price) })),
-          el('button', {
+        createElement('div', { class: 'event-footer' },
+          createElement('div', { class: 'price-lockup' },
+            createElement('span', { class: 'price-label', text: 'Admission' }),
+            createElement('span', { class: `price-value ${isFree(event) ? 'is-free' : ''}`, text: formatPrice(event.price) })),
+          createElement('button', {
             type: 'button',
-            class: 'btn btn-primary btn-card-action',
-            'aria-label': `View details and book ${ev.title}`,
-            onclick: (e) => {
-              e.stopPropagation();
-              openEventDetails(ev.id);
+            class: 'button button-primary event-card-button',
+            'aria-label': `View details and book ${event.title}`,
+            onclick: (browserEvent) => {
+              browserEvent.stopPropagation();
+              openEventDetails(event.id);
             }
-          }, canBook(ev) ? 'View & Book →' : 'View Details')
+          }, canBook(event) ? 'View & Book →' : 'View Details')
         )
       )
     );
@@ -824,454 +883,682 @@
     return card;
   }
 
-  function emptyState(title, text, btn) {
-    return el('div', { class: 'empty' }, icon('inbox'), el('h3', { class: 'h3', text: title }), el('p', { text }), btn);
+  function emptyState(title, text, button) {
+    return createElement('div', { class: 'empty' }, icon('inbox'), createElement('h3', { class: 'h3', text: title }), createElement('p', { text }), button);
   }
 
   function renderEvents() {
-    const today = todayISO();
-    let featured = state.events.filter((e) => e.status === 'active' && num(e.is_featured) && e.event_date >= today).slice(0, 3);
+    const today = todayDate();
+    let featured = state.events.filter((event) => event.status === 'active' && toNumber(event.is_featured) && event.event_date >= today).slice(0, 3);
     if (!featured.length) {
-      featured = state.events.filter((e) => e.status === 'active' && e.event_date >= today).slice(0, 3);
+      featured = state.events.filter((event) => event.status === 'active' && event.event_date >= today).slice(0, 3);
     }
-    $('#featured-wrap').hidden = featured.length === 0;
-    clear($('#featured-grid')).append(...featured.map(eventCard));
+    find('#featured-section').hidden = featured.length === 0;
+    clear(find('#featured-grid')).append(...featured.map(eventCard));
 
-    const list = filteredEvents(), shown = list.slice(0, state.page * PAGE_SIZE), grid = clear($('#events-grid'));
-    $('#results-count').textContent = state.eventsLoaded ? `${list.length} event${list.length === 1 ? '' : 's'} available` : '';
+    const list = filteredEvents(), shown = list.slice(0, state.page * PAGE_SIZE), grid = clear(find('#events-grid'));
+    find('#results-count').textContent = state.eventsLoaded ? `${list.length} event${list.length === 1 ? '' : 's'} available` : '';
     if (state.eventsLoaded && !list.length) {
       grid.append(emptyState('No events match your criteria', 'Try clearing your search query or adjusting your filters to see more occasions.',
-        el('button', { type: 'button', class: 'btn btn-primary', onclick: () => resetFilters() }, 'Reset All Filters')));
+        createElement('button', { type: 'button', class: 'button button-primary', onclick: () => resetFilters() }, 'Reset All Filters')));
     } else {
       grid.append(...shown.map(eventCard));
     }
-    $('#load-more').hidden = shown.length >= list.length;
+    find('#load-more').hidden = shown.length >= list.length;
   }
 
   /* ---------- Event Details Modal ---------- */
   function openEventDetails(id) {
-    const ev = state.events.find((e) => e.id == id);
-    if (!ev) return;
-    $('#event-title').textContent = ev.title;
-    const isStaff = ev.can_manage && state.user && ['organizer', 'admin'].includes(state.user.role);
-    
-    const aside = el('aside', { class: 'detail-aside', 'aria-label': 'Reservation details' },
-      el('div', { class: 'price-lockup' },
-        el('span', { class: 'price-label', text: 'Ticket Price' }),
-        el('span', { class: `price-val ${isFree(ev) ? 'is-free' : ''}`, text: peso(ev.price) })),
-      el('p', { class: 'muted', text: isFree(ev) ? 'Free public admission' : 'Per reserved pass' }),
-      el('div', { class: 'stat-summary', style: 'margin-block: 8px;' },
-        el('span', { class: 'badge badge-blue', text: `${ev.available_slots} of ${ev.total_slots} slots remaining` })),
-      el('button', {
+    const event = state.events.find((event) => event.id == id);
+    if (!event) return;
+    find('#event-title').textContent = event.title;
+    const isStaff = event.can_manage && state.user && ['organizer', 'admin'].includes(state.user.role);
+
+    const aside = createElement('aside', { class: 'detail-aside', 'aria-label': 'Reservation details' },
+      createElement('div', { class: 'price-lockup' },
+        createElement('span', { class: 'price-label', text: 'Ticket Price' }),
+        createElement('span', { class: `price-value ${isFree(event) ? 'is-free' : ''}`, text: formatPrice(event.price) })),
+      createElement('p', { class: 'muted', text: isFree(event) ? 'Free public admission' : 'Per reserved pass' }),
+      createElement('div', { class: 'stat-summary', style: 'margin-block: 8px;' },
+        createElement('span', { class: 'badge badge-blue', text: `${event.available_slots} of ${event.total_slots} slots remaining` })),
+      createElement('button', {
         type: 'button',
-        class: 'btn btn-secondary btn-block',
-        disabled: !canBook(ev),
-        onclick: () => { $('#dlg-event').close(); openBooking(ev); }
-      }, icon('ticket', 'icon-sm'), canBook(ev) ? 'Book Event Pass' : isPast(ev) ? 'Event Has Ended' : 'Fully Booked'),
-      isStaff && el('button', {
+        class: 'button button-secondary button-full-width',
+        disabled: !canBook(event),
+        onclick: () => { find('#event-dialog').close(); openBooking(event); }
+      }, icon('ticket', 'icon-small'), canBook(event) ? 'Book Event Pass' : isPast(event) ? 'Event Has Ended' : 'Fully Booked'),
+      isStaff && createElement('button', {
         type: 'button',
-        class: 'btn btn-outline btn-block',
-        onclick: () => { $('#dlg-event').close(); openEventForm(ev); }
-      }, icon('edit', 'icon-sm'), 'Edit Event'),
-      isStaff && el('button', {
+        class: 'button button-outline button-full-width',
+        onclick: () => { find('#event-dialog').close(); openEventForm(event); }
+      }, icon('edit', 'icon-small'), 'Edit Event'),
+      isStaff && createElement('button', {
         type: 'button',
-        class: 'btn btn-danger-outline btn-block',
-        onclick: () => { $('#dlg-event').close(); deleteEvent(ev); }
-      }, icon('trash', 'icon-sm'), 'Delete Event Listing')
+        class: 'button button-danger-outline button-full-width',
+        onclick: () => { find('#event-dialog').close(); deleteEvent(event); }
+      }, icon('trash', 'icon-small'), 'Delete Event Listing')
     );
 
-    clear($('#event-body')).append(
-      el('div', { class: 'detail-media' }, bannerImg(ev)),
-      el('div', { class: 'detail-grid' },
-        el('div', { class: 'stack' },
-          el('div', { style: 'display:flex;gap:8px;flex-wrap:wrap;align-items:center;' },
-            el('span', { class: 'badge badge-blue', text: ev.category }),
-            el('span', { class: 'badge badge-gold', text: `Brgy. ${ev.barangay}` })),
-          el('ul', { class: 'meta-list', style: 'margin-block: 10px;' },
-            el('li', {}, icon('calendar'), fmtDate(ev.event_date)),
-            el('li', {}, icon('clock'), fmtTime(ev.event_time)),
-            el('li', {}, icon('pin'), `${ev.venue_name}, ${ev.barangay}`),
-            el('li', {}, icon('users'), `Organized by: ${ev.organizer_name}`)),
-          el('h3', { class: 'h4', text: 'About This Event' }),
-          el('p', { class: 'detail-desc', text: ev.description })
+    clear(find('#event-body')).append(
+      createElement('div', { class: 'detail-media' }, createEventImage(event)),
+      createElement('div', { class: 'detail-grid' },
+        createElement('div', { class: 'stack' },
+          createElement('div', { style: 'display:flex;gap:8px;flex-wrap:wrap;align-items:center;' },
+            createElement('span', { class: 'badge badge-blue', text: event.category }),
+            createElement('span', { class: 'badge badge-gold', text: `Brgy. ${event.barangay}` })),
+          createElement('ul', { class: 'meta-list', style: 'margin-block: 10px;' },
+            createElement('li', {}, icon('calendar'), createElement('span', { class: 'meta-text', text: formatDate(event.event_date) })),
+            createElement('li', {}, icon('clock'), createElement('span', { class: 'meta-text', text: formatTime(event.event_time) })),
+            createElement('li', {}, icon('pin'), createElement('span', { class: 'meta-text', text: formatLocation(event) })),
+            createElement('li', {}, icon('users'), createElement('span', { class: 'meta-text', text: `Organized by: ${event.organizer_name}` }))),
+          createElement('h3', { class: 'h4', text: 'About This Event' }),
+          createElement('p', { class: 'event-description', text: event.description })
         ),
         aside
       )
     );
-    $('#dlg-event').showModal();
+    find('#event-dialog').showModal();
   }
 
   /* ---------- Booking Pass Workflow ---------- */
-  function openBooking(ev) {
-    if (!canBook(ev)) return toast('This event is no longer accepting reservations.', { type: 'error' });
-    const u = state.user, max = Math.min(10, num(ev.available_slots));
-    let qty = 1;
-    $('#book-title').textContent = 'Reserve Your Event Pass';
-    const alertHost = el('div', { id: 'book-alert' });
-    const name = el('input', { type: 'text', id: 'b-name', autocomplete: 'name', value: u?.name || '', required: true, placeholder: 'Your complete name' });
-    const email = el('input', { type: 'email', id: 'b-email', autocomplete: 'email', value: u?.email || '', required: true, readonly: !!u, placeholder: 'name@domain.com' });
-    const phone = el('input', { type: 'tel', id: 'b-phone', autocomplete: 'tel', value: u?.phone || '', placeholder: '0917 123 4567', required: true });
-    const out = el('output', { id: 'b-qty', 'aria-live': 'polite', text: '1' });
-    const total = el('span', { text: peso(ev.price) });
-    const minus = el('button', { type: 'button', 'aria-label': 'Decrease tickets', disabled: true }, '−');
-    const plus = el('button', { type: 'button', 'aria-label': 'Increase tickets', disabled: max <= 1 }, '+');
-    const sync = () => { out.textContent = qty; total.textContent = peso(num(ev.price) * qty); minus.disabled = qty <= 1; plus.disabled = qty >= max; };
-    minus.onclick = () => { qty = Math.max(1, qty - 1); sync(); };
-    plus.onclick = () => { qty = Math.min(max, qty + 1); sync(); };
+  function openBooking(event) {
+    if (!canBook(event)) return toast('This event is no longer accepting reservations.', { type: 'error' });
+    const user = state.user, maximum = Math.min(10, toNumber(event.available_slots));
+    let quantity = 1;
+    find('#booking-title').textContent = 'Reserve Your Event Pass';
+    const alertHost = createElement('div', { id: 'book-alert' });
+    const name = createElement('input', { type: 'text', id: 'booking-name', autocomplete: 'name', value: user?.name || '', required: true, placeholder: 'Your complete name' });
+    const email = createElement('input', { type: 'email', id: 'booking-email', autocomplete: 'email', value: user?.email || '', required: true, readonly: !!user, placeholder: 'name@domain.com' });
+    const phone = createElement('input', { type: 'tel', id: 'booking-phone', autocomplete: 'tel', value: user?.phone || '', placeholder: '0917 123 4567', required: true });
+    const quantityOutput = createElement('output', { id: 'booking-quantity', 'aria-live': 'polite', text: '1' });
+    const total = createElement('span', { text: formatPrice(event.price) });
+    const minus = createElement('button', { type: 'button', 'aria-label': 'Decrease tickets', disabled: true }, '−');
+    const plus = createElement('button', { type: 'button', 'aria-label': 'Increase tickets', disabled: maximum <= 1 }, '+');
+    const sync = () => { quantityOutput.textContent = quantity; total.textContent = formatPrice(toNumber(event.price) * quantity); minus.disabled = quantity <= 1; plus.disabled = quantity >= maximum; };
+    minus.onclick = () => { quantity = Math.max(1, quantity - 1); sync(); };
+    plus.onclick = () => { quantity = Math.min(maximum, quantity + 1); sync(); };
 
-    const form = el('form', { novalidate: true },
+    const form = createElement('form', { novalidate: true },
       alertHost,
-      !u && alertBox('info', 'Booking as Guest', 'Log in or create a citizen account if you want this pass to be saved directly to your account.', { dismissible: false }),
-      el('div', { class: 'summary' },
-        el('p', { class: 'h4', text: ev.title }),
-        el('p', { class: 'muted', text: `${fmtDate(ev.event_date)} · ${fmtTime(ev.event_time)} · ${ev.venue_name}` })),
-      el('div', { class: 'field' }, el('label', { for: 'b-name' }, 'Full name of primary attendee'), name),
-      el('div', { class: 'field' }, el('label', { for: 'b-email' }, 'Confirmation email address'), email),
-      el('div', { class: 'field' }, el('label', { for: 'b-phone' }, 'Contact mobile number'), phone),
-      el('div', { class: 'field' }, el('span', { class: 'label', id: 'b-qty-label' }, `Number of tickets (maximum ${max})`),
-        el('div', { class: 'stepper', role: 'group', 'aria-labelledby': 'b-qty-label' }, minus, out, plus)),
-      el('div', { class: 'summary' }, el('div', { class: 'summary-row total' }, el('span', { text: 'Total Amount' }), total)),
-      el('div', { class: 'form-actions' },
-        el('button', { type: 'button', class: 'btn btn-ghost', 'data-close': '' }, 'Cancel'),
-        el('button', { type: 'submit', class: 'btn btn-secondary' }, icon('check', 'icon-sm'), 'Confirm Reservation')));
+      !user && alertBox('info', 'Booking as Guest', 'Log in or create a citizen account if you want this pass to be saved directly to your account.', { dismissible: false }),
+      createElement('div', { class: 'summary' },
+        createElement('p', { class: 'h4', text: event.title }),
+        createElement('p', { class: 'muted', text: `${formatDate(event.event_date)} · ${formatTime(event.event_time)} · ${event.venue_name}` })),
+      createElement('div', { class: 'field' }, createElement('label', { for: 'booking-name' }, 'Full name of primary attendee'), name),
+      createElement('div', { class: 'field' }, createElement('label', { for: 'booking-email' }, 'Confirmation email address'), email),
+      createElement('div', { class: 'field' }, createElement('label', { for: 'booking-phone' }, 'Contact mobile number'), phone),
+      createElement('div', { class: 'field' }, createElement('span', { class: 'label', id: 'booking-quantity-label' }, `Number of tickets (maximum ${maximum})`),
+        createElement('div', { class: 'stepper', role: 'group', 'aria-labelledby': 'booking-quantity-label' }, minus, quantityOutput, plus)),
+      createElement('div', { class: 'summary' }, createElement('div', { class: 'summary-row total' }, createElement('span', { text: 'Total Amount' }), total)),
+      createElement('div', { class: 'form-actions' },
+        createElement('button', { type: 'button', class: 'button button-plain', 'data-close': '' }, 'Cancel'),
+        createElement('button', { type: 'submit', class: 'button button-secondary' }, icon('check', 'icon-small'), 'Confirm Reservation')));
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
+    form.addEventListener('submit', async (browserEvent) => {
+      browserEvent.preventDefault();
       if (!applyRules(form, [
         [name, name.value.trim().length >= 3 ? '' : 'Enter your full first and last name.'],
-        [email, emailOk(email.value.trim()) ? '' : 'Enter a valid email address.'],
+        [email, isValidEmail(email.value.trim()) ? '' : 'Enter a valid email address.'],
         [phone, phone.value.replace(/\D/g, '').length >= 7 ? '' : 'Enter a valid mobile contact number.']
       ])) return;
-      const res = await withLoading($('button[type=submit]', form), () => api('book_event', { body: {
-        event_id: ev.id, attendee_name: name.value.trim(), attendee_email: email.value.trim(), attendee_phone: phone.value.trim(), tickets_count: qty
-      } }));
-      if (!res.ok) return showApiError(alertHost, res);
-      toast(res.message, { type: 'success', duration: 6000 });
-      renderPass(res.data, 'Reservation Confirmed!');
+      const response = await withLoading(find('button[type=submit]', form), () => api('book_event', {
+        body: {
+          event_id: event.id, attendee_name: name.value.trim(), attendee_email: email.value.trim(), attendee_phone: phone.value.trim(), tickets_count: quantity
+        }
+      }));
+      if (!response.ok) return showApiError(alertHost, response);
+      toast(response.message, { type: 'success', duration: 6000 });
+      renderPass(response.data, 'Reservation Confirmed!');
       loadEvents();
     });
-    clear($('#book-body')).append(form);
-    $('#dlg-book').showModal();
+    clear(find('#booking-content')).append(form);
+    find('#booking-dialog').showModal();
     name.focus();
   }
 
-  function codeSvg(text) {
-    const ns = 'http://www.w3.org/2000/svg', svg = document.createElementNS(ns, 'svg');
-    let x = 0;
-    for (const ch of text) {
-      for (let i = 5; i >= 0; i--) {
-        const w = (ch.charCodeAt(0) >> i) & 1 ? 3 : 1;
-        if ((x + i) % 2 === 0 || w === 3) { const r = document.createElementNS(ns, 'rect'); r.setAttribute('x', x); r.setAttribute('width', w); r.setAttribute('height', 56); r.setAttribute('fill', 'currentColor'); svg.append(r); }
-        x += w + 1;
+  function createPassCode(text) {
+    const svgNamespace = 'http://www.w3.org/2000/svg', svg = document.createElementNS(svgNamespace, 'svg');
+    let position = 0;
+    for (const character of text) {
+      for (let index = 5; index >= 0; index--) {
+        const width = (character.charCodeAt(0) >> index) & 1 ? 3 : 1;
+        if ((position + index) % 2 === 0 || width === 3) { const rectangle = document.createElementNS(svgNamespace, 'rect'); rectangle.setAttribute('x', position); rectangle.setAttribute('width', width); rectangle.setAttribute('height', 56); rectangle.setAttribute('fill', 'currentColor'); svg.append(rectangle); }
+        position += width + 1;
       }
     }
-    svg.setAttribute('viewBox', `0 0 ${x} 56`); svg.setAttribute('preserveAspectRatio', 'none');
+    svg.setAttribute('viewBox', `0 0 ${position} 56`); svg.setAttribute('preserveAspectRatio', 'none');
     svg.setAttribute('class', 'code'); svg.setAttribute('aria-hidden', 'true');
     return svg;
   }
 
-  function renderPass(p, heading) {
-    $('#book-title').textContent = heading;
-    const row = (k, v) => [el('dt', { text: k }), el('dd', { text: v })];
-    clear($('#book-body')).append(
+  function renderPass(pass, heading) {
+    find('#booking-title').textContent = heading;
+    const row = (key, value) => [createElement('dt', { text: key }), createElement('dd', { text: value })];
+    clear(find('#booking-content')).append(
       alertBox('success', heading, 'Present this digital pass reference at the venue entrance.', { dismissible: false }),
-      el('div', { class: 'pass' },
-        el('p', { class: 'badge badge-blue', text: 'Iligan City Official Pass' }),
-        el('p', { class: 'pass-ref', text: p.booking_reference }),
-        codeSvg(p.booking_reference),
-        el('p', { class: 'h4', text: p.event_title }),
-        el('dl', {}, row('Attendee', p.attendee_name), row('Date', p.event_date), row('Time', p.event_time),
-          row('Venue', `${p.venue_name}, ${p.barangay}`), row('Passes', String(p.tickets_count)), row('Total', peso(num(p.price) * num(p.tickets_count))))),
-      el('div', { class: 'form-actions' },
-        el('button', { type: 'button', class: 'btn btn-ghost', 'data-close': '' }, 'Done'),
-        state.user && el('a', { class: 'btn btn-primary', href: '#/bookings', onclick: () => $('#dlg-book').close() }, 'View My Bookings')));
-    if (!$('#dlg-book').open) $('#dlg-book').showModal();
+      createElement('div', { class: 'pass' },
+        createElement('p', { class: 'badge badge-blue', text: 'Iligan City Official Pass' }),
+        createElement('p', { class: 'pass-reference', text: pass.booking_reference }),
+        createPassCode(pass.booking_reference),
+        createElement('p', { class: 'h4', text: pass.event_title }),
+        createElement('dl', {}, row('Attendee', pass.attendee_name), row('Date', pass.event_date), row('Time', pass.event_time),
+          row('Venue', formatLocation(pass)), row('Passes', String(pass.tickets_count)), row('Total', formatPrice(toNumber(pass.price) * toNumber(pass.tickets_count))))),
+      createElement('div', { class: 'form-actions' },
+        createElement('button', { type: 'button', class: 'button button-plain', 'data-close': '' }, 'Done'),
+        state.user && createElement('a', { class: 'button button-primary', href: '#/bookings', onclick: () => find('#booking-dialog').close() }, 'View My Bookings')));
+    if (!find('#booking-dialog').open) find('#booking-dialog').showModal();
   }
 
   /* ---------- My Bookings View ---------- */
+  async function loadCitizenDashboard() {
+    const user = state.user;
+    clearAlert('#citizen-alert');
+    clear(find('#citizen-stats'));
+    clear(find('#citizen-next')).append(createElement('p', { text: 'Loading your reservations…' }));
+    const result = await api('get_bookings', { params: { email: user.email } });
+    if (state.user?.id !== user.id) return;
+    if (!result.ok) {
+      clear(find('#citizen-next'));
+      return showAlert('#citizen-alert', 'error', result.message, result.tip, {
+        actions: [createElement('button', { type: 'button', class: 'button button-outline button-small', onclick: loadCitizenDashboard }, 'Try Again')]
+      });
+    }
+    state.bookings = result.data;
+    renderCitizenDashboard();
+  }
+
+  function renderCitizenDashboard() {
+    if (state.user?.role !== 'user') return;
+    find('#citizen-welcome').textContent = `Welcome, ${state.user.name}. Plan your next outing in Iligan City.`;
+    const bookings = state.bookings;
+    const upcoming = bookings.filter((booking) => booking.status === 'confirmed' && !isPast(booking))
+      .sort((first, second) => `${first.event_date} ${first.event_time}`.localeCompare(`${second.event_date} ${second.event_time}`));
+    const tickets = upcoming.reduce((total, booking) => total + toNumber(booking.tickets_count), 0);
+    const past = bookings.filter((booking) => booking.status === 'confirmed' && isPast(booking));
+    clear(find('#citizen-stats')).append(statCard(upcoming.length, 'Upcoming reservations'), statCard(tickets, 'Passes for upcoming events'), statCard(past.length, 'Past events booked'));
+    const host = clear(find('#citizen-next'));
+    const booking = upcoming[0];
+    if (!booking) {
+      host.append(emptyState('Your next outing starts here', 'Find a community event and reserve your place. Your next reservation will appear here.', createElement('a', { class: 'button button-outline', href: '#/events' }, 'Explore Events')));
+      return;
+    }
+    host.append(
+      createElement('p', { class: 'next-event-date', text: `${formatDate(booking.event_date)} · ${formatTime(booking.event_time)}` }),
+      createElement('h3', { class: 'h2', text: booking.event_title }),
+      createElement('p', { class: 'muted', text: formatLocation(booking) }),
+      createElement('p', { class: 'next-event-reference', text: `${booking.tickets_count} pass${toNumber(booking.tickets_count) === 1 ? '' : 'es'} · ${booking.booking_reference}` }),
+      createElement('div', { class: 'form-actions' },
+        createElement('button', { type: 'button', class: 'button button-primary', onclick: () => renderPass({ ...booking, event_date: formatDate(booking.event_date), event_time: formatTime(booking.event_time) }, 'Digital Pass') }, 'Open My Pass'),
+        createElement('a', { class: 'button button-plain', href: '#/bookings' }, 'All My Bookings')));
+  }
+
   async function loadBookings() {
-    const host = clear($('#bookings-list'));
+    const user = state.user;
+    const host = clear(find('#bookings-list'));
     clearAlert('#bookings-alert');
-    host.append(el('div', { class: 'skeleton', 'aria-hidden': 'true', style: 'min-height:120px' }));
-    const res = await api('get_bookings', { params: { email: state.user.email } });
-    if (!res.ok) { clear(host); return showApiError('#bookings-alert', res); }
-    state.bookings = res.data;
+    host.append(createElement('div', { class: 'skeleton', 'aria-hidden': 'true', style: 'min-height:120px' }));
+    const response = await api('get_bookings', { params: { email: user.email } });
+    if (state.user?.id !== user.id) return;
+    if (!response.ok) { clear(host); return showApiError('#bookings-alert', response); }
+    state.bookings = response.data;
     renderBookings();
   }
   function renderBookings() {
-    const host = clear($('#bookings-list'));
+    const host = clear(find('#bookings-list'));
     if (!state.bookings.length) {
-      return host.append(emptyState('No Bookings Found', 'You have not reserved passes for upcoming events yet.', el('a', { class: 'btn btn-primary', href: '#/events' }, 'Discover Events')));
+      return host.append(emptyState('No Bookings Found', 'You have not reserved passes for upcoming events yet.', createElement('a', { class: 'button button-primary', href: '#/events' }, 'Discover Events')));
     }
-    state.bookings.forEach((b) => {
-      const isCancelled = b.status === 'cancelled';
-      host.append(el('article', { class: `card booking-card ${isCancelled ? 'is-cancelled' : ''}`, 'aria-label': `Booking ${b.booking_reference}` },
-        el('div', { class: 'booking-main' },
-          el('div', { style: 'display:flex;gap:8px;flex-wrap:wrap;align-items:center' },
-            el('span', { class: `badge ${isCancelled ? 'badge-red' : 'badge-green'}`, text: isCancelled ? 'Cancelled' : 'Confirmed Active' }),
-            el('span', { class: 'ref-chip', text: b.booking_reference })),
-          el('h2', { class: 'h4 event-name', text: b.event_title }),
-          el('ul', { class: 'meta-list' },
-            el('li', {}, icon('calendar'), `${fmtDate(b.event_date)} · ${fmtTime(b.event_time)}`),
-            el('li', {}, icon('pin'), `${b.venue_name}, ${b.barangay}`),
-            el('li', {}, icon('ticket'), `${b.tickets_count} ticket${b.tickets_count > 1 ? 's' : ''} · ${peso(num(b.price) * num(b.tickets_count))}`))),
-        el('div', { class: 'event-actions' },
+    state.bookings.forEach((booking) => {
+      const isCancelled = booking.status === 'cancelled';
+      host.append(createElement('article', { class: `card booking-card ${isCancelled ? 'is-cancelled' : ''}`, 'aria-label': `Booking ${booking.booking_reference}` },
+        createElement('div', { class: 'booking-main' },
+          createElement('div', { style: 'display:flex;gap:8px;flex-wrap:wrap;align-items:center' },
+            createElement('span', { class: `badge ${isCancelled ? 'badge-red' : 'badge-green'}`, text: isCancelled ? 'Cancelled' : 'Confirmed Active' }),
+            createElement('span', { class: 'booking-reference', text: booking.booking_reference })),
+          createElement('h2', { class: 'h4 event-name', text: booking.event_title }),
+          createElement('ul', { class: 'meta-list' },
+            createElement('li', {}, icon('calendar'), createElement('span', { class: 'meta-text', text: `${formatDate(booking.event_date)} · ${formatTime(booking.event_time)}` })),
+            createElement('li', {}, icon('pin'), createElement('span', { class: 'meta-text', text: formatLocation(booking) })),
+            createElement('li', {}, icon('ticket'), createElement('span', { class: 'meta-text', text: `${booking.tickets_count} ticket${booking.tickets_count > 1 ? 's' : ''} · ${formatPrice(toNumber(booking.price) * toNumber(booking.tickets_count))}` })))),
+        createElement('div', { class: 'event-actions' },
           isCancelled
-            ? el('button', { type: 'button', class: 'btn btn-outline', onclick: () => restoreBooking(b.booking_reference) }, 'Restore Booking')
-            : [el('button', { type: 'button', class: 'btn btn-primary', onclick: () => renderPass({ ...b, event_date: fmtDate(b.event_date), event_time: fmtTime(b.event_time) }, 'Digital Pass') }, 'View Pass'),
-               el('button', { type: 'button', class: 'btn btn-danger-outline', onclick: () => cancelBooking(b) }, 'Cancel Booking')])));
+            ? createElement('button', { type: 'button', class: 'button button-outline', onclick: () => restoreBooking(booking.booking_reference) }, 'Restore Booking')
+            : [createElement('button', { type: 'button', class: 'button button-primary', onclick: () => renderPass({ ...booking, event_date: formatDate(booking.event_date), event_time: formatTime(booking.event_time) }, 'Digital Pass') }, 'View Pass'),
+            createElement('button', { type: 'button', class: 'button button-danger-outline', onclick: () => cancelBooking(booking) }, 'Cancel Booking')])));
     });
   }
-  async function cancelBooking(b) {
-    const yes = await confirmAction({
+  async function cancelBooking(booking) {
+    const confirmed = await confirmAction({
       title: 'Cancel this reservation?',
-      message: `Your ${b.tickets_count} reserved pass${b.tickets_count > 1 ? 'es' : ''} for "${b.event_title}" will be released back to the community. You can undo this right after.`,
+      message: `Your ${booking.tickets_count} reserved pass${booking.tickets_count > 1 ? 'es' : ''} for "${booking.event_title}" will be released back to the community. You can undo this right after.`,
       confirmLabel: 'Cancel Booking', cancelLabel: 'Keep Booking'
     });
-    if (!yes) return;
-    const res = await api('cancel_booking', { body: { booking_reference: b.booking_reference } });
-    if (!res.ok) return showApiError('#bookings-alert', res);
-    toast(res.message, { type: 'success', duration: 8000, actionLabel: 'Undo', onAction: () => restoreBooking(b.booking_reference) });
+    if (!confirmed) return;
+    const response = await api('cancel_booking', { body: { booking_reference: booking.booking_reference } });
+    if (!response.ok) return showApiError('#bookings-alert', response);
+    toast(response.message, { type: 'success', duration: 8000, actionLabel: 'Undo', onAction: () => restoreBooking(booking.booking_reference) });
     await loadBookings(); loadEvents();
   }
-  async function restoreBooking(ref) {
-    const res = await api('restore_booking', { body: { booking_reference: ref } });
-    if (!res.ok) return showApiError('#bookings-alert', res);
-    toast(res.message, { type: 'success' });
+  async function restoreBooking(reference) {
+    const response = await api('restore_booking', { body: { booking_reference: reference } });
+    if (!response.ok) return showApiError('#bookings-alert', response);
+    toast(response.message, { type: 'success' });
     await loadBookings(); loadEvents();
   }
 
   /* ---------- Coordinator & Admin Dashboards ---------- */
-  const statCard = (value, label) => el('div', { class: 'stat' }, el('span', { class: 'stat-value', text: value }), el('span', { class: 'stat-label', text: label }));
-  function renderStats(host, events) {
-    const today = todayISO();
-    const booked = events.reduce((s, e) => s + seatsTaken(e), 0);
-    const revenue = events.reduce((s, e) => s + seatsTaken(e) * num(e.price), 0);
-    clear(host).append(
-      statCard(events.length, 'Total Events Listed'),
-      statCard(events.filter((e) => e.status === 'active' && e.event_date >= today).length, 'Upcoming Active Events'),
-      statCard(booked, 'Reserved Passes Issued'),
-      statCard(peso(revenue) === 'FREE' ? '₱0.00' : peso(revenue), 'Total Bookings Value')
-    );
+  const statCard = (value, label) => createElement('div', { class: 'stat' }, createElement('span', { class: 'stat-value', text: value }), createElement('span', { class: 'stat-label', text: label }));
+  const tablePaginationState = {};
+
+  function getPaginationPages(current, total) {
+    if (total <= 7) {
+      return Array.from({ length: total }, (unused, index) => index + 1);
+    }
+    if (current <= 4) {
+      return [1, 2, 3, 4, 5, '...', total];
+    }
+    if (current >= total - 3) {
+      return [1, '...', total - 4, total - 3, total - 2, total - 1, total];
+    }
+    return [1, '...', current - 1, current, current + 1, '...', total];
   }
 
   function eventsTable(host, events, { caption, showCoordinator = false }) {
     clear(host);
     if (!events.length) {
-      return host.append(emptyState('No Events Yet', 'Create your first event listing to see management controls here.', el('button', { type: 'button', class: 'btn btn-primary', 'data-new-event': '' }, 'Add New Event')));
+      return host.append(emptyState('No Events Yet', 'Create your first event listing to see management controls here.', createElement('button', { type: 'button', class: 'button button-primary', 'data-new-event': '' }, 'Add New Event')));
     }
-    const head = ['Event Title', 'Date & Time', 'Barangay', showCoordinator && 'Coordinator', 'Seats Reserved', 'Price', 'Status', 'Actions'].filter(Boolean);
-    const rows = events.map((ev) => {
-      const btn = (label, ic, fn, cls = 'btn-outline') => el('button', { type: 'button', class: `btn btn-sm ${cls}`, 'aria-label': `${label}: ${ev.title}`, onclick: fn }, icon(ic, 'icon-sm'), label);
-      return el('tr', {},
-        el('td', { class: 'td-title' }, ev.title, num(ev.is_featured) ? el('span', { class: 'badge badge-gold', style: 'margin-left:8px;' }, 'Featured') : null),
-        el('td', { text: `${fmtDate(ev.event_date)} ${fmtTime(ev.event_time)}` }),
-        el('td', { text: ev.barangay }),
-        showCoordinator && el('td', { text: ev.coordinator_author_name || ev.organizer_name }),
-        el('td', { text: `${seatsTaken(ev)} / ${ev.total_slots}` }),
-        el('td', { text: peso(ev.price) }),
-        el('td', {}, el('span', { class: `badge ${ev.status === 'active' ? (isPast(ev) ? 'badge-gray' : 'badge-green') : 'badge-red'}`, text: ev.status === 'active' && isPast(ev) ? 'Concluded' : ev.status })),
-        el('td', {}, el('div', { class: 'td-actions' },
-          btn('Attendees', 'users', () => openAttendees(ev)),
-          btn('Edit', 'edit', () => openEventForm(ev)),
-          btn(num(ev.is_featured) ? 'Unfeature' : 'Feature', 'star', () => toggleFeatured(ev)),
-          btn('Delete', 'trash', () => deleteEvent(ev), 'btn-danger-outline'))));
+
+    const tableKey = host.id || caption || 'default-table';
+    if (!tablePaginationState[tableKey]) {
+      tablePaginationState[tableKey] = { page: 1, pageSize: 10 };
+    }
+    const tableState = tablePaginationState[tableKey];
+    const pageSize = tableState.pageSize || 10;
+    const totalPages = Math.max(1, Math.ceil(events.length / pageSize));
+    if (tableState.page > totalPages) tableState.page = totalPages;
+    if (tableState.page < 1) tableState.page = 1;
+    const currentPage = tableState.page;
+
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = Math.min(startIndex + pageSize, events.length);
+    const displayStatus = (event) => event.status === 'active' && isPast(event) ? 'Concluded' : event.status;
+    const columns = [
+      { label: 'Event', key: 'title', value: (event) => event.title },
+      { label: 'Date & time', key: 'date', value: (event) => `${event.event_date}T${event.event_time || '00:00:00'}` },
+      { label: 'Barangay', key: 'barangay', value: (event) => event.barangay },
+      { label: 'Reserved', key: 'reserved', value: (event) => seatsTaken(event) },
+      { label: 'Price', key: 'price', value: (event) => toNumber(event.price) },
+      { label: 'Status', key: 'status', value: displayStatus },
+      { label: 'Actions' }
+    ];
+    const sortColumn = columns.find((column) => column.key && column.key === tableState.sortKey);
+    const sortedEvents = [...events];
+    if (sortColumn) {
+      sortedEvents.sort((firstEvent, secondEvent) => {
+        const firstValue = sortColumn.value(firstEvent);
+        const secondValue = sortColumn.value(secondEvent);
+        const comparison = typeof firstValue === 'number' && typeof secondValue === 'number'
+          ? firstValue - secondValue
+          : String(firstValue ?? '').localeCompare(String(secondValue ?? ''), 'en-PH', { sensitivity: 'base', numeric: true });
+        return tableState.sortDirection === 'desc' ? -comparison : comparison;
+      });
+    }
+    const pagedEvents = sortedEvents.slice(startIndex, endIndex);
+
+    const renderHeading = (column) => {
+      if (!column.key) return createElement('th', { scope: 'col', text: column.label });
+      const active = tableState.sortKey === column.key;
+      const direction = active ? tableState.sortDirection : null;
+      return createElement('th', { scope: 'col', 'aria-sort': active ? (direction === 'asc' ? 'ascending' : 'descending') : 'none' },
+        createElement('button', {
+          type: 'button', class: `table-sort ${active ? 'is-sorted' : ''}`,
+          'data-sort-key': column.key,
+          'aria-label': `${column.label}: sort ${direction === 'asc' ? 'descending' : 'ascending'}`,
+          onclick: () => {
+            tableState.sortDirection = active && direction === 'asc' ? 'desc' : 'asc';
+            tableState.sortKey = column.key;
+            tableState.page = 1;
+            eventsTable(host, events, { caption, showCoordinator });
+            host.querySelector(`[data-sort-key="${column.key}"]`).focus({ preventScroll: true });
+          }
+        }, column.label, createElement('span', { class: `sort-arrows ${direction || ''}`, 'aria-hidden': 'true' },
+          createElement('span', { class: 'sort-up' }), createElement('span', { class: 'sort-down' }))));
+    };
+    const rows = pagedEvents.map((event) => {
+      const featured = !!toNumber(event.is_featured);
+      const status = displayStatus(event);
+      const button = (label, iconName, callback, className = '', showLabel = false) => createElement('button', {
+        type: 'button', class: `table-action ${className}`, title: label,
+        'aria-label': `${label}: ${event.title}`, onclick: callback
+      }, icon(iconName, 'icon-small'), showLabel ? label : null);
+      const featureButton = button(featured ? 'Unfeature' : 'Feature', 'star', () => toggleFeatured(event), featured ? 'is-featured' : '');
+      featureButton.setAttribute('aria-pressed', String(featured));
+      return createElement('tr', {},
+        createElement('td', { class: 'event-title-cell' },
+          createElement('span', { class: 'table-event-name', text: event.title }),
+          showCoordinator && createElement('span', { class: 'table-secondary', text: event.coordinator_author_name || event.organizer_name })),
+        createElement('td', { class: 'event-date-cell' },
+          createElement('span', { text: new Date(event.event_date + 'T00:00:00').toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' }) }),
+          createElement('span', { class: 'table-secondary', text: formatTime(event.event_time) })),
+        createElement('td', { text: event.barangay }),
+        createElement('td', { class: 'reserved-seats-cell' }, createElement('span', { text: seatsTaken(event).toLocaleString('en-PH') }),
+          createElement('span', { class: 'table-capacity', text: ` / ${toNumber(event.total_slots).toLocaleString('en-PH')}` })),
+        createElement('td', { class: 'event-price-cell', text: toNumber(event.price) === 0 ? 'Free' : formatPrice(event.price) }),
+        createElement('td', {}, createElement('span', { class: `table-status ${event.status === 'active' ? (isPast(event) ? 'is-concluded' : 'is-active') : 'is-inactive'}`, text: status })),
+        createElement('td', {}, createElement('div', { class: 'table-actions' },
+          button('Attendees', 'users', () => openAttendees(event), 'table-action-attendees', true),
+          button('Edit', 'edit', () => openEventForm(event)),
+          featureButton,
+          button('Delete', 'trash', () => deleteEvent(event), 'table-action-delete'))));
     });
-    host.append(el('div', { class: 'table-card' }, el('div', { class: 'table-scroll' },
-      el('table', { class: 'data' }, el('caption', { text: caption }),
-        el('thead', {}, el('tr', {}, head.map((h) => el('th', { scope: 'col', text: h })))), el('tbody', {}, rows)))));
+
+    const goToPage = (newPage) => {
+      tableState.page = Math.max(1, Math.min(newPage, totalPages));
+      eventsTable(host, events, { caption, showCoordinator });
+      host.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    };
+
+    const changePageSize = (newSize) => {
+      tableState.pageSize = Number(newSize) || 10;
+      tableState.page = 1;
+      eventsTable(host, events, { caption, showCoordinator });
+    };
+
+    const paginationBar = createElement('div', { class: 'table-pagination' },
+      createElement('div', { class: 'pagination-info' },
+        'Showing ',
+        createElement('strong', { text: `${startIndex + 1}–${endIndex}` }),
+        ' of ',
+        createElement('strong', { text: `${events.length}` }),
+        ` event${events.length === 1 ? '' : 's'}`
+      ),
+      createElement('div', { class: 'pagination-controls' },
+        events.length > 10 ? createElement('label', { class: 'pagination-size' },
+          'Per page: ',
+          createElement('select', {
+            'aria-label': 'Events per page',
+            onchange: (browserEvent) => changePageSize(browserEvent.target.value)
+          },
+            [10, 25, 50].map((size) => createElement('option', { value: size, selected: size === pageSize }, `${size}`))
+          )
+        ) : null,
+        totalPages > 1 ? createElement('nav', { class: 'pagination-nav', 'aria-label': 'Events table pagination' },
+          createElement('button', {
+            type: 'button',
+            class: 'pagination-button pagination-prev',
+            'aria-label': 'Previous page',
+            disabled: currentPage <= 1,
+            onclick: () => goToPage(currentPage - 1)
+          }, icon('arrowLeft', 'icon-small'), createElement('span', { text: 'Prev' })),
+          createElement('div', { class: 'pagination-pages' },
+            getPaginationPages(currentPage, totalPages).map((pageNumber) => {
+              if (pageNumber === '...') return createElement('span', { class: 'pagination-ellipsis', text: '…' });
+              const isCurrentPage = pageNumber === currentPage;
+              return createElement('button', {
+                type: 'button',
+                class: `pagination-page ${isCurrentPage ? 'is-active' : ''}`,
+                'aria-label': `Page ${pageNumber}`,
+                ...(isCurrentPage ? { 'aria-current': 'page' } : {}),
+                onclick: () => goToPage(pageNumber)
+              }, `${pageNumber}`);
+            })
+          ),
+          createElement('button', {
+            type: 'button',
+            class: 'pagination-button pagination-next',
+            'aria-label': 'Next page',
+            disabled: currentPage >= totalPages,
+            onclick: () => goToPage(currentPage + 1)
+          }, createElement('span', { text: 'Next' }), icon('arrowRight', 'icon-small'))
+        ) : null
+      )
+    );
+
+    host.append(createElement('div', { class: 'table-card events-table-card' },
+      createElement('div', { class: 'table-scroll' },
+        createElement('table', { class: 'data-table events-table' }, createElement('caption', {}, createElement('span', { text: caption }), createElement('span', { class: 'table-count', text: `${events.length} event${events.length === 1 ? '' : 's'}` })),
+          createElement('thead', {}, createElement('tr', {}, columns.map(renderHeading))),
+          createElement('tbody', {}, rows)
+        )
+      ),
+      paginationBar
+    ));
   }
 
   function refreshStaffViews() {
     if (!state.user) return;
-    const mine = state.events.filter((e) => e.can_manage);
-    if (state.user.role === 'organizer') { renderStats($('#dashboard-stats'), mine); eventsTable($('#dashboard-table'), mine, { caption: 'Your Managed Events' }); }
-    if (state.user.role === 'admin') { renderStats($('#admin-stats'), state.events); eventsTable($('#admin-table'), state.events, { caption: 'Citywide Portal Events Directory', showCoordinator: true }); }
+    if (state.user.role === 'organizer') renderCoordinatorDashboard();
+    if (state.user.role === 'admin') {
+      const events = state.events;
+      const upcoming = events.filter((event) => event.status === 'active' && !isPast(event));
+      const featured = events.filter((event) => toNumber(event.is_featured));
+      const coordinators = new Set(events.map((event) => event.coordinator_id).filter(Boolean));
+      clear(find('#admin-stats')).append(statCard(events.length, 'Citywide events'), statCard(upcoming.length, 'Upcoming active events'), statCard(featured.length, 'Featured listings'), statCard(coordinators.size, 'Coordinators with listings'));
+      eventsTable(find('#admin-table'), events, { caption: 'Citywide Portal Events Directory', showCoordinator: true });
+    }
   }
 
-  async function toggleFeatured(ev) {
-    const next = num(ev.is_featured) ? 0 : 1;
-    const res = await api('toggle_featured', { body: { id: ev.id, is_featured: next } });
-    res.ok ? toast(res.message, { type: 'success' }) : toast(res.message, { type: 'error' });
-    if (res.ok) await loadEvents();
+  function renderCoordinatorDashboard() {
+    const events = state.events.filter((event) => event.is_mine);
+    const upcoming = events.filter((event) => event.status === 'active' && !isPast(event));
+    const tickets = upcoming.reduce((total, event) => total + seatsTaken(event), 0);
+    const available = upcoming.reduce((total, event) => total + toNumber(event.available_slots), 0);
+    clear(find('#dashboard-stats')).append(statCard(events.length, 'My published events'), statCard(upcoming.length, 'Upcoming events'), statCard(tickets, 'Upcoming reserved passes'), statCard(available, 'Upcoming available seats'));
+    const filter = find('#coordinator-filter').value;
+    const visibleEvents = events.filter((event) => filter === 'all' || (filter === 'past' ? isPast(event) : !isPast(event)))
+      .sort((first, second) => `${first.event_date} ${first.event_time}`.localeCompare(`${second.event_date} ${second.event_time}`));
+    const host = clear(find('#coordinator-events'));
+    if (!visibleEvents.length) {
+      host.append(emptyState('No events in this view', events.length ? 'Choose another view to find your published events.' : 'Publish your first event to manage its seating and attendees here.',
+        createElement('button', { type: 'button', class: 'button button-outline', 'data-new-event': '' }, 'Add New Event')));
+      return;
+    }
+    visibleEvents.forEach((event) => {
+      const reserved = seatsTaken(event);
+      host.append(createElement('article', { class: 'coordinator-event' },
+        createElement('div', { class: 'coordinator-event-date' }, createElement('strong', { text: new Date(event.event_date + 'T00:00:00').getDate() }),
+          createElement('span', { text: new Date(event.event_date + 'T00:00:00').toLocaleDateString('en-PH', { month: 'short', year: 'numeric' }) })),
+        createElement('div', { class: 'coordinator-event-details' },
+          createElement('span', { class: `table-status ${isPast(event) ? 'is-concluded' : event.status === 'active' ? 'is-active' : 'is-inactive'}`, text: isPast(event) ? 'Concluded' : event.status }),
+          createElement('h3', { class: 'h4', text: event.title }),
+          createElement('p', { class: 'muted', text: `${formatTime(event.event_time)} · ${formatLocation(event)}` })),
+        createElement('div', { class: 'coordinator-capacity' },
+          createElement('p', {}, createElement('strong', { text: reserved.toLocaleString('en-PH') }), ` / ${toNumber(event.total_slots).toLocaleString('en-PH')} reserved`),
+          createElement('progress', { max: Math.max(1, toNumber(event.total_slots)), value: reserved, 'aria-label': `Reserved seats for ${event.title}` }),
+          createElement('span', { class: 'table-secondary', text: `${toNumber(event.available_slots).toLocaleString('en-PH')} seats available` })),
+        createElement('div', { class: 'coordinator-event-actions' },
+          createElement('button', { type: 'button', class: 'button button-outline button-small', onclick: () => openAttendees(event), 'aria-label': `Attendees: ${event.title}` }, icon('users', 'icon-small'), 'Attendees'),
+          createElement('button', { type: 'button', class: 'button button-plain button-small', onclick: () => openEventForm(event), 'aria-label': `Edit: ${event.title}` }, icon('edit', 'icon-small'), 'Edit'),
+          createElement('button', { type: 'button', class: 'table-action table-action-delete', title: 'Delete event', 'aria-label': `Delete: ${event.title}`, onclick: () => deleteEvent(event) }, icon('trash', 'icon-small')))));
+    });
   }
 
-  async function deleteEvent(ev) {
-    const yes = await confirmAction({
+  async function toggleFeatured(event) {
+    const next = toNumber(event.is_featured) ? 0 : 1;
+    const response = await api('toggle_featured', { body: { id: event.id, is_featured: next } });
+    response.ok ? toast(response.message, { type: 'success' }) : toast(response.message, { type: 'error' });
+    if (response.ok) await loadEvents();
+  }
+
+  async function deleteEvent(event) {
+    const confirmed = await confirmAction({
       title: 'Permanently remove event?',
-      message: `"${ev.title}" and all related booking passes will be permanently removed from Iligan City portal.`,
+      message: `"${event.title}" and all related booking passes will be permanently removed from Iligan City portal.`,
       confirmLabel: 'Delete Event', cancelLabel: 'Keep Event', requireText: 'DELETE'
     });
-    if (!yes) return;
-    const res = await api('delete_event', { body: { id: ev.id, confirmation_text: 'DELETE' } });
-    if (!res.ok) return toast(`${res.message} ${res.tip}`.trim(), { type: 'error', duration: 8000 });
-    toast(res.message, { type: 'success' });
+    if (!confirmed) return;
+    const response = await api('delete_event', { body: { id: event.id, confirmation_text: 'DELETE' } });
+    if (!response.ok) return toast(`${response.message} ${response.tip}`.trim(), { type: 'error', duration: 8000 });
+    toast(response.message, { type: 'success' });
     await loadEvents();
   }
 
-  async function openAttendees(ev) {
-    $('#att-title').textContent = `Attendees List · ${ev.title}`;
-    const body = clear($('#att-body')).appendChild(el('p', { class: 'muted', text: 'Loading attendee records...' }));
-    $('#dlg-attendees').showModal();
-    const res = await api('get_bookings', { params: { event_id: ev.id } });
-    const host = clear($('#att-body'));
-    if (!res.ok) return host.append(alertBox('error', res.message, res.tip, { dismissible: false }));
-    if (!res.data.length) return host.append(emptyState('No Reservations Yet', 'Registered attendees will appear here once citizens reserve passes.'));
-    const confirmed = res.data.filter((b) => b.status === 'confirmed').reduce((s, b) => s + num(b.tickets_count), 0);
-    host.append(el('p', { class: 'muted', style: 'margin-bottom:16px', text: `${confirmed} confirmed passes across ${res.data.length} registered reservations.` }),
-      el('div', { class: 'table-scroll' }, el('table', { class: 'data' },
-        el('thead', {}, el('tr', {}, ['Reference', 'Attendee Name', 'Contact Info', 'Tickets', 'Status'].map((h) => el('th', { scope: 'col', text: h })))),
-        el('tbody', {}, res.data.map((b) => el('tr', {},
-          el('td', { class: 'ref-chip', text: b.booking_reference }), el('td', { text: b.attendee_name }),
-          el('td', { text: `${b.attendee_email} · ${b.attendee_phone}` }), el('td', { text: b.tickets_count }),
-          el('td', {}, el('span', { class: `badge ${b.status === 'confirmed' ? 'badge-green' : 'badge-red'}`, text: b.status }))))))));
+  async function openAttendees(event) {
+    find('#attendees-title').textContent = `Attendees List · ${event.title}`;
+    const body = clear(find('#attendees-content')).appendChild(createElement('p', { class: 'muted', text: 'Loading attendee records...' }));
+    find('#attendees-dialog').showModal();
+    const response = await api('get_bookings', { params: { event_id: event.id } });
+    const host = clear(find('#attendees-content'));
+    if (!response.ok) return host.append(alertBox('error', response.message, response.tip, { dismissible: false }));
+    if (!response.data.length) return host.append(emptyState('No Reservations Yet', 'Registered attendees will appear here once citizens reserve passes.'));
+    const confirmed = response.data.filter((booking) => booking.status === 'confirmed').reduce((total, booking) => total + toNumber(booking.tickets_count), 0);
+    host.append(createElement('p', { class: 'muted', style: 'margin-bottom:16px', text: `${confirmed} confirmed passes across ${response.data.length} registered reservations.` }),
+      createElement('div', { class: 'table-scroll' }, createElement('table', { class: 'data-table' },
+        createElement('thead', {}, createElement('tr', {}, ['Reference', 'Attendee Name', 'Contact Info', 'Tickets', 'Status'].map((heading) => createElement('th', { scope: 'col', text: heading })))),
+        createElement('tbody', {}, response.data.map((booking) => createElement('tr', {},
+          createElement('td', { class: 'booking-reference', text: booking.booking_reference }), createElement('td', { text: booking.attendee_name }),
+          createElement('td', { text: `${booking.attendee_email} · ${booking.attendee_phone}` }), createElement('td', { text: booking.tickets_count }),
+          createElement('td', {}, createElement('span', { class: `badge ${booking.status === 'confirmed' ? 'badge-green' : 'badge-red'}`, text: booking.status }))))))));
   }
 
   /* ---------- Event Creation & Editing Form ---------- */
-  function openEventForm(ev = null) {
-    const form = $('#event-form');
-    form.reset(); clearAlert('#ef-alert'); clear($('#ef-dup'));
-    $$('input,select,textarea', form).forEach(clearFieldError);
-    $('#ef-date').min = ev ? '' : todayISO();
-    $('#ef-title').textContent = ev ? 'Edit Event Listing' : 'Publish New Community Event';
-    $('#ef-submit').textContent = ev ? 'Save Changes' : 'Publish Event';
-    $('#ef-id').value = ev ? ev.id : '';
-    $('#ef-preview').hidden = true;
-    if (ev) {
-      if (ev.barangay && !state.barangays.some((b) => b.name === ev.barangay)) $('#ef-barangay').append(el('option', { value: ev.barangay }, ev.barangay));
+  function openEventForm(event = null) {
+    const form = find('#event-form');
+    form.reset(); clearAlert('#event-form-alert'); clear(find('#event-duplicate-warning'));
+    findAll('input,select,textarea', form).forEach(clearFieldError);
+    find('#event-form-date').min = event ? '' : todayDate();
+    find('#event-form-heading').textContent = event ? 'Edit Event Listing' : 'Publish New Community Event';
+    find('#save-event-button').textContent = event ? 'Save Changes' : 'Publish Event';
+    find('#event-form-id').value = event ? event.id : '';
+    find('#event-image-preview').hidden = true;
+    const featureControl = find('#event-form-featured').closest('label');
+    if (featureControl) featureControl.hidden = state.user?.role !== 'admin';
+    if (event) {
+      if (event.barangay && !state.barangays.some((barangay) => barangay.name === event.barangay)) find('#event-form-barangay').append(createElement('option', { value: event.barangay }, event.barangay));
       Object.entries({
-        'ef-title-input': ev.title, 'ef-description': ev.description, 'ef-category': ev.category, 'ef-barangay': ev.barangay, 'ef-venue': ev.venue_name,
-        'ef-date': ev.event_date, 'ef-time': String(ev.event_time).slice(0, 5), 'ef-price': ev.price, 'ef-slots': ev.total_slots,
-        'ef-organizer': ev.organizer_name, 'ef-image': ev.image_url || ''
-      }).forEach(([id, v]) => { $(`#${id}`).value = v; });
-      $('#ef-featured').checked = !!num(ev.is_featured);
+        'event-form-title': event.title, 'event-form-description': event.description, 'event-form-category': event.category, 'event-form-barangay': event.barangay, 'event-form-venue': event.venue_name,
+        'event-form-date': event.event_date, 'event-form-time': String(event.event_time).slice(0, 5), 'event-form-price': event.price, 'event-form-capacity': event.total_slots,
+        'event-form-organizer': event.organizer_name, 'event-form-image': event.image_url || ''
+      }).forEach(([id, value]) => { find(`#${id}`).value = value; });
+      find('#event-form-featured').checked = !!toNumber(event.is_featured);
       updatePreview();
     } else {
-      $('#ef-organizer').value = state.user?.name || '';
+      find('#event-form-organizer').value = state.user?.name || '';
     }
-    $('#dlg-event-form').showModal();
-    $('#ef-title-input').focus();
+    find('#event-form-dialog').showModal();
+    find('#event-form-title').focus();
   }
   function updatePreview() {
-    const src = $('#ef-image').value.trim(), img = $('#ef-preview');
-    if (!src) { img.hidden = true; return; }
-    img.onerror = () => { img.hidden = true; };
-    img.onload = () => { img.hidden = false; };
-    img.src = src;
+    const imageUrl = find('#event-form-image').value.trim(), image = find('#event-image-preview');
+    if (!imageUrl) { image.hidden = true; return; }
+    image.onerror = () => { image.hidden = true; };
+    image.onload = () => { image.hidden = false; };
+    image.src = imageUrl;
   }
   async function checkDuplicateTitle() {
-    const title = $('#ef-title-input').value.trim(), host = clear($('#ef-dup'));
+    const title = find('#event-form-title').value.trim(), host = clear(find('#event-duplicate-warning'));
     if (title.length < 5) return;
-    const res = await api('check_event_exists', { params: { title } });
-    const found = res.ok && res.data?.exists && String(res.data.event.id) !== $('#ef-id').value;
-    if (found) host.append(alertBox('warning', 'Notice: Duplicate Event Title', res.data.warning, { dismissible: false }));
+    const response = await api('check_event_exists', { params: { title } });
+    const found = response.ok && response.data?.exists && String(response.data.event.id) !== find('#event-form-id').value;
+    if (found) host.append(alertBox('warning', 'Notice: Duplicate Event Title', response.data.warning, { dismissible: false }));
   }
   function bindEventForm() {
-    document.addEventListener('click', (e) => { if (e.target.closest('[data-new-event]')) openEventForm(); });
-    $('#ef-title-input').addEventListener('input', debounce(checkDuplicateTitle, 500));
-    $('#ef-image').addEventListener('input', debounce(updatePreview, 400));
-    $('#event-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const f = e.currentTarget, g = (id) => $(`#${id}`), editing = !!g('ef-id').value;
-      const price = Number(g('ef-price').value), slots = Number(g('ef-slots').value);
-      if (!applyRules(f, [
-        [g('ef-title-input'), g('ef-title-input').value.trim().length >= 5 ? '' : 'Use a descriptive title (at least 5 characters).'],
-        [g('ef-description'), g('ef-description').value.trim().length >= 15 ? '' : 'Describe the event in at least 15 characters.'],
-        [g('ef-category'), g('ef-category').value.trim() ? '' : 'Choose or type a category.'],
-        [g('ef-barangay'), g('ef-barangay').value ? '' : 'Select the barangay where the event happens.'],
-        [g('ef-venue'), g('ef-venue').value.trim() ? '' : 'Enter the venue or landmark.'],
-        [g('ef-date'), !g('ef-date').value ? 'Select the event date.' : (!editing && g('ef-date').value < todayISO() ? 'The date cannot be in the past.' : '')],
-        [g('ef-time'), g('ef-time').value ? '' : 'Set the start time.'],
-        [g('ef-price'), g('ef-price').value !== '' && price >= 0 ? '' : 'Enter 0 for free events, or a positive amount.'],
-        [g('ef-slots'), Number.isInteger(slots) && slots >= 1 ? '' : 'Seats must be a whole number of at least 1.']
+    document.addEventListener('click', (browserEvent) => { if (browserEvent.target.closest('[data-new-event]')) openEventForm(); });
+    find('#event-form-title').addEventListener('input', debounce(checkDuplicateTitle, 500));
+    find('#event-form-image').addEventListener('input', debounce(updatePreview, 400));
+    find('#event-form').addEventListener('submit', async (browserEvent) => {
+      browserEvent.preventDefault();
+      const form = browserEvent.currentTarget, field = (id) => find(`#${id}`), editing = !!field('event-form-id').value;
+      const price = Number(field('event-form-price').value), slots = Number(field('event-form-capacity').value);
+      if (!applyRules(form, [
+        [field('event-form-title'), field('event-form-title').value.trim().length >= 5 ? '' : 'Use a descriptive title (at least 5 characters).'],
+        [field('event-form-description'), field('event-form-description').value.trim().length >= 15 ? '' : 'Describe the event in at least 15 characters.'],
+        [field('event-form-category'), field('event-form-category').value.trim() ? '' : 'Choose or type a category.'],
+        [field('event-form-barangay'), field('event-form-barangay').value ? '' : 'Select the barangay where the event happens.'],
+        [field('event-form-venue'), field('event-form-venue').value.trim() ? '' : 'Enter the venue or landmark.'],
+        [field('event-form-date'), !field('event-form-date').value ? 'Select the event date.' : (!editing && field('event-form-date').value < todayDate() ? 'The date cannot be in the past.' : '')],
+        [field('event-form-time'), field('event-form-time').value ? '' : 'Set the start time.'],
+        [field('event-form-price'), field('event-form-price').value !== '' && price >= 0 ? '' : 'Enter 0 for free events, or a positive amount.'],
+        [field('event-form-capacity'), Number.isInteger(slots) && slots >= 1 ? '' : 'Seats must be a whole number of at least 1.']
       ])) return;
       const body = {
-        id: g('ef-id').value || undefined, title: g('ef-title-input').value.trim(), description: g('ef-description').value.trim(),
-        category: g('ef-category').value.trim(), barangay: g('ef-barangay').value, venue_name: g('ef-venue').value.trim(),
-        event_date: g('ef-date').value, event_time: g('ef-time').value, price, total_slots: slots,
-        organizer_name: g('ef-organizer').value.trim(), image_url: g('ef-image').value.trim(), is_featured: g('ef-featured').checked ? 1 : 0
+        id: field('event-form-id').value || undefined, title: field('event-form-title').value.trim(), description: field('event-form-description').value.trim(),
+        category: field('event-form-category').value.trim(), barangay: field('event-form-barangay').value, venue_name: field('event-form-venue').value.trim(),
+        event_date: field('event-form-date').value, event_time: field('event-form-time').value, price, total_slots: slots,
+        organizer_name: field('event-form-organizer').value.trim(), image_url: field('event-form-image').value.trim(), is_featured: field('event-form-featured').checked ? 1 : 0
       };
-      const res = await withLoading(g('ef-submit'), () => api(editing ? 'update_event' : 'create_event', { body }));
-      if (!res.ok) {
-        showApiError('#ef-alert', res);
-        $('#dlg-event-form .modal-body').scrollTo({ top: 0, behavior: 'smooth' });
+      const response = await withLoading(field('save-event-button'), () => api(editing ? 'update_event' : 'create_event', { body }));
+      if (!response.ok) {
+        showApiError('#event-form-alert', response);
+        find('#event-form-dialog .dialog-content').scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }
-      $('#dlg-event-form').close();
-      toast(res.message, { type: 'success', duration: 6000 });
+      find('#event-form-dialog').close();
+      toast(response.message, { type: 'success', duration: 6000 });
       await loadEvents();
     });
   }
 
   /* ---------- Admin Console ---------- */
-  function renderPills(hostSel, items, onDelete, label) {
-    const host = clear($(hostSel));
-    if (!items.length) return host.append(el('li', { class: 'muted', text: `No ${label} configured yet.` }));
-    items.forEach((it) => host.append(el('li', { class: 'pill' }, it.name,
-      el('button', { type: 'button', class: 'icon-btn', 'aria-label': `Remove ${it.name}`, onclick: () => onDelete(it) }, icon('trash', 'icon-sm')))));
+  function renderPills(selector, items, onDelete, label) {
+    const host = clear(find(selector));
+    if (!items.length) return host.append(createElement('li', { class: 'muted', text: `No ${label} configured yet.` }));
+    items.forEach((item) => host.append(createElement('li', { class: 'pill' }, item.name,
+      createElement('button', { type: 'button', class: 'icon-button', 'aria-label': `Remove ${item.name}`, onclick: () => onDelete(item) }, icon('trash', 'icon-small')))));
   }
   function renderAdminLists() {
     renderPills('#barangay-list', state.barangays, deleteBarangay, 'barangays');
     renderPills('#tag-list', state.tags, deleteTag, 'tags');
-    $('#c-title').value = state.settings.hero_title || '';
-    $('#c-subtitle').value = state.settings.hero_subtitle || '';
-    $('#c-image').value = state.settings.hero_bg_image || '';
+    find('#homepage-title').value = state.settings.hero_title || '';
+    find('#homepage-subtitle').value = state.settings.hero_subtitle || '';
+    find('#homepage-image').value = state.settings.hero_bg_image || '';
   }
-  async function deleteBarangay(b) {
-    const yes = await confirmAction({ title: `Remove ${b.name}?`, message: 'Existing events keep their location, but this barangay will no longer be offered for new events.', confirmLabel: 'Remove Barangay' });
-    if (!yes) return;
-    const res = await api('delete_barangay', { body: { id: b.id } });
-    if (!res.ok) return showApiError('#admin-alert', res);
-    state.barangays = res.data.barangays; fillBarangaySelects(); renderAdminLists(); toast(res.message, { type: 'success' });
+  async function deleteBarangay(barangay) {
+    const confirmed = await confirmAction({ title: `Remove ${barangay.name}?`, message: 'Existing events keep their location, but this barangay will no longer be offered for new events.', confirmLabel: 'Remove Barangay' });
+    if (!confirmed) return;
+    const response = await api('delete_barangay', { body: { id: barangay.id } });
+    if (!response.ok) return showApiError('#admin-alert', response);
+    state.barangays = response.data.barangays; fillBarangaySelects(); renderAdminLists(); toast(response.message, { type: 'success' });
   }
-  async function deleteTag(t) {
-    const res = await api('delete_hero_tag', { body: { id: t.id } });
-    if (!res.ok) return showApiError('#admin-alert', res);
-    state.tags = res.data.tags; renderHeroTags(); renderAdminLists(); toast(res.message, { type: 'success' });
+  async function deleteTag(tag) {
+    const response = await api('delete_hero_tag', { body: { id: tag.id } });
+    if (!response.ok) return showApiError('#admin-alert', response);
+    state.tags = response.data.tags; renderHeroTags(); renderAdminLists(); toast(response.message, { type: 'success' });
   }
   function bindAdmin() {
     const panels = { events: '#panel-events', content: '#panel-content', barangays: '#panel-barangays', tags: '#panel-tags' };
-    initTabs($('#view-admin .tabs'), (tab) => Object.entries(panels).forEach(([k, sel]) => { $(sel).hidden = k !== tab.dataset.tab; }));
+    initTabs(find('#view-admin .tabs'), (tab) => Object.entries(panels).forEach(([panelName, selector]) => { find(selector).hidden = panelName !== tab.dataset.tab; }));
 
-    $('#content-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const img = $('#c-image').value.trim();
-      const res = await withLoading($('button[type=submit]', e.currentTarget), () => api('update_settings', { body: { hero_title: $('#c-title').value.trim(), hero_subtitle: $('#c-subtitle').value.trim(), hero_bg_image: img, hero_banner_image: img } }));
-      if (!res.ok) return showApiError('#admin-alert', res);
-      state.settings = res.data; toast(res.message, { type: 'success' });
+    find('#content-form').addEventListener('submit', async (browserEvent) => {
+      browserEvent.preventDefault();
+      const imageUrl = find('#homepage-image').value.trim();
+      const response = await withLoading(find('button[type=submit]', browserEvent.currentTarget), () => api('update_settings', { body: { hero_title: find('#homepage-title').value.trim(), hero_subtitle: find('#homepage-subtitle').value.trim(), hero_bg_image: imageUrl, hero_banner_image: imageUrl } }));
+      if (!response.ok) return showApiError('#admin-alert', response);
+      state.settings = response.data; toast(response.message, { type: 'success' });
     });
-    $('#barangay-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const input = $('#new-barangay');
-      if (!applyRules(e.currentTarget, [[input, input.value.trim().length >= 2 ? '' : 'Enter at least 2 characters.']])) return;
-      const res = await api('add_barangay', { body: { name: input.value.trim() } });
-      if (!res.ok) return showApiError('#admin-alert', res);
-      state.barangays = res.data.barangays; input.value = ''; fillBarangaySelects(); renderAdminLists(); toast(res.message, { type: 'success' });
+    find('#barangay-form').addEventListener('submit', async (browserEvent) => {
+      browserEvent.preventDefault();
+      const input = find('#new-barangay');
+      if (!applyRules(browserEvent.currentTarget, [[input, input.value.trim().length >= 2 ? '' : 'Enter at least 2 characters.']])) return;
+      const response = await api('add_barangay', { body: { name: input.value.trim() } });
+      if (!response.ok) return showApiError('#admin-alert', response);
+      state.barangays = response.data.barangays; input.value = ''; fillBarangaySelects(); renderAdminLists(); toast(response.message, { type: 'success' });
     });
-    $('#tag-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const input = $('#new-tag');
-      if (!applyRules(e.currentTarget, [[input, input.value.trim().length >= 2 ? '' : 'Enter at least 2 characters.']])) return;
-      const res = await api('add_hero_tag', { body: { name: input.value.trim() } });
-      if (!res.ok) return showApiError('#admin-alert', res);
-      state.tags = res.data.tags; input.value = ''; renderHeroTags(); renderAdminLists(); toast(res.message, { type: 'success' });
+    find('#tag-form').addEventListener('submit', async (browserEvent) => {
+      browserEvent.preventDefault();
+      const input = find('#new-tag');
+      if (!applyRules(browserEvent.currentTarget, [[input, input.value.trim().length >= 2 ? '' : 'Enter at least 2 characters.']])) return;
+      const response = await api('add_hero_tag', { body: { name: input.value.trim() } });
+      if (!response.ok) return showApiError('#admin-alert', response);
+      state.tags = response.data.tags; input.value = ''; renderHeroTags(); renderAdminLists(); toast(response.message, { type: 'success' });
     });
   }
 
   /* ---------- Contact Form ---------- */
   function bindContact() {
-    const form = $('#contact-form');
+    const form = find('#contact-form');
     if (!form) return;
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const name = $('#cf-name'), email = $('#cf-email'), topic = $('#cf-topic'), msg = $('#cf-message');
+    form.addEventListener('submit', async (browserEvent) => {
+      browserEvent.preventDefault();
+      const name = find('#contact-name'), email = find('#contact-email'), topic = find('#contact-topic'), message = find('#contact-message');
       if (!applyRules(form, [
         [name, name.value.trim().length >= 3 ? '' : 'Enter your full name (at least 3 characters).'],
-        [email, emailOk(email.value.trim()) ? '' : 'Enter a valid email address.'],
+        [email, isValidEmail(email.value.trim()) ? '' : 'Enter a valid email address.'],
         [topic, topic.value ? '' : 'Select an inquiry topic.'],
-        [msg, msg.value.trim().length >= 10 ? '' : 'Please enter a message of at least 10 characters.']
+        [message, message.value.trim().length >= 10 ? '' : 'Please enter a message of at least 10 characters.']
       ])) return;
-      await withLoading($('button[type=submit]', form), () => new Promise((r) => setTimeout(r, 350)));
+      await withLoading(find('button[type=submit]', form), () => new Promise((resolve) => setTimeout(resolve, 350)));
       const sender = name.value.trim();
       const chosenTopic = topic.value;
       form.reset();
@@ -1283,10 +1570,10 @@
   /* =========================================================
      CS-NAVIGATION CONTROLLER (Adapted from Navigation.js)
      ========================================================= */
-  let closeMobileMenuFn = () => {};
+  let closeMobileMenu = () => { };
 
   function initCsNavigation() {
-    const CONFIG = {
+    const navigationSettings = {
       BREAKPOINTS: { MOBILE: 1023.5 },
       SCROLL_THRESHOLD: 100,
       SELECTORS: {
@@ -1306,13 +1593,13 @@
     };
 
     const elements = {
-      body: document.querySelector(CONFIG.SELECTORS.body),
-      navigation: document.querySelector(CONFIG.SELECTORS.navigation),
-      hamburger: document.querySelector(CONFIG.SELECTORS.hamburger),
-      menuWrapper: document.querySelector(CONFIG.SELECTORS.menuWrapper),
+      body: document.querySelector(navigationSettings.SELECTORS.body),
+      navigation: document.querySelector(navigationSettings.SELECTORS.navigation),
+      hamburger: document.querySelector(navigationSettings.SELECTORS.hamburger),
+      menuWrapper: document.querySelector(navigationSettings.SELECTORS.menuWrapper),
     };
 
-    const isMobile = () => window.matchMedia(`(max-width: ${CONFIG.BREAKPOINTS.MOBILE}px)`).matches;
+    const isMobile = () => window.matchMedia(`(max-width: ${navigationSettings.BREAKPOINTS.MOBILE}px)`).matches;
 
     const toggleAriaExpanded = (element, forceState) => {
       if (!element) return false;
@@ -1328,32 +1615,32 @@
 
     const toggleDropdown = (dropdown, forceClose = false) => {
       if (!dropdown) return false;
-      const toggle = dropdown.querySelector(CONFIG.SELECTORS.dropdownToggle);
-      const menu = dropdown.querySelector(CONFIG.SELECTORS.dropdownMenu);
-      const isCurrentlyActive = dropdown.classList.contains(CONFIG.CLASSES.active);
-      const shouldActivate = forceClose ? false : !isCurrentlyActive;
+      const toggle = dropdown.querySelector(navigationSettings.SELECTORS.dropdownToggle);
+      const menu = dropdown.querySelector(navigationSettings.SELECTORS.dropdownMenu);
+      const isActive = dropdown.classList.contains(navigationSettings.CLASSES.active);
+      const shouldOpen = forceClose ? false : !isActive;
 
-      dropdown.classList.toggle(CONFIG.CLASSES.active, shouldActivate);
-      if (toggle) toggle.setAttribute('aria-expanded', shouldActivate.toString());
-      if (menu) setInertState(menu, !shouldActivate);
-      return shouldActivate;
+      dropdown.classList.toggle(navigationSettings.CLASSES.active, shouldOpen);
+      if (toggle) toggle.setAttribute('aria-expanded', shouldOpen.toString());
+      if (menu) setInertState(menu, !shouldOpen);
+      return shouldOpen;
     };
 
     const closeAllDropdowns = () => {
       if (!elements.navigation) return;
-      elements.navigation.querySelectorAll(`${CONFIG.SELECTORS.dropdown}.${CONFIG.CLASSES.active}`).forEach((dropdown) => {
+      elements.navigation.querySelectorAll(`${navigationSettings.SELECTORS.dropdown}.${navigationSettings.CLASSES.active}`).forEach((dropdown) => {
         toggleDropdown(dropdown, true);
       });
     };
 
     const toggleMobileMenu = (forceClose = false) => {
       if (!elements.hamburger || !elements.navigation || !elements.body) return;
-      const isCurrentlyOpen = elements.navigation.classList.contains(CONFIG.CLASSES.active);
-      const shouldOpen = forceClose ? false : !isCurrentlyOpen;
+      const isOpen = elements.navigation.classList.contains(navigationSettings.CLASSES.active);
+      const shouldOpen = forceClose ? false : !isOpen;
 
-      elements.hamburger.classList.toggle(CONFIG.CLASSES.active, shouldOpen);
-      elements.navigation.classList.toggle(CONFIG.CLASSES.active, shouldOpen);
-      elements.body.classList.toggle(CONFIG.CLASSES.menuOpen, shouldOpen);
+      elements.hamburger.classList.toggle(navigationSettings.CLASSES.active, shouldOpen);
+      elements.navigation.classList.toggle(navigationSettings.CLASSES.active, shouldOpen);
+      elements.body.classList.toggle(navigationSettings.CLASSES.menuOpen, shouldOpen);
       toggleAriaExpanded(elements.hamburger, shouldOpen);
 
       if (elements.menuWrapper && isMobile()) {
@@ -1362,9 +1649,9 @@
       if (!shouldOpen) closeAllDropdowns();
     };
 
-    closeMobileMenuFn = () => {
+    closeMobileMenu = () => {
       closeAllDropdowns();
-      if (elements.navigation?.classList.contains(CONFIG.CLASSES.active)) {
+      if (elements.navigation?.classList.contains(navigationSettings.CLASSES.active)) {
         toggleMobileMenu(true);
       }
     };
@@ -1372,18 +1659,18 @@
     const updateInertStates = () => {
       if (!elements.menuWrapper) return;
       if (isMobile()) {
-        const isMenuOpen = elements.navigation?.classList.contains(CONFIG.CLASSES.active);
+        const isMenuOpen = elements.navigation?.classList.contains(navigationSettings.CLASSES.active);
         setInertState(elements.menuWrapper, !isMenuOpen);
       } else {
         setInertState(elements.menuWrapper, false);
-        if (elements.navigation?.classList.contains(CONFIG.CLASSES.active)) {
+        if (elements.navigation?.classList.contains(navigationSettings.CLASSES.active)) {
           toggleMobileMenu(true);
         }
       }
       if (elements.navigation) {
-        elements.navigation.querySelectorAll(CONFIG.SELECTORS.dropdown).forEach((dropdown) => {
-          const isOpen = dropdown.classList.contains(CONFIG.CLASSES.active);
-          const dropdownMenu = dropdown.querySelector(CONFIG.SELECTORS.dropdownMenu);
+        elements.navigation.querySelectorAll(navigationSettings.SELECTORS.dropdown).forEach((dropdown) => {
+          const isOpen = dropdown.classList.contains(navigationSettings.CLASSES.active);
+          const dropdownMenu = dropdown.querySelector(navigationSettings.SELECTORS.dropdownMenu);
           if (dropdownMenu) setInertState(dropdownMenu, !isOpen);
         });
       }
@@ -1395,39 +1682,39 @@
 
     if (elements.navigation) {
       elements.navigation.addEventListener('click', (event) => {
-        const dropdownToggle = event.target.closest(CONFIG.SELECTORS.dropdownToggle);
+        const dropdownToggle = event.target.closest(navigationSettings.SELECTORS.dropdownToggle);
         if (dropdownToggle) {
           event.preventDefault();
-          const dropdown = dropdownToggle.closest(CONFIG.SELECTORS.dropdown);
+          const dropdown = dropdownToggle.closest(navigationSettings.SELECTORS.dropdown);
           if (dropdown) toggleDropdown(dropdown);
           return;
         }
         // Close mobile menu & dropdowns when a navigation link is clicked
         if (event.target.closest('a[data-route]')) {
-          closeMobileMenuFn();
+          closeMobileMenu();
         }
       });
 
-      elements.navigation.querySelectorAll(CONFIG.SELECTORS.dropdown).forEach((dropdown) => {
+      elements.navigation.querySelectorAll(navigationSettings.SELECTORS.dropdown).forEach((dropdown) => {
         let hoverTimeout;
         dropdown.addEventListener('mouseenter', () => {
           if (!isMobile()) {
             clearTimeout(hoverTimeout);
-            const dropdownMenu = dropdown.querySelector(CONFIG.SELECTORS.dropdownMenu);
+            const dropdownMenu = dropdown.querySelector(navigationSettings.SELECTORS.dropdownMenu);
             if (dropdownMenu) setInertState(dropdownMenu, false);
           }
         });
         dropdown.addEventListener('mouseleave', () => {
-          if (!isMobile() && !dropdown.classList.contains(CONFIG.CLASSES.active)) {
+          if (!isMobile() && !dropdown.classList.contains(navigationSettings.CLASSES.active)) {
             hoverTimeout = setTimeout(() => {
-              const dropdownMenu = dropdown.querySelector(CONFIG.SELECTORS.dropdownMenu);
+              const dropdownMenu = dropdown.querySelector(navigationSettings.SELECTORS.dropdownMenu);
               if (dropdownMenu) setInertState(dropdownMenu, true);
             }, 300);
           }
         });
         dropdown.addEventListener('focusout', (event) => {
           setTimeout(() => {
-            if (!dropdown.contains(document.activeElement) && dropdown.classList.contains(CONFIG.CLASSES.active)) {
+            if (!dropdown.contains(document.activeElement) && dropdown.classList.contains(navigationSettings.CLASSES.active)) {
               toggleDropdown(dropdown, true);
             }
           }, 10);
@@ -1437,14 +1724,14 @@
 
     document.addEventListener('keydown', (event) => {
       if (event.key !== 'Escape') return;
-      const activeDropdown = elements.navigation?.querySelector(`${CONFIG.SELECTORS.dropdown}.${CONFIG.CLASSES.active}`);
+      const activeDropdown = elements.navigation?.querySelector(`${navigationSettings.SELECTORS.dropdown}.${navigationSettings.CLASSES.active}`);
       if (activeDropdown) {
-        const toggle = activeDropdown.querySelector(CONFIG.SELECTORS.dropdownToggle);
+        const toggle = activeDropdown.querySelector(navigationSettings.SELECTORS.dropdownToggle);
         toggleDropdown(activeDropdown, true);
         toggle?.focus();
         return;
       }
-      if (elements.navigation?.classList.contains(CONFIG.CLASSES.active)) {
+      if (elements.navigation?.classList.contains(navigationSettings.CLASSES.active)) {
         toggleMobileMenu(true);
         elements.hamburger?.focus();
       }
@@ -1452,7 +1739,7 @@
 
     if (elements.navigation) {
       elements.navigation.addEventListener('focusout', () => {
-        if (!isMobile() || !elements.navigation.classList.contains(CONFIG.CLASSES.active)) return;
+        if (!isMobile() || !elements.navigation.classList.contains(navigationSettings.CLASSES.active)) return;
         setTimeout(() => {
           if (document.activeElement && !elements.navigation.contains(document.activeElement)) {
             toggleMobileMenu(true);
@@ -1462,8 +1749,8 @@
     }
 
     window.addEventListener('scroll', () => {
-      const isScrolled = document.documentElement.scrollTop >= CONFIG.SCROLL_THRESHOLD;
-      elements.body?.classList.toggle(CONFIG.CLASSES.scrolled, isScrolled);
+      const isScrolled = document.documentElement.scrollTop >= navigationSettings.SCROLL_THRESHOLD;
+      elements.body?.classList.toggle(navigationSettings.CLASSES.scrolled, isScrolled);
     }, { passive: true });
 
     let resizeTimer;
@@ -1477,60 +1764,67 @@
 
   /* ---------- Global Nav & Routing ---------- */
   function bindGlobal() {
-    document.addEventListener('click', (e) => {
-      const close = e.target.closest('[data-close]');
+    document.addEventListener('click', (browserEvent) => {
+      const close = browserEvent.target.closest('[data-close]');
       if (close) close.closest('dialog').close();
-      const auth = e.target.closest('[data-open-auth]');
+      const auth = browserEvent.target.closest('[data-open-auth]');
       if (auth) {
-        closeMobileMenuFn();
+        closeMobileMenu();
         openAuth(auth.dataset.openAuth);
       }
     });
-    ['#dlg-event', '#dlg-attendees'].forEach((sel) => $(sel).addEventListener('click', (e) => { if (e.target === e.currentTarget) e.currentTarget.close(); }));
+    ['#event-dialog', '#attendees-dialog'].forEach((selector) => find(selector).addEventListener('click', (browserEvent) => { if (browserEvent.target === browserEvent.currentTarget) browserEvent.currentTarget.close(); }));
   }
 
   let firstRoute = true;
   function route() {
     const name = (location.hash.replace(/^#\/?/, '') || 'home').split('?')[0];
-    const def = ROUTES[name];
-    if (!def) { location.replace('#/home'); return; }
-    if (def.roles && !(state.user && def.roles.includes(state.user.role))) {
+    const page = ROUTES[name];
+    if (!page) { location.replace('#/home'); return; }
+    if (page.roles && !(state.user && page.roles.includes(state.user.role))) {
       location.replace('#/home');
       state.user ? toast('You do not have permission to view that section.', { type: 'error' }) : openAuth('login', 'Please sign in to access that portal section.');
       return;
     }
-    $$('.view').forEach((v) => { v.hidden = v.id !== `view-${name}`; });
-    $$('[data-route]').forEach((a) => {
-      const on = a.dataset.route === name;
-      a.classList.toggle('cs-active', on);
-      on ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current');
+    findAll('.view').forEach((view) => { view.hidden = view.id !== `view-${name}`; });
+    findAll('[data-route]').forEach((link) => {
+      const isActive = link.dataset.route === name;
+      link.classList.toggle('cs-active', isActive);
+      isActive ? link.setAttribute('aria-current', 'page') : link.removeAttribute('aria-current');
     });
-    const portalBtn = $('#cs-portal-dropdown-btn');
-    if (portalBtn) {
-      const isPortalRoute = ['bookings', 'dashboard', 'admin'].includes(name);
-      portalBtn.classList.toggle('cs-active', isPortalRoute);
+    const portalButton = find('#cs-portal-dropdown-btn');
+    if (portalButton) {
+      const isPortalRoute = ['citizen', 'bookings', 'dashboard', 'admin'].includes(name);
+      portalButton.classList.toggle('cs-active', isPortalRoute);
     }
-    closeMobileMenuFn();
-    document.title = `${def.title} | Iligan Community Event Portal`;
-    if (!firstRoute) { window.scrollTo(0, 0); $('#main').focus({ preventScroll: true }); }
+    closeMobileMenu();
+    document.title = `${page.title} | Iligan Community Event Portal`;
+    if (!firstRoute) { window.scrollTo(0, 0); find('#main').focus({ preventScroll: true }); }
     firstRoute = false;
     if (name === 'bookings') loadBookings();
+    if (name === 'citizen') loadCitizenDashboard();
     if (name === 'dashboard' || name === 'admin') refreshStaffViews();
     if (name === 'admin') renderAdminLists();
   }
 
   /* ---------- App Initialization ---------- */
-  async function init() {
+  async function startApp() {
     loadUser();
-    applyAuthUI();
+    if (state.user) {
+      const response = await api('get_profile');
+      if (response.ok) setUser(response.data);
+      else if (response.status === 401) setUser(null);
+    }
+    updateAccountDisplay();
     initCsNavigation();
     initHeroCarousel();
     bindGlobal(); bindAuth(); bindProfile(); bindFilters(); bindEventForm(); bindAdmin(); bindContact();
+    find('#coordinator-filter').addEventListener('change', renderCoordinatorDashboard);
     window.addEventListener('hashchange', route);
     route();
-    await Promise.all([loadMeta(), loadEvents()]);
+    await Promise.all([loadSettings(), loadEvents()]);
     if (location.hash.includes('admin')) renderAdminLists();
   }
 
-  document.addEventListener('DOMContentLoaded', init);
+  document.addEventListener('DOMContentLoaded', startApp);
 })();

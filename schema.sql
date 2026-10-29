@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS `bookings` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO `users` (`name`, `email`, `phone`, `role`) VALUES
-('Amina Alonto', 'amina.alonto@gmail.com', '09171234567', 'user'),
+('Mohammad Saumay', 'amina.alonto@gmail.com', '09171234567', 'user'),
 ('Juan dela Cruz', 'juan.delacruz@yahoo.com', '09189876543', 'user'),
 ('Iligan City Tourism Office', 'tourism@iligancity.gov.ph', '09223344556', 'organizer'),
 ('LGU Community Affairs', 'affairs@iligancity.gov.ph', '09334455667', 'organizer')
