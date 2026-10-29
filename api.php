@@ -7,9 +7,12 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+date_default_timezone_set('Asia/Manila');
+
 define('OFFICIAL_LGU_COORD_KEY', 'ILIGAN-COORD-2026');
 
 header('Content-Type: application/json; charset=UTF-8');
+header('Cache-Control: no-store');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
@@ -19,10 +22,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-$databaseHost = '127.0.0.1';
-$databaseName = 'iligan_events_db';
-$databaseUser = 'root';
-$databasePassword = '';
+$databaseHost = getenv('ILIGAN_DB_HOST') ?: '127.0.0.1';
+$databaseName = getenv('ILIGAN_DB_NAME') ?: 'iligan_events_db';
+$databaseUser = getenv('ILIGAN_DB_USER') ?: 'root';
+$databasePassword = getenv('ILIGAN_DB_PASSWORD') ?: '';
 
 try {
     $databaseAddress = "mysql:host={$databaseHost};dbname={$databaseName};charset=utf8mb4";
@@ -73,6 +76,19 @@ function getAuthenticatedUser($database) {
     $statement->execute([':id' => $userId]);
     $user = $statement->fetch();
     return $user ?: null;
+}
+
+function requireBookingOwner($database, $booking) {
+    $user = getAuthenticatedUser($database);
+    if (!$user || ($user['role'] !== 'admin' && strcasecmp($user['email'], $booking['attendee_email']) !== 0)) {
+        if ($database->inTransaction()) $database->rollBack();
+        sendJsonResponse(false, 'You can only manage your own bookings.', null, 'Sign in with the email used for this reservation.', 403);
+    }
+}
+
+// Portal data is available only to a verified server session.
+if (!in_array($action, ['login', 'register', 'logout'], true) && !getAuthenticatedUser($database)) {
+    sendJsonResponse(false, 'Please sign in or create an account to access the portal.', null, 'Sign in to continue.', 401);
 }
 
 switch ($action) {
@@ -217,6 +233,7 @@ switch ($action) {
             $search = trim($_GET['search'] ?? '');
             $category = trim($_GET['category'] ?? '');
             $barangay = trim($_GET['barangay'] ?? '');
+            $coordinatorFilter = trim($_GET['coordinator'] ?? '');
             $view = trim($_GET['role'] ?? 'user');
 
             $user = getAuthenticatedUser($database);
@@ -224,8 +241,9 @@ switch ($action) {
             $isAdmin = ($user && $user['role'] === 'admin');
 
             $query = "SELECT e.*,
-                      u.name AS coordinator_author_name,
-                      u.email AS coordinator_author_email,
+                      COALESCE(u.name, e.organizer_name) AS coordinator_author_name,
+                      u.email AS coordinator_email,
+                      u.phone AS coordinator_phone,
                       (SELECT COUNT(*) FROM bookings b WHERE b.event_id = e.id AND b.status = 'confirmed') AS confirmed_bookings_count
                       FROM events e
                       LEFT JOIN users u ON e.coordinator_id = u.id
@@ -237,12 +255,14 @@ switch ($action) {
             }
 
             if (!empty($search)) {
-                $query .= " AND (e.title LIKE :s1 OR e.description LIKE :s2 OR e.venue_name LIKE :s3 OR e.barangay LIKE :s4)";
+                $query .= " AND (e.title LIKE :s1 OR e.description LIKE :s2 OR e.venue_name LIKE :s3 OR e.barangay LIKE :s4 OR u.name LIKE :s5 OR e.organizer_name LIKE :s6)";
                 $searchTerm = '%' . $search . '%';
                 $parameters[':s1'] = $searchTerm;
                 $parameters[':s2'] = $searchTerm;
                 $parameters[':s3'] = $searchTerm;
                 $parameters[':s4'] = $searchTerm;
+                $parameters[':s5'] = $searchTerm;
+                $parameters[':s6'] = $searchTerm;
             }
 
             if (!empty($category) && $category !== 'All') {
@@ -253,6 +273,12 @@ switch ($action) {
             if (!empty($barangay) && $barangay !== 'All') {
                 $query .= " AND e.barangay = :barangay";
                 $parameters[':barangay'] = $barangay;
+            }
+
+            if (!empty($coordinatorFilter) && $coordinatorFilter !== 'All') {
+                $query .= " AND (u.name = :coord OR u.email = :coord OR e.coordinator_id = :coord_id)";
+                $parameters[':coord'] = $coordinatorFilter;
+                $parameters[':coord_id'] = is_numeric($coordinatorFilter) ? (int)$coordinatorFilter : 0;
             }
 
             $query .= " ORDER BY e.event_date ASC, e.event_time ASC";
@@ -274,7 +300,7 @@ switch ($action) {
 
                 $coordinatorId = (int)($event['coordinator_id'] ?? 0);
                 $event['is_mine'] = ($userId > 0 && $coordinatorId === $userId);
-                $event['can_manage'] = ($isAdmin || $event['is_mine']);
+                $event['can_manage'] = ($isAdmin || ($user && $user['role'] === 'organizer' && $event['is_mine']));
             }
 
             sendJsonResponse(true, 'Events retrieved successfully.', $events);
@@ -289,7 +315,15 @@ switch ($action) {
             sendJsonResponse(false, 'Event ID was not specified.', null, 'Please click on an event card from the discovery feed.', 400);
         }
 
-        $statement = $database->prepare("SELECT * FROM events WHERE id = :id");
+        $statement = $database->prepare("
+            SELECT e.*,
+                   COALESCE(u.name, e.organizer_name) AS coordinator_author_name,
+                   u.email AS coordinator_email,
+                   u.phone AS coordinator_phone
+            FROM events e
+            LEFT JOIN users u ON e.coordinator_id = u.id
+            WHERE e.id = :id
+        ");
         $statement->execute([':id' => $id]);
         $event = $statement->fetch();
 
@@ -303,6 +337,12 @@ switch ($action) {
         $event['formatted_time'] = $eventTime->format('g:i A');
         $event['formatted_price'] = (float)$event['price'] <= 0 ? 'FREE' : '₱' . number_format((float)$event['price'], 2);
 
+        $user = getAuthenticatedUser($database);
+        $userId = $user ? (int)$user['id'] : 0;
+        $isAdmin = ($user && $user['role'] === 'admin');
+        $isOrganizer = ($user && $user['role'] === 'organizer');
+        $event['is_mine'] = ($userId > 0 && (int)($event['coordinator_id'] ?? 0) === $userId);
+        $event['can_manage'] = ($isAdmin || ($isOrganizer && $event['is_mine']));
         sendJsonResponse(true, 'Event details loaded.', $event);
         break;
 
@@ -341,7 +381,7 @@ switch ($action) {
                 sendJsonResponse(false, 'This event could not be found.', null, 'It may have been concluded or cancelled by the organizer.', 404);
             }
 
-            if ($event['status'] !== 'active') {
+            if ($event['status'] !== 'active' || $event['event_date'] < date('Y-m-d')) {
                 $database->rollBack();
                 sendJsonResponse(false, 'This event is no longer accepting bookings.', null, 'Please browse other active upcoming events in Iligan City.', 400);
             }
@@ -364,8 +404,7 @@ switch ($action) {
                 ':id'    => $eventId
             ]);
 
-            $randomNumber = rand(1000, 9999);
-            $bookingReference = 'AH-' . date('y') . $randomNumber;
+            $bookingReference = 'ILG-' . date('Y') . '-' . strtoupper(bin2hex(random_bytes(4)));
 
             $insertBooking = $database->prepare("
                 INSERT INTO bookings
@@ -385,6 +424,14 @@ switch ($action) {
             $bookingId = $database->lastInsertId();
             $database->commit();
 
+            $coordName = $event['organizer_name'] ?? 'Iligan City Tourism Office';
+            if (!empty($event['coordinator_id'])) {
+                $cStmt = $database->prepare("SELECT name FROM users WHERE id = :cid");
+                $cStmt->execute([':cid' => $event['coordinator_id']]);
+                $cRow = $cStmt->fetch();
+                if ($cRow && !empty($cRow['name'])) $coordName = $cRow['name'];
+            }
+
             $passData = [
                 'booking_id'        => $bookingId,
                 'booking_reference' => $bookingReference,
@@ -393,6 +440,7 @@ switch ($action) {
                 'attendee_phone'    => $attendeePhone,
                 'tickets_count'     => $ticketsCount,
                 'event_title'       => $event['title'],
+                'coordinator_name'  => $coordName,
                 'event_date'        => (new DateTime($event['event_date']))->format('F d, Y'),
                 'event_time'        => (new DateTime($event['event_time']))->format('g:i A'),
                 'venue_name'        => $event['venue_name'],
@@ -439,9 +487,11 @@ switch ($action) {
 
             $query = "
                 SELECT b.*, e.title AS event_title, e.category, e.barangay, e.venue_name,
-                       e.event_date, e.event_time, e.price, e.organizer_name
+                       e.event_date, e.event_time, e.price, e.organizer_name,
+                       COALESCE(u.name, e.organizer_name) AS coordinator_name
                 FROM bookings b
                 JOIN events e ON b.event_id = e.id
+                LEFT JOIN users u ON e.coordinator_id = u.id
                 WHERE 1=1
             ";
             $parameters = [];
@@ -496,6 +546,8 @@ switch ($action) {
                 sendJsonResponse(false, 'Booking record not found.', null, 'Please verify your booking reference code.', 404);
             }
 
+            requireBookingOwner($database, $booking);
+
             if ($booking['status'] === 'cancelled') {
                 $database->rollBack();
                 sendJsonResponse(false, 'This ticket has already been cancelled.', null, 'No further action is required.', 400);
@@ -546,16 +598,23 @@ switch ($action) {
                 sendJsonResponse(false, 'Booking reference not found.', null, 'Cannot restore a non-existent ticket.', 404);
             }
 
+            requireBookingOwner($database, $booking);
+
             if ($booking['status'] === 'confirmed') {
                 $database->rollBack();
                 sendJsonResponse(true, 'Your ticket is already active and confirmed.', ['booking_reference' => $bookingReference]);
             }
 
-            $eventStatement = $database->prepare("SELECT available_slots FROM events WHERE id = :id FOR UPDATE");
+            $eventStatement = $database->prepare("SELECT available_slots, status, event_date FROM events WHERE id = :id FOR UPDATE");
             $eventStatement->execute([':id' => $booking['event_id']]);
             $event = $eventStatement->fetch();
 
-            if ($event && $event['available_slots'] >= $booking['tickets_count']) {
+            if (!$event || $event['status'] !== 'active' || $event['event_date'] < date('Y-m-d')) {
+                $database->rollBack();
+                sendJsonResponse(false, 'This event is no longer accepting reservations.', null, 'Choose an active upcoming event.', 409);
+            }
+
+            if ($event['available_slots'] >= $booking['tickets_count']) {
                 $reservedSlots = $database->prepare("UPDATE events SET available_slots = available_slots - :count WHERE id = :id");
                 $reservedSlots->execute([
                     ':count' => $booking['tickets_count'],
@@ -703,13 +762,8 @@ switch ($action) {
 
     case 'update_event':
         $user = getAuthenticatedUser($database);
-        if (!$user) {
-            $user = [
-                'id' => 3,
-                'name' => 'Iligan City Tourism Office',
-                'email' => 'tourism@iligancity.gov.ph',
-                'role' => 'organizer'
-            ];
+        if (!$user || !in_array($user['role'], ['organizer', 'admin'])) {
+            sendJsonResponse(false, 'Coordinator Authentication Required.', null, 'Sign in as a coordinator to manage your own events.', 403);
         }
 
         $eventId = filter_var($request['id'] ?? 0, FILTER_VALIDATE_INT);
@@ -748,11 +802,18 @@ switch ($action) {
         $isAdmin = (($user['role'] ?? '') === 'admin');
 
         if (!$isOwner && !$isAdmin) {
+            $coordName = $existingEvent['organizer_name'];
+            if (!empty($existingEvent['coordinator_id'])) {
+                $coordStmt = $database->prepare("SELECT name FROM users WHERE id = :cid");
+                $coordStmt->execute([':cid' => $existingEvent['coordinator_id']]);
+                $cUser = $coordStmt->fetch();
+                if ($cUser) $coordName = $cUser['name'];
+            }
             sendJsonResponse(
                 false,
                 'Access Denied: You cannot edit another coordinator\'s listing.',
                 null,
-                'This event is managed by "' . htmlspecialchars($existingEvent['organizer_name']) . '". Your account (' . htmlspecialchars($user['name']) . ') is only authorized to edit events published by your coordinator account.',
+                'This event is coordinated by "' . htmlspecialchars($coordName) . '". As a coordinator (' . htmlspecialchars($user['name']) . '), you can only edit events that you have published. Each coordinator maintains full ownership of their own event promotions.',
                 403
             );
         }
@@ -905,11 +966,18 @@ switch ($action) {
             $isAdmin = (($user['role'] ?? '') === 'admin');
 
             if (!$isOwner && !$isAdmin) {
+                $coordName = $event['organizer_name'];
+                if (!empty($event['coordinator_id'])) {
+                    $coordStmt = $database->prepare("SELECT name FROM users WHERE id = :cid");
+                    $coordStmt->execute([':cid' => $event['coordinator_id']]);
+                    $cUser = $coordStmt->fetch();
+                    if ($cUser) $coordName = $cUser['name'];
+                }
                 sendJsonResponse(
                     false,
                     'Access Denied: Cannot delete another coordinator\'s listing.',
                     null,
-                    'This event was published by another coordinator (' . htmlspecialchars($event['organizer_name']) . '). You can only delete your own published listings.',
+                    'This event is coordinated by "' . htmlspecialchars($coordName) . '". You can only delete your own published listings. Each coordinator manages and protects their own events.',
                     403
                 );
             }
@@ -972,6 +1040,25 @@ switch ($action) {
             sendJsonResponse(true, 'Tag removed.', ['tags' => $allTags]);
         } catch (Exception $error) {
             sendJsonResponse(false, 'Could not remove tag.', null, null, 500);
+        }
+        break;
+
+    case 'get_coordinators':
+        try {
+            $statement = $database->query("
+                SELECT u.id, u.name, u.email, u.phone,
+                       COUNT(e.id) AS total_events,
+                       SUM(CASE WHEN e.status = 'active' THEN 1 ELSE 0 END) AS active_events
+                FROM users u
+                LEFT JOIN events e ON e.coordinator_id = u.id
+                WHERE u.role = 'organizer'
+                GROUP BY u.id, u.name, u.email, u.phone
+                ORDER BY u.name ASC
+            ");
+            $coordinators = $statement->fetchAll();
+            sendJsonResponse(true, 'Coordinators loaded successfully.', ['coordinators' => $coordinators]);
+        } catch (Exception $error) {
+            sendJsonResponse(false, 'Could not load coordinators.', null, null, 500);
         }
         break;
 
@@ -1073,6 +1160,44 @@ switch ($action) {
             $settings[$row['setting_key']] = $row['setting_value'];
         }
         sendJsonResponse(true, 'Hero banner updated successfully!', $settings);
+        break;
+
+    case 'send_inquiry':
+        $name = trim($request['name'] ?? '');
+        $email = trim($request['email'] ?? '');
+        $topic = trim($request['topic'] ?? '');
+        $barangay = trim($request['barangay'] ?? '');
+        $message = trim($request['message'] ?? '');
+        if (mb_strlen($name) < 3 || mb_strlen($name) > 100 || !filter_var($email, FILTER_VALIDATE_EMAIL) || mb_strlen($email) > 150 || !$topic || mb_strlen($topic) > 100 || mb_strlen($barangay) > 100 || mb_strlen($message) < 10 || mb_strlen($message) > 1000) {
+            sendJsonResponse(false, 'Please check your inquiry details.', null, 'Use a valid email and a message between 10 and 1000 characters.', 422);
+        }
+        $statement = $database->prepare('INSERT INTO inquiries (name, email, topic, barangay, message) VALUES (:name, :email, :topic, :barangay, :message)');
+        $statement->execute(['name'=>$name, 'email'=>$email, 'topic'=>$topic, 'barangay'=>$barangay, 'message'=>$message]);
+        sendJsonResponse(true, 'Your inquiry has been saved.', ['id'=>(int)$database->lastInsertId()]);
+        break;
+
+    case 'get_inquiries':
+    case 'resolve_inquiry':
+        $user = getAuthenticatedUser($database);
+        if (!$user || $user['role'] !== 'admin') sendJsonResponse(false, 'Administrator access required.', [], 'Please sign in with an administrator account.', 403);
+        if ($action === 'resolve_inquiry') {
+            $id = filter_var($request['id'] ?? 0, FILTER_VALIDATE_INT);
+            if (!$id) sendJsonResponse(false, 'Please select an inquiry.', null, null, 422);
+            $statement = $database->prepare("UPDATE inquiries SET status = 'resolved' WHERE id = :id");
+            $statement->execute(['id'=>$id]);
+            sendJsonResponse(true, 'Inquiry marked as resolved.');
+        }
+        sendJsonResponse(true, 'Support inquiries loaded.', $database->query('SELECT * FROM inquiries ORDER BY created_at DESC, id DESC')->fetchAll());
+        break;
+
+    case 'get_portal_updates':
+        $user = getAuthenticatedUser($database);
+        if (!$user) sendJsonResponse(false, 'Please sign in to view your updates.', null, null, 401);
+        $statement = $database->prepare("SELECT COUNT(*) FROM bookings WHERE attendee_email = :email AND status = 'confirmed'");
+        $statement->execute(['email'=>$user['email']]);
+        $bookings = (int)$statement->fetchColumn();
+        $inquiries = $user['role'] === 'admin' ? (int)$database->query("SELECT COUNT(*) FROM inquiries WHERE status = 'new'")->fetchColumn() : 0;
+        sendJsonResponse(true, 'Portal updates loaded.', ['bookings'=>$bookings, 'inquiries'=>$inquiries]);
         break;
 
     case 'get_profile':

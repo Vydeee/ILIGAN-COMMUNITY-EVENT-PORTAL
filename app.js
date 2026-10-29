@@ -24,6 +24,7 @@
     events: { title: 'Discover Events' },
     about: { title: 'About Us' },
     contact: { title: 'Contact Us' },
+    guide: { title: 'Portal Guide' },
     citizen: { title: 'Citizen Dashboard', roles: ['user'] },
     bookings: { title: 'My Bookings', roles: ['user', 'organizer', 'admin'] },
     dashboard: { title: 'Coordinator Dashboard', roles: ['organizer'] },
@@ -78,7 +79,7 @@
     bookings: [],
     page: 1,
     eventsLoaded: false,
-    filters: { search: '', category: 'All', barangay: '', price: '', date: '', sort: 'date', past: false },
+    filters: { search: '', category: 'All', barangay: '', coordinator: '', price: '', date: '', sort: 'date', past: false },
     carouselIndex: 0,
     carouselTimer: null,
     carouselProgressStart: null,
@@ -125,7 +126,11 @@
     inbox: '<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5.1 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.5-6.9A2 2 0 0 0 16.7 4H7.3a2 2 0 0 0-1.8 1.1z"/>',
     search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
     arrowLeft: '<line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>',
-    arrowRight: '<line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>'
+    arrowRight: '<line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>',
+    badgeCheck: '<path d="M12 2l3.09 3.26 4.41.64 1.55 4.19 3.1 3.25-3.1 3.26-1.55 4.19-4.41.64L12 22l-3.09-3.26-4.41-.64-1.55-4.19-3.1-3.26 3.1-3.25 1.55-4.19 4.41-.64z"/><polyline points="9 12 11 14 15 10"/>',
+    lock: '<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+    mail: '<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>',
+    user: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>'
   };
   function icon(name, className = '') {
     const template = document.createElement('template');
@@ -190,6 +195,11 @@
     try {
       const response = await fetch(url, requestOptions);
       const json = await response.json();
+      if (response.status === 401 && state.user && action !== 'login') {
+        setUser(null);
+        findAll('dialog[open]').forEach((dialog) => dialog.close());
+        route();
+      }
       return { ok: !!json.success, status: response.status, message: json.message || '', tip: json.actionable_tip || '', data: json.data };
     } catch {
       return { ok: false, message: 'We could not reach the server.', tip: 'Make sure Apache and MySQL are running in XAMPP, then try again.', data: null };
@@ -215,17 +225,27 @@
   const showApiError = (target, response) => showAlert(target, 'error', response.message || 'Something went wrong.', response.tip);
 
   function toast(message, { type = 'info', actionLabel = '', onAction = null, duration = 5000 } = {}) {
-    const node = createElement('div', { class: `toast toast-${type}` }, createElement('p', { class: 'toast-text', text: message }));
-    const remove = () => node.remove();
+    const node = createElement('div', { class: `toast toast-${type}`, role: type === 'error' ? 'alert' : 'status' }, icon({ info: 'info', warning: 'warning', success: 'check', error: 'error' }[type]), createElement('p', { class: 'toast-text', text: message }));
+    const region = find('#toast-region');
+    const host = findAll('dialog[open]').at(-1) || document.body;
+    if (region.parentElement !== host) {
+      region.hidePopover();
+      host.append(region);
+    }
+    const remove = () => {
+      node.remove();
+      if (!region.childElementCount) region.hidePopover();
+    };
     if (actionLabel) node.append(createElement('button', { type: 'button', class: 'button button-plain', onclick: () => { remove(); onAction && onAction(); } }, actionLabel));
     node.append(createElement('button', { type: 'button', class: 'icon-button', 'aria-label': 'Dismiss notification', onclick: remove }, icon('x', 'icon-small')));
-    find('#toast-region').append(node);
+    region.append(node);
+    region.showPopover();
     setTimeout(remove, duration);
   }
 
   async function withLoading(button, task) {
-    button.classList.add('is-loading'); button.disabled = true;
-    try { return await task(); } finally { button.classList.remove('is-loading'); button.disabled = false; }
+    button.classList.add('is-loading'); button.disabled = true; button.setAttribute('aria-busy', 'true');
+    try { return await task(); } finally { button.classList.remove('is-loading'); button.disabled = false; button.removeAttribute('aria-busy'); }
   }
 
   function confirmAction({ title, message, confirmLabel = 'Confirm', cancelLabel = 'Keep It', requireText = '' }) {
@@ -235,7 +255,7 @@
       find('#confirm-message').textContent = message;
       confirmButton.textContent = confirmLabel; cancel.textContent = cancelLabel;
       find('#confirmation-text-field').hidden = !requireText;
-      input.value = ''; confirmButton.disabled = !!requireText;
+      input.value = ''; input.placeholder = requireText; confirmButton.disabled = !!requireText;
       if (requireText) find('#confirmation-text-label').textContent = `Type "${requireText}" in capital letters to confirm:`;
       input.oninput = () => { confirmButton.disabled = input.value !== requireText; };
       let result = false;
@@ -252,7 +272,8 @@
     const id = `${input.id}-err`;
     input.setAttribute('aria-invalid', 'true');
     input.setAttribute('aria-describedby', [input.getAttribute('aria-describedby'), id].filter(Boolean).join(' '));
-    input.parentElement.append(createElement('p', { class: 'field-error', id, text: message }));
+    const field = input.closest('.field') || input.parentElement;
+    field.append(createElement('p', { class: 'field-error', id }, icon('error', 'icon-small'), createElement('span', { text: message })));
   }
   function clearFieldError(input) {
     input.removeAttribute('aria-invalid');
@@ -296,18 +317,38 @@
     const track = find('#carousel-track'), dots = find('#carousel-dots');
     if (!track) return;
 
-    // Build slides
+    // Build slides (Split Spotlight Hero Carousel)
     clear(track); clear(dots);
+    const totalSlides = state.carouselSlides.length;
     state.carouselSlides.forEach((slide, index) => {
-      const backgroundImage = createElement('img', { class: 'carousel-background', src: slide.image, alt: slide.title, loading: index === 0 ? 'eager' : 'lazy' });
-      backgroundImage.addEventListener('error', () => { backgroundImage.src = 'images/kasadya_sa_diyandi.jpg'; });
+      const showcaseImage = createElement('img', {
+        class: 'carousel-media-img',
+        src: slide.image,
+        alt: slide.title,
+        loading: index === 0 ? 'eager' : 'lazy',
+        decoding: 'async'
+      });
+      const backdropFill = createElement('img', {
+        class: 'carousel-media-backdrop',
+        src: slide.image,
+        alt: '',
+        'aria-hidden': 'true',
+        loading: index === 0 ? 'eager' : 'lazy',
+        decoding: 'async'
+      });
+      showcaseImage.addEventListener('error', () => {
+        showcaseImage.src = 'images/kasadya_sa_diyandi.jpg';
+        backdropFill.src = 'images/kasadya_sa_diyandi.jpg';
+      });
+
+      const slideCounter = `${String(index + 1).padStart(2, '0')} / ${String(totalSlides).padStart(2, '0')}`;
 
       const slideNode = createElement('div', { class: `carousel-slide ${index === 0 ? 'is-active' : ''}`, 'data-slide': index },
-        backgroundImage,
-        createElement('div', { class: 'carousel-scrim' }),
-        createElement('div', { class: 'container' },
+        createElement('div', { class: 'container carousel-split-grid' },
           createElement('div', { class: 'carousel-content' },
-            createElement('span', { class: 'carousel-badge', text: slide.badge || 'Community Highlight' }),
+            createElement('div', { class: 'carousel-eyebrow-row' },
+              createElement('span', { class: 'carousel-badge', text: slide.badge || 'Community Highlight' }),
+              createElement('span', { class: 'carousel-slide-count', text: `Featured Spotlight · ${slideCounter}` })),
             createElement('h2', { class: 'carousel-title', text: slide.title }),
             createElement('p', { class: 'carousel-subtitle', text: slide.subtitle }),
             slide.meta && createElement('div', { class: 'carousel-meta-row' },
@@ -318,14 +359,24 @@
                 class: 'button carousel-button-primary',
                 onclick: () => {
                   if (slide.eventId) openEventDetails(slide.eventId);
-                  else location.hash = '#/events';
+                  else navigateTo('#/events');
                 }
               }, icon('ticket', 'icon-small'), slide.actionText || 'Book Pass'),
               createElement('button', {
                 type: 'button',
                 class: 'button carousel-button-transparent',
-                onclick: () => { location.hash = '#/events'; }
-              }, 'Browse All Events')))));
+                onclick: () => { navigateTo('#/events'); }
+              }, 'Browse All Events'))),
+          createElement('div', {
+            class: 'carousel-media-showcase',
+            onclick: () => {
+              if (slide.eventId) openEventDetails(slide.eventId);
+              else navigateTo('#/events');
+            }
+          },
+            backdropFill,
+            showcaseImage,
+            createElement('span', { class: 'carousel-media-tag' }, icon('star', 'icon-small'), 'Featured Event'))));
       track.append(slideNode);
 
       // Dot button
@@ -414,15 +465,117 @@
   }
 
   /* =========================================================
+     LANDING PAGE SCROLLSPY NAVIGATION (ALL ROLES)
+     ========================================================= */
+  const LANDING_ROUTES = ['home', 'events', 'about', 'contact'];
+  let syncHomeScrollspy = () => {};
+  let lockScrollspy = () => {};
+  const navigateTo = (hash) => {
+    if (location.hash === hash) route();
+    else location.hash = hash;
+  };
+
+  function setActiveNavRoute(routeName) {
+    findAll('[data-route]').forEach((link) => {
+      const isActive = link.dataset.route === routeName;
+      link.classList.toggle('cs-active', isActive);
+      isActive ? link.setAttribute('aria-current', 'page') : link.removeAttribute('aria-current');
+    });
+    const portalButton = find('#cs-portal-dropdown-btn');
+    if (portalButton) {
+      const isPortalRoute = ['citizen', 'bookings', 'dashboard', 'admin'].includes(routeName);
+      portalButton.classList.toggle('cs-active', isPortalRoute);
+    }
+    const page = ROUTES[routeName];
+    if (page && state.user) {
+      document.title = `${page.title} | Iligan Community Event Portal`;
+    }
+  }
+
+  function initHomeScrollspy() {
+    const header = find('#cs-navigation');
+
+    // Keep --header-height CSS custom property synced with sticky header
+    const updateHeaderHeight = () => {
+      if (header) {
+        const height = Math.round(header.getBoundingClientRect().height);
+        if (height > 0) document.documentElement.style.setProperty('--header-height', `${height}px`);
+      }
+    };
+    updateHeaderHeight();
+    if (header && typeof ResizeObserver !== 'undefined') {
+      new ResizeObserver(updateHeaderHeight).observe(header);
+    }
+    window.addEventListener('resize', updateHeaderHeight, { passive: true });
+
+    let activeLandingRoute = 'home';
+    let clickLockUntil = 0;
+
+    lockScrollspy = (durationMs = 850) => {
+      clickLockUntil = performance.now() + durationMs;
+    };
+
+    let scrollTicking = false;
+    syncHomeScrollspy = () => {
+      const homeView = find('#view-home');
+      if (!homeView || homeView.hidden) return;
+      if (performance.now() < clickLockUntil) return;
+
+      const sections = LANDING_ROUTES
+        .map((routeKey) => ({ routeKey, element: find(`#view-${routeKey}`) }))
+        .filter((item) => item.element && !item.element.hidden);
+
+      if (!sections.length) return;
+
+      const headerHeight = header ? header.getBoundingClientRect().height : 70;
+      const triggerLine = headerHeight + 120;
+
+      // If scrolled near the very bottom of the page, highlight the last landing section (Contact Us)
+      const scrolledToBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 40;
+      let currentRoute = sections[0].routeKey;
+
+      if (scrolledToBottom) {
+        currentRoute = sections[sections.length - 1].routeKey;
+      } else {
+        for (const { routeKey, element } of sections) {
+          const rect = element.getBoundingClientRect();
+          if (rect.top <= triggerLine) {
+            currentRoute = routeKey;
+          } else {
+            break;
+          }
+        }
+      }
+
+      if (activeLandingRoute !== currentRoute) {
+        activeLandingRoute = currentRoute;
+        setActiveNavRoute(currentRoute);
+        if (location.hash !== `#/${currentRoute}`) {
+          history.replaceState(null, '', `#/${currentRoute}`);
+        }
+      }
+    };
+
+    window.addEventListener('scroll', () => {
+      if (!scrollTicking) {
+        scrollTicking = true;
+        requestAnimationFrame(() => {
+          syncHomeScrollspy();
+          scrollTicking = false;
+        });
+      }
+    }, { passive: true });
+  }
+
+  /* =========================================================
      AUTH & INTERACTIVE MODAL CONTROLS
      ========================================================= */
-  function loadUser() {
-    try { state.user = JSON.parse(localStorage.getItem(USER_STORAGE_KEY)); } catch { state.user = null; }
-  }
   function setUser(user) {
     if (state.user?.id !== user?.id) state.bookings = [];
     state.user = user;
     user ? localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user)) : localStorage.removeItem(USER_STORAGE_KEY);
+    document.body.classList.toggle('login-required', !user);
+    find('#login-status').hidden = true;
     updateAccountDisplay();
   }
   function updateAccountDisplay() {
@@ -432,29 +585,31 @@
     findAll('[data-role]').forEach((element) => { element.hidden = !(user && element.dataset.role.split(' ').includes(user.role)); });
     if (user) {
       find('#user-name').textContent = user.name;
-      find('#user-avatar').textContent = (user.name || 'U').trim().charAt(0).toUpperCase();
       find('#user-role').textContent = ROLE_NAMES[user.role] || 'Citizen';
+      find('#menu-name').textContent = user.name;
+      find('#menu-email').textContent = user.email;
+      find('#menu-role').textContent = ROLE_NAMES[user.role] || 'Citizen';
+      find('#menu-avatar').textContent = (user.name || 'U').trim().charAt(0).toUpperCase();
     }
   }
-  function getUserHome(user) { return { user: '#/citizen', organizer: '#/dashboard', admin: '#/admin' }[user.role] || '#/home'; }
 
   function switchAuthTab(tab) {
     const isLogin = tab === 'login';
-    const wrap = find('.auth-tabs-wrap');
-    if (wrap) wrap.classList.toggle('is-register', !isLogin);
+    const dialog = find('#dlg-auth');
+    dialog.classList.toggle('is-register', !isLogin);
+    find('#auth-panel-switch').textContent = isLogin ? 'Create Account →' : '← Sign In to Your Account';
 
     find('#login-form').hidden = !isLogin;
     find('#register-form').hidden = isLogin;
-    find('#auth-title').textContent = isLogin ? 'Welcome Back' : 'Create Your Account';
+    find('#auth-title').textContent = isLogin ? 'Log in to Your Account' : 'Create Your Account';
     find('#auth-description').textContent = isLogin
-      ? 'Sign in to access your digital passes and registered events.'
+      ? 'Sign in to access the portal, discover events, and manage your passes.'
       : 'Join our community portal to reserve slots or publish official city events.';
 
-    find('#auth-tab-login').classList.toggle('is-active', isLogin);
-    find('#auth-tab-register').classList.toggle('is-active', !isLogin);
+    find('.auth-form-panel').scrollTop = 0;
     clearAlert('#auth-alert');
+    if (dialog.open) (isLogin ? find('#login-email') : find('#register-name')).focus({ preventScroll: true });
   }
-  window.switchAuthTab = switchAuthTab;
 
   function openAuth(tab = 'login', notice = '') {
     switchAuthTab(tab);
@@ -469,14 +624,13 @@
     find('#dlg-auth').close();
     form.reset();
     toast(response.message, { type: 'success' });
-    await loadEvents();
-    const target = getUserHome(state.user);
-    if (location.hash === target) route(); else location.hash = target;
+    if (location.hash === '#/home') route(); else location.hash = '#/home';
+    await Promise.all([loadSettings(), loadEvents()]);
   }
 
   function bindAuth() {
-    find('#auth-tab-login').onclick = () => switchAuthTab('login');
-    find('#auth-tab-register').onclick = () => switchAuthTab('register');
+    find('#dlg-auth').addEventListener('cancel', (event) => { if (!state.user) event.preventDefault(); });
+    find('#auth-panel-switch').onclick = () => switchAuthTab(find('#login-form').hidden ? 'login' : 'register');
 
     // Password visibility toggles
     findAll('[data-toggle-password]').forEach((button) => {
@@ -532,6 +686,8 @@
     });
 
     find('#sign-out-button').addEventListener('click', async () => {
+      find('#account-menu').hidePopover();
+      closeMobileMenu();
       const user = state.user;
       const roleTitle = user ? (ROLE_NAMES[user.role] || 'Citizen') : 'Citizen';
       const confirmed = await confirmAction({
@@ -541,12 +697,12 @@
         cancelLabel: 'Stay Signed In'
       });
       if (!confirmed) return;
-      await api('logout', { body: {} });
+      const response = await api('logout', { body: {} });
+      if (!response.ok) return toast(response.message, { type: 'error' });
       setUser(null);
       state.bookings = [];
+      route();
       toast('You have been signed out.', { type: 'success' });
-      await loadEvents();
-      if (location.hash === '#/home') route(); else location.hash = '#/home';
     });
 
     /* =========================================================
@@ -577,6 +733,10 @@
           const accounts = {
             admin: { email: 'admin@iligancity.gov.ph', password: 'password123' },
             organizer: { email: 'tourism@iligancity.gov.ph', password: 'password123' },
+            coord_tourism: { email: 'tourism@iligancity.gov.ph', password: 'password123' },
+            coord_sports: { email: 'sports@iligancity.gov.ph', password: 'password123' },
+            coord_arts: { email: 'arts.guild@iligancity.gov.ph', password: 'password123' },
+            coord_eco: { email: 'ecotourism@iligancity.gov.ph', password: 'password123' },
             citizen: { email: 'amina.alonto@gmail.com', password: 'password123' }
           };
           const account = accounts[role];
@@ -600,6 +760,8 @@
 
   /* ---------- Profile ---------- */
   async function openProfile() {
+    find('#account-menu').hidePopover();
+    closeMobileMenu();
     const dialog = find('#profile-dialog');
     clearAlert('#profile-alert');
     find('#profile-password').value = '';
@@ -650,7 +812,7 @@
     state.events = response.data;
     state.eventsLoaded = true;
 
-    // Curate up to 4 premier featured carousel slides from active events
+    // Curate premier featured carousel slides from active events
     const validFeatured = state.events.filter((event) =>
       event.status === 'active' &&
       toNumber(event.is_featured) &&
@@ -660,10 +822,10 @@
       !event.title.toLowerCase().includes('alderhaven') &&
       event.description &&
       event.description.trim().length > 25
-    ).slice(0, 4);
+    );
 
-    if (validFeatured.length >= 2) {
-      state.carouselSlides = validFeatured.map((event) => ({
+    if (validFeatured.length >= 1) {
+      state.carouselSlides = validFeatured.slice(0, 5).map((event) => ({
         title: event.title,
         subtitle: (event.description || '').replace(/\s+/g, ' ').slice(0, 140) + (event.description.length > 140 ? '...' : ''),
         badge: event.category,
@@ -678,6 +840,7 @@
     initHeroCarousel();
 
     buildCategoryChips();
+    renderCoordinatorFilterOptions();
     renderEvents();
     renderCategoryOptions();
     refreshStaffViews();
@@ -686,7 +849,9 @@
 
   /* ---------- Filters & Search ---------- */
   function renderHeroTags() {
-    const host = clear(find('#hero-tags'));
+    const host = find('#hero-tags');
+    if (!host) return;
+    clear(host);
     if (!state.tags.length) return;
     host.append(createElement('span', { class: 'tag-label', text: 'Popular:' }), ...state.tags.map((tag) =>
       createElement('button', { type: 'button', class: 'tag-button', onclick: () => applyTag(tag.name) }, tag.name)));
@@ -696,15 +861,15 @@
     resetFilters(false);
     if (isBarangay) {
       state.filters.barangay = name;
-      find('#filter-barangay').value = name;
+      if (find('#filter-barangay')) find('#filter-barangay').value = name;
     } else {
       state.filters.search = name;
-      find('#search-input').value = name;
+      if (find('#search-input')) find('#search-input').value = name;
       if (find('#discover-search-input')) find('#discover-search-input').value = name;
     }
     state.page = 1;
     renderEvents();
-    location.hash = '#/events';
+    navigateTo('#/events');
   }
   function fillBarangaySelects() {
     const names = state.barangays.map((barangay) => barangay.name);
@@ -726,11 +891,27 @@
       onclick: () => { state.filters.category = category; state.page = 1; buildCategoryChips(); renderEvents(); }
     }, category === 'All' ? 'All Events' : category)));
   }
+  function renderCoordinatorFilterOptions() {
+    const select = find('#filter-coordinator');
+    if (!select) return;
+    const current = select.value;
+    const coordinators = [...new Set(state.events.map((e) => e.coordinator_author_name || e.organizer_name).filter(Boolean))].sort();
+    clear(select).append(
+      createElement('option', { value: '' }, 'All coordinators'),
+      ...coordinators.map((name) => createElement('option', { value: name, selected: name === current }, name))
+    );
+  }
+
   function resetFilters(render = true) {
-    state.filters = { search: '', category: 'All', barangay: '', price: '', date: '', sort: 'date', past: false };
-    find('#search-input').value = '';
+    state.filters = { search: '', category: 'All', barangay: '', coordinator: '', price: '', date: '', sort: 'date', past: false };
+    if (find('#search-input')) find('#search-input').value = '';
     if (find('#discover-search-input')) find('#discover-search-input').value = '';
-    find('#filter-barangay').value = ''; find('#filter-price').value = ''; find('#filter-date').value = ''; find('#filter-sort').value = 'date'; find('#filter-past').checked = false;
+    if (find('#filter-barangay')) find('#filter-barangay').value = '';
+    if (find('#filter-coordinator')) find('#filter-coordinator').value = '';
+    if (find('#filter-price')) find('#filter-price').value = '';
+    if (find('#filter-date')) find('#filter-date').value = '';
+    if (find('#filter-sort')) find('#filter-sort').value = 'date';
+    if (find('#filter-past')) find('#filter-past').checked = false;
     state.page = 1; buildCategoryChips();
     if (render) renderEvents();
   }
@@ -741,10 +922,11 @@
       if (!filters.past && event.event_date < today) return false;
       if (filters.category !== 'All' && event.category !== filters.category) return false;
       if (filters.barangay && event.barangay !== filters.barangay) return false;
+      if (filters.coordinator && (event.coordinator_author_name || '').toLowerCase() !== filters.coordinator.toLowerCase() && String(event.coordinator_id) !== filters.coordinator) return false;
       if (filters.price === 'free' && !isFree(event)) return false;
       if (filters.price === 'paid' && isFree(event)) return false;
       if (filters.date && event.event_date < filters.date) return false;
-      if (searchText && ![event.title, event.description, event.venue_name, event.barangay, event.category, event.organizer_name].join(' ').toLowerCase().includes(searchText)) return false;
+      if (searchText && ![event.title, event.description, event.venue_name, event.barangay, event.category, event.organizer_name, event.coordinator_author_name].join(' ').toLowerCase().includes(searchText)) return false;
       return true;
     });
     const sorters = {
@@ -755,31 +937,35 @@
     };
     return list.sort(sorters[filters.sort]);
   }
-  const filtersActive = () => { const filters = state.filters; return !!(filters.search || filters.category !== 'All' || filters.barangay || filters.price || filters.date || filters.past); };
+  const filtersActive = () => { const filters = state.filters; return !!(filters.search || filters.category !== 'All' || filters.barangay || filters.coordinator || filters.price || filters.date || filters.past); };
 
   function bindFilters() {
-    find('#hero-search').addEventListener('submit', (browserEvent) => {
-      browserEvent.preventDefault();
-      const value = find('#search-input').value;
-      state.filters.search = value;
-      if (find('#discover-search-input')) find('#discover-search-input').value = value;
-      state.page = 1;
-      renderEvents();
-      location.hash = '#/events';
-    });
-    find('#search-input').addEventListener('input', debounce(() => {
-      const value = find('#search-input').value;
-      state.filters.search = value;
-      if (find('#discover-search-input')) find('#discover-search-input').value = value;
-      state.page = 1;
-      renderEvents();
-    }, 300));
+    if (find('#hero-search')) {
+      find('#hero-search').addEventListener('submit', (browserEvent) => {
+        browserEvent.preventDefault();
+        const value = find('#search-input') ? find('#search-input').value : '';
+        state.filters.search = value;
+        if (find('#discover-search-input')) find('#discover-search-input').value = value;
+        state.page = 1;
+        renderEvents();
+        navigateTo('#/events');
+      });
+    }
+    if (find('#search-input')) {
+      find('#search-input').addEventListener('input', debounce(() => {
+        const value = find('#search-input').value;
+        state.filters.search = value;
+        if (find('#discover-search-input')) find('#discover-search-input').value = value;
+        state.page = 1;
+        renderEvents();
+      }, 300));
+    }
     if (find('#discover-search-form')) {
       find('#discover-search-form').addEventListener('submit', (browserEvent) => {
         browserEvent.preventDefault();
         const value = find('#discover-search-input').value;
         state.filters.search = value;
-        find('#search-input').value = value;
+        if (find('#search-input')) find('#search-input').value = value;
         state.page = 1;
         renderEvents();
         find('#events-results-heading').scrollIntoView({ behavior: 'smooth' });
@@ -789,12 +975,12 @@
       find('#discover-search-input').addEventListener('input', debounce(() => {
         const value = find('#discover-search-input').value;
         state.filters.search = value;
-        find('#search-input').value = value;
+        if (find('#search-input')) find('#search-input').value = value;
         state.page = 1;
         renderEvents();
       }, 300));
     }
-    const filterFields = { 'filter-barangay': 'barangay', 'filter-price': 'price', 'filter-date': 'date', 'filter-sort': 'sort' };
+    const filterFields = { 'filter-barangay': 'barangay', 'filter-coordinator': 'coordinator', 'filter-price': 'price', 'filter-date': 'date', 'filter-sort': 'sort' };
     Object.entries(filterFields).forEach(([id, key]) => find(`#${id}`).addEventListener('change', (browserEvent) => { state.filters[key] = browserEvent.target.value; state.page = 1; renderEvents(); }));
     find('#filter-past').addEventListener('change', (browserEvent) => { state.filters.past = browserEvent.target.checked; state.page = 1; renderEvents(); });
     find('#filter-reset').addEventListener('click', () => resetFilters());
@@ -824,6 +1010,8 @@
         createElement('span', { class: 'pulse-dot' }), `${slots} slots available`);
     }
 
+    const coordinatorName = event.coordinator_author_name || event.organizer_name || 'Iligan City Tourism Office';
+
     const card = createElement('article', {
       class: 'card event-card',
       'aria-labelledby': headingId,
@@ -844,16 +1032,16 @@
 
       // 2. Event Body with Breathing Room & Uncluttered Layout
       createElement('div', { class: 'event-body' },
-        createElement('div', { class: 'event-location-pill' },
-          icon('pin', 'icon-small'),
-          createElement('span', { text: `Brgy. ${event.barangay}` })),
         createElement('h3', { class: 'event-name', id: headingId, text: event.title }),
 
-        // Clean highlight rows (Venue and Time)
+        // Clean highlight rows (Coordinator, Venue and Time)
         createElement('div', { class: 'event-highlights' },
           createElement('div', { class: 'highlight-row' },
+            icon('user', 'icon-small'),
+            createElement('span', { class: 'highlight-text', title: `Coordinator: ${coordinatorName}`, text: `Coordinator: ${coordinatorName}` })),
+          createElement('div', { class: 'highlight-row' },
             icon('pin', 'icon-small'),
-            createElement('span', { class: 'highlight-text', text: event.venue_name })),
+            createElement('span', { class: 'highlight-text', title: event.venue_name, text: event.venue_name })),
           createElement('div', { class: 'highlight-row' },
             icon('clock', 'icon-small'),
             createElement('span', { class: 'highlight-text', text: formatTime(event.event_time) }))
@@ -889,12 +1077,44 @@
 
   function renderEvents() {
     const today = todayDate();
-    let featured = state.events.filter((event) => event.status === 'active' && toNumber(event.is_featured) && event.event_date >= today).slice(0, 3);
+    // 1. Prioritize active events marked as featured by administrators
+    let featured = state.events.filter((event) => event.status === 'active' && toNumber(event.is_featured));
+
+    // Sort featured events: upcoming dates first, followed by others, ordered chronologically
+    featured.sort((a, b) => {
+      const aUpcoming = a.event_date >= today ? 1 : 0;
+      const bUpcoming = b.event_date >= today ? 1 : 0;
+      if (aUpcoming !== bUpcoming) return bUpcoming - aUpcoming;
+      return (a.event_date + (a.event_time || '')).localeCompare(b.event_date + (b.event_time || ''));
+    });
+
+    // Fallback: If no event has been manually marked featured, display upcoming active events
     if (!featured.length) {
-      featured = state.events.filter((event) => event.status === 'active' && event.event_date >= today).slice(0, 3);
+      featured = state.events.filter((event) => event.status === 'active' && event.event_date >= today);
+      featured.sort((a, b) => (a.event_date + (a.event_time || '')).localeCompare(b.event_date + (b.event_time || '')));
     }
-    find('#featured-section').hidden = featured.length === 0;
-    clear(find('#featured-grid')).append(...featured.map(eventCard));
+    if (!featured.length) {
+      featured = state.events.filter((event) => event.status === 'active');
+    }
+
+    const hasActiveFilters = Boolean(
+      state.filters.search.trim() ||
+      (state.filters.category && state.filters.category !== 'All') ||
+      state.filters.barangay ||
+      state.filters.coordinator ||
+      state.filters.price ||
+      state.filters.date ||
+      state.filters.past
+    );
+
+    const featuredList = featured.slice(0, 3);
+    find('#featured-section').hidden = hasActiveFilters || featuredList.length === 0;
+    clear(find('#featured-grid')).append(...featuredList.map(eventCard));
+
+    const directoryHeading = find('#directory-heading-title');
+    if (directoryHeading) {
+      directoryHeading.textContent = hasActiveFilters ? 'Filtered Event Results' : 'All Upcoming Events';
+    }
 
     const list = filteredEvents(), shown = list.slice(0, state.page * PAGE_SIZE), grid = clear(find('#events-grid'));
     find('#results-count').textContent = state.eventsLoaded ? `${list.length} event${list.length === 1 ? '' : 's'} available` : '';
@@ -912,7 +1132,11 @@
     const event = state.events.find((event) => event.id == id);
     if (!event) return;
     find('#event-title').textContent = event.title;
+    const coordinatorName = event.coordinator_author_name || event.organizer_name || 'Iligan City Tourism Office';
+    const isOrganizer = state.user && state.user.role === 'organizer';
+    const isOwner = !!event.is_mine;
     const isStaff = event.can_manage && state.user && ['organizer', 'admin'].includes(state.user.role);
+    const isOtherCoordinator = isOrganizer && !isOwner;
 
     const aside = createElement('aside', { class: 'detail-aside', 'aria-label': 'Reservation details' },
       createElement('div', { class: 'price-lockup' },
@@ -936,7 +1160,14 @@
         type: 'button',
         class: 'button button-danger-outline button-full-width',
         onclick: () => { find('#event-dialog').close(); deleteEvent(event); }
-      }, icon('trash', 'icon-small'), 'Delete Event Listing')
+      }, icon('trash', 'icon-small'), 'Delete Event Listing'),
+      isOtherCoordinator && createElement('div', { class: 'coord-lock-notice' },
+        icon('lock', 'icon-small'),
+        createElement('div', {},
+          createElement('strong', { text: 'Protected Listing' }),
+          createElement('p', { class: 'muted-small', text: `Coordinated by ${coordinatorName}.` })
+        )
+      )
     );
 
     clear(find('#event-body')).append(
@@ -950,7 +1181,7 @@
             createElement('li', {}, icon('calendar'), createElement('span', { class: 'meta-text', text: formatDate(event.event_date) })),
             createElement('li', {}, icon('clock'), createElement('span', { class: 'meta-text', text: formatTime(event.event_time) })),
             createElement('li', {}, icon('pin'), createElement('span', { class: 'meta-text', text: formatLocation(event) })),
-            createElement('li', {}, icon('users'), createElement('span', { class: 'meta-text', text: `Organized by: ${event.organizer_name}` }))),
+            createElement('li', {}, icon('users'), createElement('span', { class: 'meta-text', text: `Coordinator: ${coordinatorName}` }))),
           createElement('h3', { class: 'h4', text: 'About This Event' }),
           createElement('p', { class: 'event-description', text: event.description })
         ),
@@ -974,13 +1205,16 @@
     const total = createElement('span', { text: formatPrice(event.price) });
     const minus = createElement('button', { type: 'button', 'aria-label': 'Decrease tickets', disabled: true }, '−');
     const plus = createElement('button', { type: 'button', 'aria-label': 'Increase tickets', disabled: maximum <= 1 }, '+');
-    const sync = () => { quantityOutput.textContent = quantity; total.textContent = formatPrice(toNumber(event.price) * quantity); minus.disabled = quantity <= 1; plus.disabled = quantity >= maximum; };
+    const slider = createElement('input', { type: 'range', id: 'booking-quantity-slider', min: 1, max: maximum, value: 1, step: 1, disabled: maximum === 1 });
+    const sync = () => { slider.value = quantity; quantityOutput.textContent = quantity; total.textContent = formatPrice(toNumber(event.price) * quantity); minus.disabled = quantity <= 1; plus.disabled = quantity >= maximum; };
+    slider.oninput = () => { quantity = toNumber(slider.value); sync(); };
     minus.onclick = () => { quantity = Math.max(1, quantity - 1); sync(); };
     plus.onclick = () => { quantity = Math.min(maximum, quantity + 1); sync(); };
 
     const form = createElement('form', { novalidate: true },
       alertHost,
       !user && alertBox('info', 'Booking as Guest', 'Log in or create a citizen account if you want this pass to be saved directly to your account.', { dismissible: false }),
+      !isFree(event) && alertBox('warning', 'Payment is arranged with the organizer', 'This portal reserves a place and does not collect online payments. Confirm payment arrangements with the organizer.', { dismissible: false }),
       createElement('div', { class: 'summary' },
         createElement('p', { class: 'h4', text: event.title }),
         createElement('p', { class: 'muted', text: `${formatDate(event.event_date)} · ${formatTime(event.event_time)} · ${event.venue_name}` })),
@@ -988,7 +1222,8 @@
       createElement('div', { class: 'field' }, createElement('label', { for: 'booking-email' }, 'Confirmation email address'), email),
       createElement('div', { class: 'field' }, createElement('label', { for: 'booking-phone' }, 'Contact mobile number'), phone),
       createElement('div', { class: 'field' }, createElement('span', { class: 'label', id: 'booking-quantity-label' }, `Number of tickets (maximum ${maximum})`),
-        createElement('div', { class: 'stepper', role: 'group', 'aria-labelledby': 'booking-quantity-label' }, minus, quantityOutput, plus)),
+        createElement('div', { class: 'stepper', role: 'group', 'aria-labelledby': 'booking-quantity-label' }, minus, quantityOutput, plus),
+        createElement('label', { for: 'booking-quantity-slider', class: 'hint' }, 'Slide to choose the number of tickets'), slider),
       createElement('div', { class: 'summary' }, createElement('div', { class: 'summary-row total' }, createElement('span', { text: 'Total Amount' }), total)),
       createElement('div', { class: 'form-actions' },
         createElement('button', { type: 'button', class: 'button button-plain', 'data-close': '' }, 'Cancel'),
@@ -1006,8 +1241,12 @@
           event_id: event.id, attendee_name: name.value.trim(), attendee_email: email.value.trim(), attendee_phone: phone.value.trim(), tickets_count: quantity
         }
       }));
-      if (!response.ok) return showApiError(alertHost, response);
-      toast(response.message, { type: 'success', duration: 6000 });
+      if (!response.ok) {
+        showApiError(alertHost, response);
+        if (response.status === 409) { find('#portal-alert-message').textContent = response.message; find('#portal-alert').showModal(); }
+        return;
+      }
+      toast(response.message, { type: 'success', duration: 5000 });
       renderPass(response.data, 'Reservation Confirmed!');
       loadEvents();
     });
@@ -1016,19 +1255,17 @@
     name.focus();
   }
 
-  function createPassCode(text) {
-    const svgNamespace = 'http://www.w3.org/2000/svg', svg = document.createElementNS(svgNamespace, 'svg');
-    let position = 0;
-    for (const character of text) {
-      for (let index = 5; index >= 0; index--) {
-        const width = (character.charCodeAt(0) >> index) & 1 ? 3 : 1;
-        if ((position + index) % 2 === 0 || width === 3) { const rectangle = document.createElementNS(svgNamespace, 'rect'); rectangle.setAttribute('x', position); rectangle.setAttribute('width', width); rectangle.setAttribute('height', 56); rectangle.setAttribute('fill', 'currentColor'); svg.append(rectangle); }
-        position += width + 1;
-      }
-    }
-    svg.setAttribute('viewBox', `0 0 ${position} 56`); svg.setAttribute('preserveAspectRatio', 'none');
-    svg.setAttribute('class', 'code'); svg.setAttribute('aria-hidden', 'true');
-    return svg;
+  function createPassCode(reference) {
+    const code = window.qrcode(0, 'M');
+    code.addData(`ILIGAN-PASS:${reference}`);
+    code.make();
+    const template = document.createElement('template');
+    template.innerHTML = code.createSvgTag({ cellSize: 4, margin: 16, scalable: true });
+    const image = template.content.firstElementChild;
+    image.setAttribute('class', 'code');
+    image.setAttribute('role', 'img');
+    image.setAttribute('aria-label', `QR code for booking ${reference}`);
+    return image;
   }
 
   function renderPass(pass, heading) {
@@ -1041,7 +1278,9 @@
         createElement('p', { class: 'pass-reference', text: pass.booking_reference }),
         createPassCode(pass.booking_reference),
         createElement('p', { class: 'h4', text: pass.event_title }),
-        createElement('dl', {}, row('Attendee', pass.attendee_name), row('Date', pass.event_date), row('Time', pass.event_time),
+        createElement('dl', {}, row('Attendee', pass.attendee_name),
+          row('Coordinator', pass.coordinator_name || pass.coordinator_author_name || pass.organizer_name || 'Iligan City Tourism Office'),
+          row('Date', pass.event_date), row('Time', pass.event_time),
           row('Venue', formatLocation(pass)), row('Passes', String(pass.tickets_count)), row('Total', formatPrice(toNumber(pass.price) * toNumber(pass.tickets_count))))),
       createElement('div', { class: 'form-actions' },
         createElement('button', { type: 'button', class: 'button button-plain', 'data-close': '' }, 'Done'),
@@ -1110,10 +1349,11 @@
     }
     state.bookings.forEach((booking) => {
       const isCancelled = booking.status === 'cancelled';
+      const past = isPast(booking);
       host.append(createElement('article', { class: `card booking-card ${isCancelled ? 'is-cancelled' : ''}`, 'aria-label': `Booking ${booking.booking_reference}` },
         createElement('div', { class: 'booking-main' },
           createElement('div', { style: 'display:flex;gap:8px;flex-wrap:wrap;align-items:center' },
-            createElement('span', { class: `badge ${isCancelled ? 'badge-red' : 'badge-green'}`, text: isCancelled ? 'Cancelled' : 'Confirmed Active' }),
+            createElement('span', { class: `badge ${isCancelled ? 'badge-red' : past ? 'badge-gray' : 'badge-green'}`, text: isCancelled ? 'Cancelled' : past ? 'Concluded' : 'Confirmed Active' }),
             createElement('span', { class: 'booking-reference', text: booking.booking_reference })),
           createElement('h2', { class: 'h4 event-name', text: booking.event_title }),
           createElement('ul', { class: 'meta-list' },
@@ -1122,9 +1362,9 @@
             createElement('li', {}, icon('ticket'), createElement('span', { class: 'meta-text', text: `${booking.tickets_count} ticket${booking.tickets_count > 1 ? 's' : ''} · ${formatPrice(toNumber(booking.price) * toNumber(booking.tickets_count))}` })))),
         createElement('div', { class: 'event-actions' },
           isCancelled
-            ? createElement('button', { type: 'button', class: 'button button-outline', onclick: () => restoreBooking(booking.booking_reference) }, 'Restore Booking')
+            ? (past ? createElement('span', { class: 'muted', text: 'This event has concluded.' }) : createElement('button', { type: 'button', class: 'button button-outline', onclick: () => restoreBooking(booking.booking_reference) }, 'Restore Booking'))
             : [createElement('button', { type: 'button', class: 'button button-primary', onclick: () => renderPass({ ...booking, event_date: formatDate(booking.event_date), event_time: formatTime(booking.event_time) }, 'Digital Pass') }, 'View Pass'),
-            createElement('button', { type: 'button', class: 'button button-danger-outline', onclick: () => cancelBooking(booking) }, 'Cancel Booking')])));
+            !past && createElement('button', { type: 'button', class: 'button button-danger-outline', onclick: () => cancelBooking(booking) }, 'Cancel Booking')])));
     });
   }
   async function cancelBooking(booking) {
@@ -1136,7 +1376,7 @@
     if (!confirmed) return;
     const response = await api('cancel_booking', { body: { booking_reference: booking.booking_reference } });
     if (!response.ok) return showApiError('#bookings-alert', response);
-    toast(response.message, { type: 'success', duration: 8000, actionLabel: 'Undo', onAction: () => restoreBooking(booking.booking_reference) });
+    toast(response.message, { type: 'success', duration: 5000, actionLabel: 'Undo', onAction: () => restoreBooking(booking.booking_reference) });
     await loadBookings(); loadEvents();
   }
   async function restoreBooking(reference) {
@@ -1228,7 +1468,7 @@
     const rows = pagedEvents.map((event) => {
       const featured = !!toNumber(event.is_featured);
       const status = displayStatus(event);
-      const button = (label, iconName, callback, className = '', showLabel = false) => createElement('button', {
+      const button = (label, iconName, callback, className = '', showLabel = true) => createElement('button', {
         type: 'button', class: `table-action ${className}`, title: label,
         'aria-label': `${label}: ${event.title}`, onclick: callback
       }, icon(iconName, 'icon-small'), showLabel ? label : null);
@@ -1340,6 +1580,9 @@
   }
 
   function renderCoordinatorDashboard() {
+    if (find('#hub-coordinator-name') && state.user) {
+      find('#hub-coordinator-name').textContent = `Coordinator: ${state.user.name}`;
+    }
     const events = state.events.filter((event) => event.is_mine);
     const upcoming = events.filter((event) => event.status === 'active' && !isPast(event));
     const tickets = upcoming.reduce((total, event) => total + seatsTaken(event), 0);
@@ -1357,7 +1600,7 @@
     visibleEvents.forEach((event) => {
       const reserved = seatsTaken(event);
       host.append(createElement('article', { class: 'coordinator-event' },
-        createElement('div', { class: 'coordinator-event-date' }, createElement('strong', { text: new Date(event.event_date + 'T00:00:00').getDate() }),
+        createElement('time', { class: 'coordinator-event-date', datetime: event.event_date }, createElement('strong', { text: new Date(event.event_date + 'T00:00:00').getDate() }),
           createElement('span', { text: new Date(event.event_date + 'T00:00:00').toLocaleDateString('en-PH', { month: 'short', year: 'numeric' }) })),
         createElement('div', { class: 'coordinator-event-details' },
           createElement('span', { class: `table-status ${isPast(event) ? 'is-concluded' : event.status === 'active' ? 'is-active' : 'is-inactive'}`, text: isPast(event) ? 'Concluded' : event.status }),
@@ -1366,11 +1609,11 @@
         createElement('div', { class: 'coordinator-capacity' },
           createElement('p', {}, createElement('strong', { text: reserved.toLocaleString('en-PH') }), ` / ${toNumber(event.total_slots).toLocaleString('en-PH')} reserved`),
           createElement('progress', { max: Math.max(1, toNumber(event.total_slots)), value: reserved, 'aria-label': `Reserved seats for ${event.title}` }),
-          createElement('span', { class: 'table-secondary', text: `${toNumber(event.available_slots).toLocaleString('en-PH')} seats available` })),
+          createElement('span', { class: 'table-secondary', text: `${toNumber(event.available_slots).toLocaleString('en-PH')} seats available · ${Math.min(100, Math.round(reserved / Math.max(1, toNumber(event.total_slots)) * 100))}% reserved` })),
         createElement('div', { class: 'coordinator-event-actions' },
           createElement('button', { type: 'button', class: 'button button-outline button-small', onclick: () => openAttendees(event), 'aria-label': `Attendees: ${event.title}` }, icon('users', 'icon-small'), 'Attendees'),
           createElement('button', { type: 'button', class: 'button button-plain button-small', onclick: () => openEventForm(event), 'aria-label': `Edit: ${event.title}` }, icon('edit', 'icon-small'), 'Edit'),
-          createElement('button', { type: 'button', class: 'table-action table-action-delete', title: 'Delete event', 'aria-label': `Delete: ${event.title}`, onclick: () => deleteEvent(event) }, icon('trash', 'icon-small')))));
+          createElement('button', { type: 'button', class: 'table-action table-action-delete', title: 'Delete event', 'aria-label': `Delete: ${event.title}`, onclick: () => deleteEvent(event) }, icon('trash', 'icon-small'), 'Delete'))));
     });
   }
 
@@ -1382,6 +1625,10 @@
   }
 
   async function deleteEvent(event) {
+    if (event && !event.can_manage) {
+      const owner = event.coordinator_author_name || event.organizer_name || 'another coordinator';
+      return toast(`Access Denied: This event is coordinated by "${owner}". You cannot delete another coordinator's event.`, { type: 'error', duration: 7000 });
+    }
     const confirmed = await confirmAction({
       title: 'Permanently remove event?',
       message: `"${event.title}" and all related booking passes will be permanently removed from Iligan City portal.`,
@@ -1414,6 +1661,11 @@
 
   /* ---------- Event Creation & Editing Form ---------- */
   function openEventForm(event = null) {
+    if (!state.user || !['organizer', 'admin'].includes(state.user.role)) return toast('Sign in as a coordinator to publish events.', { type: 'error' });
+    if (event && !event.can_manage) {
+      const owner = event.coordinator_author_name || event.organizer_name || 'another coordinator';
+      return toast(`Access Denied: This event is coordinated by "${owner}". Coordinators cannot edit another coordinator's listing.`, { type: 'error', duration: 7000 });
+    }
     const form = find('#event-form');
     form.reset(); clearAlert('#event-form-alert'); clear(find('#event-duplicate-warning'));
     findAll('input,select,textarea', form).forEach(clearFieldError);
@@ -1436,6 +1688,7 @@
     } else {
       find('#event-form-organizer').value = state.user?.name || '';
     }
+    updateTextCounters();
     find('#event-form-dialog').showModal();
     find('#event-form-title').focus();
   }
@@ -1485,7 +1738,7 @@
         return;
       }
       find('#event-form-dialog').close();
-      toast(response.message, { type: 'success', duration: 6000 });
+      toast(response.message, { type: 'success', duration: 5000 });
       await loadEvents();
     });
   }
@@ -1495,7 +1748,7 @@
     const host = clear(find(selector));
     if (!items.length) return host.append(createElement('li', { class: 'muted', text: `No ${label} configured yet.` }));
     items.forEach((item) => host.append(createElement('li', { class: 'pill' }, item.name,
-      createElement('button', { type: 'button', class: 'icon-button', 'aria-label': `Remove ${item.name}`, onclick: () => onDelete(item) }, icon('trash', 'icon-small')))));
+      createElement('button', { type: 'button', class: 'icon-button', 'aria-label': `Remove ${item.name}`, onclick: () => onDelete(item) }, icon('trash', 'icon-small'), 'Delete'))));
   }
   function renderAdminLists() {
     renderPills('#barangay-list', state.barangays, deleteBarangay, 'barangays');
@@ -1517,8 +1770,8 @@
     state.tags = response.data.tags; renderHeroTags(); renderAdminLists(); toast(response.message, { type: 'success' });
   }
   function bindAdmin() {
-    const panels = { events: '#panel-events', content: '#panel-content', barangays: '#panel-barangays', tags: '#panel-tags' };
-    initTabs(find('#view-admin .tabs'), (tab) => Object.entries(panels).forEach(([panelName, selector]) => { find(selector).hidden = panelName !== tab.dataset.tab; }));
+    const panels = { events: '#panel-events', content: '#panel-content', barangays: '#panel-barangays', tags: '#panel-tags', inquiries: '#panel-inquiries' };
+    initTabs(find('#view-admin .tabs'), (tab) => { Object.entries(panels).forEach(([panelName, selector]) => { find(selector).hidden = panelName !== tab.dataset.tab; }); if (tab.dataset.tab === 'inquiries') loadInquiries(); });
 
     find('#content-form').addEventListener('submit', async (browserEvent) => {
       browserEvent.preventDefault();
@@ -1558,12 +1811,15 @@
         [topic, topic.value ? '' : 'Select an inquiry topic.'],
         [message, message.value.trim().length >= 10 ? '' : 'Please enter a message of at least 10 characters.']
       ])) return;
-      await withLoading(find('button[type=submit]', form), () => new Promise((resolve) => setTimeout(resolve, 350)));
-      const sender = name.value.trim();
-      const chosenTopic = topic.value;
+      const response = await withLoading(find('button[type=submit]', form), () => api('send_inquiry', { body: {
+        name: name.value.trim(), email: email.value.trim(), topic: topic.value,
+        barangay: find('#contact-barangay').value.trim(), message: message.value.trim()
+      } }));
+      if (!response.ok) return showApiError('#contact-alert', response);
       form.reset();
-      showAlert('#contact-alert', 'success', 'Inquiry Sent to Iligan Tourism & Events Desk', `Thank you, ${sender}! Your message regarding "${chosenTopic}" has been logged. Our desk will reply within 1 business day.`);
-      toast('Your message has been sent to the Iligan Tourism Desk.', { type: 'success' });
+      updateTextCounters();
+      showAlert('#contact-alert', 'success', 'Inquiry Saved', 'Your inquiry is saved in the portal support inbox. Keep your email available for a reply.');
+      toast('Your inquiry has been saved.', { type: 'success' });
     });
   }
 
@@ -1762,15 +2018,75 @@
     updateInertStates();
   }
 
+
+  function updateTextCounters() {
+    findAll('textarea[maxlength]').forEach((input) => {
+      const id = `${input.id}-count`;
+      let counter = document.getElementById(id);
+      if (!counter) {
+        counter = createElement('span', { id, class: 'character-count' });
+        input.after(counter);
+        const descriptions = new Set((input.getAttribute('aria-describedby') || '').split(' ').filter(Boolean));
+        descriptions.add(id);
+        input.setAttribute('aria-describedby', [...descriptions].join(' '));
+        input.addEventListener('input', () => { counter.textContent = `${input.value.length} / ${input.maxLength} characters`; });
+      }
+      counter.textContent = `${input.value.length} / ${input.maxLength} characters`;
+    });
+  }
+
+  function bindPortalControls() {
+    updateTextCounters();
+    find('#mobile-action').addEventListener('click', () => {
+      if (state.user && ['organizer', 'admin'].includes(state.user.role)) openEventForm();
+      else navigateTo('#/events');
+    });
+    document.addEventListener('click', (event) => {
+      if (event.target.closest('[data-open-privacy]')) find('#privacy-dialog').showModal();
+    });
+    findAll('input, textarea, select').forEach((input) => input.addEventListener('input', () => {
+      if (input.getAttribute('aria-invalid') === 'true') clearFieldError(input);
+    }));
+  }
+
+  async function loadInquiries() {
+    const host = clear(find('#inquiries-list'));
+    host.append(createElement('p', { text: 'Loading support inquiries…' }));
+    const response = await api('get_inquiries');
+    clear(host);
+    if (!response.ok) return host.append(alertBox('error', response.message, response.tip));
+    if (!response.data.length) return host.append(emptyState('No support inquiries yet', 'Submitted contact messages will appear here.'));
+    response.data.forEach((inquiry) => host.append(createElement('article', { class: 'card form-card stack' },
+      createElement('h3', { class: 'h4', text: inquiry.topic }),
+      createElement('p', { class: 'muted', text: `${inquiry.name} · ${inquiry.email} · ${inquiry.created_at}` }),
+      createElement('p', { class: 'event-description', text: inquiry.message }),
+      inquiry.status === 'new' ? createElement('button', { type: 'button', class: 'button button-outline', onclick: async () => {
+        const result = await api('resolve_inquiry', { body: { id: inquiry.id } });
+        if (!result.ok) return toast(result.message, { type: 'error' });
+        toast('Inquiry marked as resolved.', { type: 'success' });
+        loadInquiries();
+      } }, 'Mark Resolved') : createElement('span', { class: 'badge badge-green', text: 'Resolved' }))));
+  }
+
   /* ---------- Global Nav & Routing ---------- */
   function bindGlobal() {
     document.addEventListener('click', (browserEvent) => {
       const close = browserEvent.target.closest('[data-close]');
-      if (close) close.closest('dialog').close();
+      if (close && (state.user || close.closest('dialog').id !== 'dlg-auth')) close.closest('dialog').close();
       const auth = browserEvent.target.closest('[data-open-auth]');
       if (auth) {
         closeMobileMenu();
         openAuth(auth.dataset.openAuth);
+        return;
+      }
+      const routeAnchor = browserEvent.target.closest('a[href^="#/"]');
+      if (routeAnchor) {
+        const targetHash = routeAnchor.getAttribute('href');
+        const targetName = (targetHash.replace(/^#\/?/, '') || 'home').split('?')[0];
+        if (LANDING_ROUTES.includes(targetName) && location.hash === targetHash) {
+          browserEvent.preventDefault();
+          route();
+        }
       }
     });
     ['#event-dialog', '#attendees-dialog'].forEach((selector) => find(selector).addEventListener('click', (browserEvent) => { if (browserEvent.target === browserEvent.currentTarget) browserEvent.currentTarget.close(); }));
@@ -1778,6 +2094,13 @@
 
   let firstRoute = true;
   function route() {
+    if (!state.user) {
+      findAll('.view').forEach((view) => { view.hidden = true; });
+      document.title = 'Sign In | Iligan Community Event Portal';
+      closeMobileMenu();
+      if (!find('#dlg-auth').open) openAuth('login');
+      return;
+    }
     const name = (location.hash.replace(/^#\/?/, '') || 'home').split('?')[0];
     const page = ROUTES[name];
     if (!page) { location.replace('#/home'); return; }
@@ -1786,20 +2109,41 @@
       state.user ? toast('You do not have permission to view that section.', { type: 'error' }) : openAuth('login', 'Please sign in to access that portal section.');
       return;
     }
-    findAll('.view').forEach((view) => { view.hidden = view.id !== `view-${name}`; });
-    findAll('[data-route]').forEach((link) => {
-      const isActive = link.dataset.route === name;
-      link.classList.toggle('cs-active', isActive);
-      isActive ? link.setAttribute('aria-current', 'page') : link.removeAttribute('aria-current');
+    const isLandingRoute = LANDING_ROUTES.includes(name);
+    findAll('.view').forEach((view) => {
+      if (isLandingRoute) {
+        view.hidden = !view.hasAttribute('data-landing-section');
+      } else {
+        view.hidden = view.id !== `view-${name}`;
+      }
     });
-    const portalButton = find('#cs-portal-dropdown-btn');
-    if (portalButton) {
-      const isPortalRoute = ['citizen', 'bookings', 'dashboard', 'admin'].includes(name);
-      portalButton.classList.toggle('cs-active', isPortalRoute);
-    }
+    setActiveNavRoute(name);
     closeMobileMenu();
-    document.title = `${page.title} | Iligan Community Event Portal`;
-    if (!firstRoute) { window.scrollTo(0, 0); find('#main').focus({ preventScroll: true }); }
+    find('#mobile-action').textContent = state.user && ['organizer', 'admin'].includes(state.user.role) ? 'Add Event' : 'Discover Events';
+    find('#account-menu').hidePopover();
+    if (name === 'guide') {
+      const topic = new URLSearchParams(location.hash.split('?')[1] || '').get('topic') || 'booking';
+      findAll('[data-help-topic]').forEach((link) => {
+        const active = link.dataset.helpTopic === topic;
+        active ? link.setAttribute('aria-current', 'location') : link.removeAttribute('aria-current');
+      });
+      if (location.hash.includes('?') && ['booking', 'accounts', 'events', 'privacy'].includes(topic)) requestAnimationFrame(() => find(`#guide-${topic}`).scrollIntoView({ block: 'start' }));
+    }
+    if (isLandingRoute) {
+      lockScrollspy(900);
+      const scrollBehavior = firstRoute ? 'instant' : 'smooth';
+      if (name === 'home') {
+        window.scrollTo({ top: 0, left: 0, behavior: scrollBehavior });
+      } else {
+        requestAnimationFrame(() => {
+          find(`#view-${name}`)?.scrollIntoView({ behavior: scrollBehavior, block: 'start' });
+        });
+      }
+      if (!firstRoute) find('#main').focus({ preventScroll: true });
+    } else if (!firstRoute) {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      find('#main').focus({ preventScroll: true });
+    }
     firstRoute = false;
     if (name === 'bookings') loadBookings();
     if (name === 'citizen') loadCitizenDashboard();
@@ -1809,19 +2153,16 @@
 
   /* ---------- App Initialization ---------- */
   async function startApp() {
-    loadUser();
-    if (state.user) {
-      const response = await api('get_profile');
-      if (response.ok) setUser(response.data);
-      else if (response.status === 401) setUser(null);
-    }
-    updateAccountDisplay();
     initCsNavigation();
     initHeroCarousel();
-    bindGlobal(); bindAuth(); bindProfile(); bindFilters(); bindEventForm(); bindAdmin(); bindContact();
+    initHomeScrollspy();
+    bindGlobal(); bindAuth(); bindProfile(); bindFilters(); bindEventForm(); bindAdmin(); bindContact(); bindPortalControls();
     find('#coordinator-filter').addEventListener('change', renderCoordinatorDashboard);
     window.addEventListener('hashchange', route);
+    const response = await api('get_profile');
+    setUser(response.ok ? response.data : null);
     route();
+    if (!state.user) return;
     await Promise.all([loadSettings(), loadEvents()]);
     if (location.hash.includes('admin')) renderAdminLists();
   }

@@ -51,12 +51,16 @@ CREATE TABLE IF NOT EXISTS `bookings` (
         REFERENCES `events` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO `users` (`name`, `email`, `phone`, `role`) VALUES
-('Mohammad Saumay', 'amina.alonto@gmail.com', '09171234567', 'user'),
-('Juan dela Cruz', 'juan.delacruz@yahoo.com', '09189876543', 'user'),
-('Iligan City Tourism Office', 'tourism@iligancity.gov.ph', '09223344556', 'organizer'),
-('LGU Community Affairs', 'affairs@iligancity.gov.ph', '09334455667', 'organizer')
-ON DUPLICATE KEY UPDATE `name` = VALUES(`name`);
+INSERT INTO `users` (`name`, `email`, `phone`, `role`, `password`) VALUES
+('Mohammad Saumay', 'amina.alonto@gmail.com', '09171234567', 'user', 'password123'),
+('Juan dela Cruz', 'juan.delacruz@yahoo.com', '09189876543', 'user', 'password123'),
+('Iligan City Tourism Office', 'tourism@iligancity.gov.ph', '09223344556', 'organizer', 'password123'),
+('City Health & Community Affairs', 'affairs@iligancity.gov.ph', '09334455667', 'organizer', 'password123'),
+('Iligan Youth & Sports Development', 'sports@iligancity.gov.ph', '09445566778', 'organizer', 'password123'),
+('Iligan Eco-Tourism & Nature Council', 'ecotourism@iligancity.gov.ph', '09556677889', 'organizer', 'password123'),
+('Iligan Arts & Culture Guild', 'arts.guild@iligancity.gov.ph', '09667788990', 'organizer', 'password123'),
+('Santiago Bay Tourism Association', 'santiago.tourism@iligancity.gov.ph', '09778899001', 'organizer', 'password123')
+ON DUPLICATE KEY UPDATE `name` = VALUES(`name`), `role` = VALUES(`role`), `password` = VALUES(`password`);
 
 INSERT INTO `events` 
 (`id`, `title`, `description`, `image_url`, `category`, `barangay`, `venue_name`, `event_date`, `event_time`, `price`, `total_slots`, `available_slots`, `organizer_name`, `status`) 
@@ -68,7 +72,7 @@ VALUES
  'Festival', 
  'Poblacion', 
  'Quezon Avenue to Anahaw Amphitheater, Buhanginan Hills', 
- '2026-10-15', 
+ '2026-11-12', 
  '07:30:00', 
  0.00, 
  1500, 
@@ -83,7 +87,7 @@ VALUES
  'Eco-Tourism', 
  'Maria Cristina', 
  'NPC Nature Park Grounds', 
- '2026-10-18', 
+ '2026-11-15', 
  '06:30:00', 
  120.00, 
  100, 
@@ -98,7 +102,7 @@ VALUES
  'LGU Public Service', 
  'Tubod', 
  'Barangay Tubod Multi-Purpose Gymnasium', 
- '2026-10-22', 
+ '2026-11-18', 
  '08:30:00', 
  0.00, 
  250, 
@@ -113,7 +117,7 @@ VALUES
  'Sports', 
  'Buru-un', 
  'Timoga Spring Resort Complex', 
- '2026-10-25', 
+ '2026-11-23', 
  '09:00:00', 
  75.00, 
  150, 
@@ -188,7 +192,7 @@ VALUES
  'Festival', 
  'Poblacion', 
  'St. Michael the Archangel Cathedral, Quezon Avenue', 
- '2026-10-10', 
+ '2026-11-08', 
  '07:30:00', 
  0.00, 
  1200, 
@@ -203,7 +207,7 @@ VALUES
  'Arts & Culture', 
  'Pala-o', 
  'Anahaw Amphitheater, Buhanginan Hills', 
- '2026-10-24', 
+ '2026-11-20', 
  '18:30:00', 
  150.00, 
  450, 
@@ -218,7 +222,7 @@ VALUES
  'Arts & Culture', 
  'Santiago', 
  'Paseo de Santiago Seaside Amphitheater', 
- '2026-10-28', 
+ '2026-11-26', 
  '19:00:00', 
  100.00, 
  350, 
@@ -233,7 +237,7 @@ VALUES
  'Arts & Culture', 
  'Tibanga', 
  'MSU-IIT Gymnasium, Tibanga, Iligan City', 
- '2026-10-17', 
+ '2026-11-14', 
  '19:00:00', 
  50.00, 
  850, 
@@ -248,7 +252,7 @@ VALUES
  'Festival', 
  'Pala-o', 
  'Anahaw Amphitheater, Buhanginan Hills', 
- '2026-10-09', 
+ '2026-11-07', 
  '16:00:00', 
  0.00, 
  1800, 
@@ -263,7 +267,7 @@ VALUES
  'Festival', 
  'Poblacion', 
  'City Public Plaza to Anahaw Amphitheater, Poblacion', 
- '2026-10-14', 
+ '2026-11-11', 
  '07:00:00', 
  0.00, 
  900, 
@@ -293,7 +297,7 @@ VALUES
  'Sports', 
  'Poblacion', 
  'Iligan City Sports Complex Grounds & City Plaza', 
- '2026-10-11', 
+ '2026-11-09', 
  '07:00:00', 
  0.00, 
  600, 
@@ -308,7 +312,7 @@ VALUES
  'Festival', 
  'Pala-o', 
  'Anahaw Amphitheater, Buhanginan Hills', 
- '2026-10-19', 
+ '2026-11-16', 
  '15:00:00', 
  0.00, 
  1200, 
@@ -347,3 +351,93 @@ INSERT INTO `site_settings` (`setting_key`, `setting_value`) VALUES
 ('hero_title', 'Experience the Heart & Spirit of Iligan City'),
 ('hero_subtitle', 'Your official, interactive community gateway to cultural celebrations, eco-adventures at world-renowned waterfalls, youth sports galas, and free public health services across Iligan.')
 ON DUPLICATE KEY UPDATE `setting_value` = VALUES(`setting_value`);
+
+USE iligan_events_db;
+CREATE TABLE IF NOT EXISTS inquiries (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(150) NOT NULL,
+    topic VARCHAR(100) NOT NULL,
+    barangay VARCHAR(100) NOT NULL DEFAULT '',
+    message TEXT NOT NULL,
+    status ENUM('new', 'resolved') NOT NULL DEFAULT 'new',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Complete the location and search-tag tables on existing installations.
+-- Source: https://psa.gov.ph/classification/psgc/barangays/1030900000
+-- Pala-o is the portal display spelling of PSA Palao.
+USE iligan_events_db;
+CREATE TABLE IF NOT EXISTS barangays (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(100) NOT NULL UNIQUE) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE IF NOT EXISTS hero_tags (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(100) NOT NULL UNIQUE) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+INSERT IGNORE INTO barangays (name) VALUES
+('Abuno'),
+('Bonbonon'),
+('Bunawan'),
+('Buru-un'),
+('Dalipuga'),
+('Digkilaan'),
+('Hinaplanon'),
+('Kabacsanan'),
+('Kiwalan'),
+('Mahayahay'),
+('Mainit'),
+('Mandulog'),
+('Maria Cristina'),
+('Pala-o'),
+('Poblacion'),
+('Puga-an'),
+('Rogongon'),
+('Santa Elena'),
+('Santa Filomena'),
+('Suarez'),
+('Tambacan'),
+('Saray'),
+('Tipanoy'),
+('Tomas L. Cabili'),
+('Upper Tominobo'),
+('Tubod'),
+('Bagong Silang'),
+('Del Carmen'),
+('Dulag'),
+('San Miguel'),
+('Santiago'),
+('Santo Rosario'),
+('Tibanga'),
+('Acmac-Mariano Badelles Sr.'),
+('Ditucalan'),
+('Hindang'),
+('Kalilangan'),
+('Lanipao'),
+('Luinab'),
+('Panoroganan'),
+('San Roque'),
+('Ubaldo Laya'),
+('Upper Hinaplanon'),
+('Villa Verde');
+INSERT IGNORE INTO hero_tags (name) VALUES ('Poblacion'),('Tubod'),('Pala-o'),('Buru-un'),('Ditucalan'),('Maria Cristina');
+INSERT IGNORE INTO users (name,email,role,password) VALUES ('Portal Administrator','admin@iligancity.gov.ph','admin','password123');
+
+-- Assign events to their designated sector coordinators for open promotion and access protection
+UPDATE events SET coordinator_id=(SELECT id FROM users WHERE email='tourism@iligancity.gov.ph' LIMIT 1) WHERE id IN (1, 12, 13, 14, 21, 23, 27);
+UPDATE events SET coordinator_id=(SELECT id FROM users WHERE email='ecotourism@iligancity.gov.ph' LIMIT 1) WHERE id IN (2, 6, 8, 28, 106);
+UPDATE events SET coordinator_id=(SELECT id FROM users WHERE email='affairs@iligancity.gov.ph' LIMIT 1) WHERE id IN (3, 24);
+UPDATE events SET coordinator_id=(SELECT id FROM users WHERE email='sports@iligancity.gov.ph' LIMIT 1) WHERE id IN (4, 16);
+UPDATE events SET coordinator_id=(SELECT id FROM users WHERE email='arts.guild@iligancity.gov.ph' LIMIT 1) WHERE id IN (5, 10, 11, 15, 17, 25, 101, 102, 103, 105);
+UPDATE events SET coordinator_id=(SELECT id FROM users WHERE email='santiago.tourism@iligancity.gov.ph' LIMIT 1) WHERE id IN (7, 26, 104);
+UPDATE events SET coordinator_id=(SELECT id FROM users WHERE email='tourism@iligancity.gov.ph' LIMIT 1) WHERE coordinator_id IS NULL;
+
+-- Add separate classroom coordinator accounts and clearly marked sample listings.
+-- Existing accounts, passwords, listings, ownership, and bookings are preserved.
+USE iligan_events_db;
+START TRANSACTION;
+INSERT IGNORE INTO users (name,email,role,password) VALUES ('Pala-o Community Events','palao.coordinator@example.test','organizer','$2y$10$uhtdUhhwjRlqrd6QFRL.iuVfC/r7nxSJrFzcAuatvm2wx9qdv086W');
+INSERT INTO events (title,description,image_url,category,barangay,venue_name,event_date,event_time,price,total_slots,available_slots,organizer_name,coordinator_id,is_featured,status)
+SELECT 'Pala-o Community Makers Day','Sample event for the student portal, published by Pala-o Community Events. This demonstration listing is not an official event announcement.','images/anahaw_amphitheater.webp','Community','Pala-o','Pala-o community activity area','2026-11-21','09:00:00',0,80,80,u.name,u.id,0,'active' FROM users u WHERE u.email='palao.coordinator@example.test' AND u.role='organizer' AND NOT EXISTS (SELECT 1 FROM events e WHERE e.coordinator_id=u.id AND e.title='Pala-o Community Makers Day');
+INSERT IGNORE INTO users (name,email,role,password) VALUES ('Buru-un Eco Activities','buruun.coordinator@example.test','organizer','$2y$10$uhtdUhhwjRlqrd6QFRL.iuVfC/r7nxSJrFzcAuatvm2wx9qdv086W');
+INSERT INTO events (title,description,image_url,category,barangay,venue_name,event_date,event_time,price,total_slots,available_slots,organizer_name,coordinator_id,is_featured,status)
+SELECT 'Buru-un Community Nature Gathering','Sample event for the student portal, published by Buru-un Eco Activities. This demonstration listing is not an official event announcement.','images/anahaw_amphitheater.webp','Eco-Tourism','Buru-un','Buru-un community meeting area','2026-11-22','07:00:00',0,60,60,u.name,u.id,0,'active' FROM users u WHERE u.email='buruun.coordinator@example.test' AND u.role='organizer' AND NOT EXISTS (SELECT 1 FROM events e WHERE e.coordinator_id=u.id AND e.title='Buru-un Community Nature Gathering');
+INSERT IGNORE INTO users (name,email,role,password) VALUES ('Iligan Arts Collective','arts.coordinator@example.test','organizer','$2y$10$uhtdUhhwjRlqrd6QFRL.iuVfC/r7nxSJrFzcAuatvm2wx9qdv086W');
+INSERT INTO events (title,description,image_url,category,barangay,venue_name,event_date,event_time,price,total_slots,available_slots,organizer_name,coordinator_id,is_featured,status)
+SELECT 'Iligan Community Arts Showcase','Sample event for the student portal, published by Iligan Arts Collective. This demonstration listing is not an official event announcement.','images/harana_sessions.webp','Arts & Culture','Poblacion','Poblacion community activity area','2026-11-28','15:00:00',0,100,100,u.name,u.id,0,'active' FROM users u WHERE u.email='arts.coordinator@example.test' AND u.role='organizer' AND NOT EXISTS (SELECT 1 FROM events e WHERE e.coordinator_id=u.id AND e.title='Iligan Community Arts Showcase');
+COMMIT;

@@ -1,16 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Iligan Community Event Portal | Discover and Book Local Events</title>
-  <meta name="description" content="Discover community events across Iligan City, book your pass online, and let coordinators publish events for every barangay.">
+  <meta name="description"
+    content="Discover community events across Iligan City, book your pass online, and let coordinators publish events for every barangay.">
   <meta name="theme-color" content="#1E3A8A">
   <link rel="icon" href="images/iligan_city_seal_circle.webp" type="image/webp">
-  <link rel="stylesheet" href="styles.css?v=20261029-spacing">
-  <script src="app.js?v=20261029-spacing" defer></script>
+  <link rel="preload" href="fonts/inter.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="preload" href="fonts/roboto.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="stylesheet" href="styles.css?v=20261029-test-login-compact">
+  <script src="vendor/qrcode.js" defer></script>
+  <script src="app.js?v=20261029-test-login-compact" defer></script>
 </head>
-<body>
+
+<body class="login-required">
+  <div id="login-status" class="login-status" role="status">Checking your session…<noscript>Enable JavaScript to sign in
+      to the portal.</noscript></div>
   <a class="skip-link" href="#main">Skip to main content</a>
 
   <!-- ============================================ -->
@@ -20,7 +28,8 @@
     <div class="cs-container">
       <!-- Nav Logo -->
       <a href="#/home" class="cs-logo" aria-label="Iligan Community Event Portal, back to home">
-        <img class="cs-logo-img" src="images/iligan_city_seal_circle.webp" alt="Iligan City Official Seal" width="44" height="44" decoding="async">
+        <img class="cs-logo-img" src="images/iligan_city_seal_circle.webp" alt="Iligan City Official Seal" width="44"
+          height="44" decoding="async">
         <span class="brand-text">
           <span class="brand-title">Iligan City</span>
           <span class="brand-subtitle">Community Event Portal</span>
@@ -30,7 +39,8 @@
       <!-- Navigation List -->
       <nav class="cs-nav" aria-label=" main navigation">
         <!-- Mobile Nav Toggle -->
-        <button type="button" class="cs-toggle" id="cs-toggle" aria-expanded="false" aria-controls="cs-ul-wrapper" aria-label="mobile menu toggle">
+        <button type="button" class="cs-toggle" id="cs-toggle" aria-expanded="false" aria-controls="cs-ul-wrapper"
+          aria-label="mobile menu toggle">
           <span class="cs-box" aria-hidden="true">
             <span class="cs-line cs-line1" aria-hidden="true"></span>
             <span class="cs-line cs-line2" aria-hidden="true"></span>
@@ -64,16 +74,21 @@
 
             <!-- Role-Based Dropdown (Visible when signed in) -->
             <li class="cs-li cs-dropdown" data-role="user organizer admin" hidden>
-              <button type="button" class="cs-li-link cs-dropdown-toggle" id="cs-portal-dropdown-btn" aria-haspopup="menu" aria-expanded="false">
+              <button type="button" class="cs-li-link cs-dropdown-toggle" id="cs-portal-dropdown-btn"
+                aria-haspopup="menu" aria-expanded="false">
                 My Portal
-                <svg class="cs-drop-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><polyline points="6 9 12 15 18 9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <svg class="cs-drop-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                  <polyline points="6 9 12 15 18 9" fill="none" stroke="currentColor" stroke-width="2.2"
+                    stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
               </button>
               <ul class="cs-drop-ul" aria-labelledby="cs-portal-dropdown-btn">
                 <li class="cs-drop-li" data-role="user" hidden>
                   <a href="#/citizen" class="cs-li-link cs-drop-link" data-route="citizen">Citizen Dashboard</a>
                 </li>
                 <li class="cs-drop-li" data-role="user organizer admin">
-                  <a href="#/bookings" class="cs-li-link cs-drop-link" data-route="bookings">My Bookings &amp; Passes</a>
+                  <a href="#/bookings" class="cs-li-link cs-drop-link" data-route="bookings">My Bookings &amp;
+                    Passes</a>
                 </li>
                 <li class="cs-drop-li" data-role="organizer" hidden>
                   <a href="#/dashboard" class="cs-li-link cs-drop-link" data-route="dashboard">Coordinator Dashboard</a>
@@ -91,37 +106,68 @@
             <button type="button" class="cs-button-solid" data-open-auth="register">Create Account</button>
           </div>
           <div class="cs-nav-actions" id="account-navigation" hidden>
-            <button type="button" class="user-chip" id="open-profile" aria-haspopup="dialog">
-              <span class="avatar" id="user-avatar" aria-hidden="true">U</span>
+            <button type="button" class="user-chip" id="account-menu-button" popovertarget="account-menu"
+              aria-label="Open account menu">
+
               <span class="user-meta">
                 <span class="user-name" id="user-name">User</span>
                 <span class="role-badge" id="user-role">Citizen</span>
               </span>
+              <svg class="icon account-chevron" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m6 9 6 6 6-6" />
+              </svg>
             </button>
-            <button type="button" class="button button-plain cs-btn-logout" id="sign-out-button">Sign Out</button>
           </div>
         </div>
       </nav>
     </div>
   </header>
 
+  <div id="account-menu" class="account-menu" popover aria-label="Your account">
+    <div class="account-menu-header">
+      <span class="avatar account-menu-avatar" id="menu-avatar" aria-hidden="true">U</span>
+      <div class="account-menu-details">
+        <h2 id="menu-name">User</h2>
+        <p id="menu-email"></p><span class="account-menu-role" id="menu-role">Citizen</span>
+      </div>
+    </div>
+    <div class="account-menu-actions">
+      <button type="button" class="account-menu-action" id="open-profile" aria-haspopup="dialog"><span
+          class="account-action-icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="8" r="4" />
+            <path d="M4 21v-2a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v2" />
+          </svg></span><span>Account Settings</span><span aria-hidden="true">›</span></button>
+      <button type="button" class="account-menu-action account-sign-out" id="sign-out-button"><span
+          class="account-action-icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M9 4H4v16h5M10 12h11m-4-4 4 4-4 4" />
+          </svg></span><span>Sign Out</span><span aria-hidden="true">›</span></button>
+    </div>
+  </div>
+
   <main id="main" tabindex="-1">
 
     <!-- ===== View: Home ===== -->
-    <section class="view" id="view-home" aria-labelledby="home-heading">
-      
+    <section class="view landing-scrollspy-section" id="view-home" data-landing-section="home"
+      aria-labelledby="home-heading">
+      <h1 class="visually-hidden" id="home-heading">Iligan City Community Events</h1>
+
       <!-- Top Carousel Section -->
-      <section class="hero-carousel" id="hero-carousel" aria-roledescription="carousel" aria-label="Featured Community Highlights">
+      <section class="hero-carousel" id="hero-carousel" aria-roledescription="carousel"
+        aria-label="Featured Community Highlights">
         <div class="carousel-track" id="carousel-track">
           <!-- Slides populated dynamically via app.js -->
         </div>
 
         <!-- Carousel navigation arrows -->
         <button type="button" class="carousel-arrow prev" id="carousel-previous" aria-label="Previous slide">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
         </button>
         <button type="button" class="carousel-arrow next" id="carousel-next" aria-label="Next slide">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
         </button>
 
         <!-- Carousel footer with dots and animated progress bar -->
@@ -133,172 +179,262 @@
         </div>
       </section>
 
-      <!-- Floating Search & Quick Filter Dock -->
-      <div class="search-dock-wrap">
-        <div class="container">
-          <div class="search-dock card">
-            <div class="search-dock-header">
-              <h1 id="home-heading" class="search-dock-title">Find what's happening across Iligan City</h1>
-              <p class="search-dock-description" id="hero-subtitle">Browse cultural festivals, eco-tourism caravans, and barangay activities, then reserve your passes in minutes.</p>
-            </div>
-            <form class="hero-search" id="hero-search" role="search">
-              <div class="search-input-wrapper">
-                <label class="visually-hidden" for="search-input">Search events</label>
-                <svg class="icon search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-                <input type="search" id="search-input" placeholder="Search by event title, venue, or barangay..." autocomplete="off">
-              </div>
-              <button type="submit" class="button button-secondary search-button">
-                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-                <span>Search Events</span>
-              </button>
-            </form>
-            <div class="hero-tags" id="hero-tags" aria-label="Popular barangays"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="container section">
-        <!-- Featured Events Highlights -->
-        <div id="featured-section" hidden>
-          <div class="section-head">
-            <div class="section-head-title">
-              <span class="eyebrow-accent">Handpicked For You</span>
-              <h2 class="h2">Featured Community Events</h2>
-            </div>
-            <a href="#/events" class="button button-outline button-small">Explore All Events &rarr;</a>
-          </div>
-          <div class="grid cards" id="featured-grid"></div>
-        </div>
-
-        <!-- Civic Portal Highlights Section -->
+      <div class="container section" id="home-civic-highlights" data-scrollspy-section="home-civic-highlights">
+        <!-- Civic Portal Highlights Section (Editorial Split Showcase) -->
         <div class="home-pillars">
-          <div class="section-head">
-            <div class="section-head-title">
+          <div class="editorial-showcase">
+            <div class="editorial-lead">
               <span class="eyebrow-accent">City of Majestic Waterfalls</span>
-              <h2 class="h2">One Portal for Every Barangay in Iligan</h2>
+              <h2 class="h2 editorial-heading">One Portal for Every Barangay in Iligan</h2>
+              <p class="editorial-intro muted">Connecting all 44 barangays, accredited sector coordinators, and citizens
+                through a single transparent civic calendar.</p>
+              <figure class="editorial-visual-frame">
+                <img src="images/login-waterfall.jpg" alt="Majestic waterfall in Iligan City surrounded by lush forest"
+                  width="640" height="400" loading="lazy" decoding="async" class="editorial-visual-img">
+                <figcaption class="editorial-stats-bar" aria-label="Portal civic coverage statistics">
+                  <div class="editorial-stat">
+                    <strong class="editorial-stat-num">44</strong>
+                    <span class="editorial-stat-label">Barangays</span>
+                  </div>
+                  <div class="editorial-stat">
+                    <strong class="editorial-stat-num">100%</strong>
+                    <span class="editorial-stat-label">Verified Host</span>
+                  </div>
+                  <div class="editorial-stat">
+                    <strong class="editorial-stat-num">Instant</strong>
+                    <span class="editorial-stat-label">QR Passes</span>
+                  </div>
+                </figcaption>
+              </figure>
             </div>
-          </div>
-          <div class="grid home-pillar-grid">
-            <article class="card home-pillar-card">
-              <div class="pillar-icon-wrap">
-                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-              </div>
-              <h3 class="h3">Verified City &amp; Barangay Events</h3>
-              <p class="muted">From the vibrant Diyandi Festival street dances in Poblacion to eco-runs near Maria Cristina Falls, every listing is verified by official coordinators.</p>
-              <a href="#/events" class="pillar-link">Browse Event Calendar &rarr;</a>
-            </article>
-            <article class="card home-pillar-card">
-              <div class="pillar-icon-wrap">
-                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2M13 17v2M13 11v2"/></svg>
-              </div>
-              <h3 class="h3">Instant Digital QR Passes</h3>
-              <p class="muted">Reserve free or paid seats in seconds. Receive an instant booking reference and scannable digital pass ready for venue check-in.</p>
-              <a href="#/about" class="pillar-link">Learn How It Works &rarr;</a>
-            </article>
-            <article class="card home-pillar-card">
-              <div class="pillar-icon-wrap">
-                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-              </div>
-              <h3 class="h3">LGU &amp; Coordinator Tools</h3>
-              <p class="muted">Barangay captains, tourism officers, and accredited organizers can publish events, monitor real-time seat capacity, and manage attendee rosters.</p>
-              <a href="#/contact" class="pillar-link">Partner With Us &rarr;</a>
-            </article>
+
+            <div class="editorial-list" role="list">
+              <article class="editorial-item" role="listitem">
+                <div class="pillar-icon-wrap" aria-hidden="true">
+                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="3" y="4" width="18" height="18" rx="2" />
+                    <path d="M16 2v4M8 2v4M3 10h18" />
+                  </svg>
+                </div>
+                <div class="editorial-body">
+                  <div class="editorial-item-head">
+                    <span class="editorial-number" aria-hidden="true">01</span>
+                    <h3 class="h3">Verified City &amp; Barangay Events</h3>
+                  </div>
+                  <p class="muted">From the vibrant Diyandi Festival street dances in Poblacion to eco-runs near Maria
+                    Cristina Falls, every listing is verified by official coordinators.</p>
+                  <a href="#/events" class="pillar-link">Browse Event Calendar &rarr;</a>
+                </div>
+              </article>
+
+              <article class="editorial-item" role="listitem">
+                <div class="pillar-icon-wrap" aria-hidden="true">
+                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                      d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z" />
+                    <path d="M13 5v2M13 17v2M13 11v2" />
+                  </svg>
+                </div>
+                <div class="editorial-body">
+                  <div class="editorial-item-head">
+                    <span class="editorial-number" aria-hidden="true">02</span>
+                    <h3 class="h3">Instant Digital QR Passes</h3>
+                  </div>
+                  <p class="muted">Reserve free or paid seats in seconds. Receive an instant booking reference and
+                    scannable digital pass ready for venue check-in.</p>
+                  <a href="#/about" class="pillar-link">Learn How It Works &rarr;</a>
+                </div>
+              </article>
+
+              <article class="editorial-item" role="listitem">
+                <div class="pillar-icon-wrap" aria-hidden="true">
+                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  </svg>
+                </div>
+                <div class="editorial-body">
+                  <div class="editorial-item-head">
+                    <span class="editorial-number" aria-hidden="true">03</span>
+                    <h3 class="h3">LGU &amp; Coordinator Tools</h3>
+                  </div>
+                  <p class="muted">Barangay captains, tourism officers, and accredited organizers can publish events,
+                    monitor real-time seat capacity, and manage attendee rosters.</p>
+                  <a href="#/contact" class="pillar-link">Partner With Us &rarr;</a>
+                </div>
+              </article>
+            </div>
           </div>
         </div>
       </div>
+
+      <!-- ===== Why This Portal Matters (Dark Contrast Section) ===== -->
+      <section class="why-matters-section" id="home-why-matters" data-scrollspy-section="home-why-matters"
+        aria-labelledby="why-matters-heading">
+        <div class="container why-matters-grid">
+          <div class="why-matters-lead">
+            <span class="line-eyebrow line-eyebrow-light">Why This Portal Matters</span>
+            <h2 id="why-matters-heading" class="why-matters-title">Verified city events fill up fast — reserve your pass
+              first.</h2>
+            <p class="why-matters-description">Popular concerts at Anahaw Amphitheater, free LGU medical missions, and
+              limited-slot waterfall treks used to be scattered across flyers and social feeds. The Iligan Portal puts
+              every verified listing and live seat counter in one place so you never miss out.</p>
+            <a href="#/events" class="why-matters-cta">Reserve your pass <span aria-hidden="true">&rarr;</span></a>
+          </div>
+
+          <div class="why-matters-bars" role="list"
+            aria-label="Comparison of ways to find and reserve Iligan City events">
+            <div class="why-bar-card is-highlighted" role="listitem">
+              <div class="why-bar-header">
+                <span class="why-bar-label"><span class="why-dot is-active" aria-hidden="true"></span>You, with Iligan
+                  Event Portal</span>
+                <span class="why-bar-time is-active">Minutes after it posts</span>
+              </div>
+              <div class="why-bar-track" aria-hidden="true">
+                <div class="why-bar-fill is-active" style="width: 92%;"></div>
+              </div>
+            </div>
+
+            <div class="why-bar-card" role="listitem">
+              <div class="why-bar-header">
+                <span class="why-bar-label"><span class="why-dot" aria-hidden="true"></span>Checking scattered social
+                  pages</span>
+                <span class="why-bar-time">Days later, once slots are low</span>
+              </div>
+              <div class="why-bar-track" aria-hidden="true">
+                <div class="why-bar-fill" style="width: 34%;"></div>
+              </div>
+            </div>
+
+            <div class="why-bar-card" role="listitem">
+              <div class="why-bar-header">
+                <span class="why-bar-label"><span class="why-dot" aria-hidden="true"></span>“I’ll just walk in this
+                  weekend”</span>
+                <span class="why-bar-time">Often after registration closes</span>
+              </div>
+              <div class="why-bar-track" aria-hidden="true">
+                <div class="why-bar-fill" style="width: 12%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </section>
 
     <!-- ===== View: Discover events ===== -->
-    <section class="view" id="view-events" aria-labelledby="events-heading" hidden>
-      <div class="page-banner">
-        <div class="container">
-          <span class="eyebrow-accent">Community Calendar</span>
-          <h1 id="events-heading" class="h1">Discover Events Across Iligan City</h1>
-          <p class="page-banner-description">Filter by barangay, category, date, or admission type to find upcoming gatherings and reserve your pass.</p>
-          <form class="discover-search-bar" id="discover-search-form" role="search">
-            <div class="search-input-wrapper">
-              <label class="visually-hidden" for="discover-search-input">Search events</label>
-              <svg class="icon search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-              <input type="search" id="discover-search-input" placeholder="Search by event title, venue, organizer, or barangay..." autocomplete="off">
-            </div>
-            <button type="submit" class="button button-secondary">
-              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-              <span>Search</span>
-            </button>
-          </form>
-        </div>
-      </div>
-
-      <div class="container section">
-        <!-- All Upcoming Events Section -->
-        <div class="section-head" id="events-results-heading">
-          <div class="section-head-title">
-            <span class="eyebrow-accent">Live Directory</span>
-            <h2 class="h2">All Upcoming Events</h2>
+    <section class="view landing-scrollspy-section" id="view-events" data-landing-section="events"
+      aria-labelledby="events-heading">
+      <div class="container section discover-events-shell">
+        <!-- Discover Section Header -->
+        <div class="discover-header">
+          <div class="discover-header-copy">
+            <span class="line-eyebrow">Live Community Directory</span>
+            <h1 id="events-heading" class="discover-main-title">Discover Events Across Iligan City</h1>
           </div>
           <p class="results-badge" id="results-count" aria-live="polite"></p>
         </div>
 
-        <!-- Filter Controls -->
-        <form class="filters card" id="filters" aria-label="Filter events">
-          <div class="field">
-            <label for="filter-barangay">Barangay</label>
-            <select id="filter-barangay"><option value="">All barangays</option></select>
-          </div>
-          <div class="field">
-            <label for="filter-price">Price</label>
-            <select id="filter-price">
-              <option value="">Any price</option>
-              <option value="free">Free events only</option>
-              <option value="paid">Paid events only</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="filter-date">Date from</label>
-            <input type="date" id="filter-date">
-          </div>
-          <div class="field">
-            <label for="filter-sort">Sort order</label>
-            <select id="filter-sort">
-              <option value="date">Date: Soonest first</option>
-              <option value="price-asc">Price: Low to high</option>
-              <option value="price-desc">Price: High to low</option>
-              <option value="slots">Available seats: Most first</option>
-            </select>
-          </div>
-          <label class="check filter-check">
-            <input type="checkbox" id="filter-past">
-            <span>Show concluded</span>
-          </label>
-          <button type="button" class="button button-plain" id="filter-reset">Reset</button>
-        </form>
+        <!-- Unified Discovery Command Bar (Filters + Category Pills) -->
+        <div class="discover-command-card">
+          <form class="filters discover-filters-grid" id="filters" aria-label="Filter events">
+            <div class="field discover-search-field">
+              <label for="discover-search-input">Search Keyword</label>
+              <input type="search" id="discover-search-input"
+                placeholder="Search title, venue, organizer, or barangay..." autocomplete="off">
+            </div>
+            <div class="field">
+              <label for="filter-barangay">Barangay</label>
+              <select id="filter-barangay">
+                <option value="">All barangays</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="filter-coordinator">Coordinator</label>
+              <select id="filter-coordinator">
+                <option value="">All coordinators</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="filter-price">Admission</label>
+              <select id="filter-price">
+                <option value="">Any price</option>
+                <option value="free">Free events only</option>
+                <option value="paid">Paid events only</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="filter-date">Date From</label>
+              <input type="date" id="filter-date">
+            </div>
+            <div class="field">
+              <label for="filter-sort">Sort By</label>
+              <select id="filter-sort">
+                <option value="date">Date: Soonest first</option>
+                <option value="price-asc">Price: Low to high</option>
+                <option value="price-desc">Price: High to low</option>
+                <option value="slots">Available seats: Most first</option>
+              </select>
+            </div>
 
-        <!-- Category Pills -->
-        <div class="chips-container">
-          <div class="chips" id="category-chips" role="group" aria-label="Filter by category"></div>
+            <div class="discover-toolbar-footer">
+              <div class="chips-container">
+                <div class="chips" id="category-chips" role="group" aria-label="Filter by category"></div>
+              </div>
+              <div class="discover-toolbar-actions">
+                <label class="check filter-check">
+                  <input type="checkbox" id="filter-past" role="switch" class="toggle-switch">
+                  <span>Show concluded</span>
+                </label>
+                <button type="button" class="button button-outline button-small" id="filter-reset">Reset Filters</button>
+              </div>
+            </div>
+          </form>
         </div>
 
         <div id="events-alert"></div>
-        
-        <!-- Events Grid -->
-        <div class="grid cards" id="events-grid" aria-live="polite"></div>
-        
-        <div class="center">
-          <button type="button" class="button button-outline btn-load-more" id="load-more" hidden>
-            <span>Load More Events</span>
-            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-          </button>
+
+        <!-- Featured Events Highlights (Handpicked For You - 3 Curated Cards) -->
+        <div id="featured-section" class="discover-featured-section" hidden>
+          <div class="discover-subhead">
+            <div class="section-head-title">
+              <span class="eyebrow-accent">Handpicked For You</span>
+              <h2 class="h2">Featured Community Events</h2>
+            </div>
+            <span class="discover-featured-pill">Curated Highlights</span>
+          </div>
+          <div class="grid cards" id="featured-grid"></div>
+        </div>
+
+        <!-- All Upcoming Events Directory -->
+        <div class="discover-directory-block">
+          <div class="discover-subhead" id="events-results-heading">
+            <div class="section-head-title">
+              <span class="eyebrow-accent">Complete Schedule</span>
+              <h2 class="h2" id="directory-heading-title">All Upcoming Events</h2>
+            </div>
+          </div>
+
+          <!-- Events Grid -->
+          <div class="grid cards" id="events-grid" aria-live="polite"></div>
+
+          <div class="center">
+            <button type="button" class="button button-outline btn-load-more" id="load-more" hidden>
+              <span>Load More Events</span>
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
     </section>
 
     <!-- ===== View: About Us ===== -->
-    <section class="view" id="view-about" aria-labelledby="about-heading" hidden>
+    <section class="view landing-scrollspy-section" id="view-about" data-landing-section="about"
+      aria-labelledby="about-heading">
       <div class="page-banner">
         <div class="container">
           <span class="eyebrow-accent">About the Portal</span>
           <h1 id="about-heading" class="h1">Connecting Iliganons Through Culture, Heritage &amp; Community</h1>
-          <p class="page-banner-description">The official digital gateway for discovering festivals, civic initiatives, eco-tourism adventures, and barangay gatherings across Iligan City.</p>
         </div>
       </div>
 
@@ -307,8 +443,13 @@
           <div class="about-introduction">
             <span class="eyebrow-accent">Our Civic Mission</span>
             <h2 class="h2">Empowering All 44 Barangays of the City of Majestic Waterfalls</h2>
-            <p>Iligan City is home to a rich tapestry of Maranao, Higaonon, and Visayan traditions—celebrated annually during the month-long <strong>Kasadya sa Diyandi Festival</strong> in honor of Senior San Miguel, alongside year-round eco-tourism runs, culinary expos, and barangay assemblies.</p>
-            <p>The <strong>Iligan Community Event Portal</strong> was built to bridge citizens, tourists, and local event coordinators in one accessible web platform. Whether you are reserving a free seat for a cultural night at Anahaw Amphitheater or organizing a coastal clean-up in Barangay Dalipuga, our platform streamlines discovery and attendance.</p>
+            <p>Iligan City is home to a rich tapestry of Maranao, Higaonon, and Visayan traditions—celebrated annually
+              during the month-long <strong>Kasadya sa Diyandi Festival</strong> in honor of Senior San Miguel,
+              alongside year-round eco-tourism runs, culinary expos, and barangay assemblies.</p>
+            <p>The <strong>Iligan Community Event Portal</strong> was built to bridge citizens, tourists, and local
+              event coordinators in one accessible web platform. Whether you are reserving a free seat for a cultural
+              night at Anahaw Amphitheater or organizing a coastal clean-up in Barangay Dalipuga, our platform
+              streamlines discovery and attendance.</p>
             <div class="about-stats-row">
               <div class="about-stat">
                 <span class="about-stat-number">44</span>
@@ -325,58 +466,86 @@
             </div>
           </div>
           <div class="about-media-grid">
-            <img src="images/diyandi_festival_panoramic_header.webp" alt="Kasadya sa Diyandi street dancers in Iligan City" class="about-image about-main-image" loading="lazy">
-            <img src="images/anahaw_amphitheater.webp" alt="Anahaw Amphitheater in Buhanginan Hills, Iligan City" class="about-image" loading="lazy">
-            <img src="images/diyandi_paramotor_show.webp" alt="Diyandi Paramotor & Aerial Display in Iligan City" class="about-image" loading="lazy">
+            <img src="images/diyandi_festival_panoramic_header.webp"
+              alt="Kasadya sa Diyandi street dancers in Iligan City" class="about-image about-main-image"
+              loading="lazy">
+            <img src="images/anahaw_amphitheater.webp" alt="Anahaw Amphitheater in Buhanginan Hills, Iligan City"
+              class="about-image" loading="lazy">
+            <img src="images/diyandi_paramotor_show.webp" alt="Diyandi Paramotor & Aerial Display in Iligan City"
+              class="about-image" loading="lazy">
           </div>
         </div>
 
-        <div class="about-how-section">
-          <div class="section-head">
-            <div class="section-head-title">
-              <span class="eyebrow-accent">Platform Guide</span>
-              <h2 class="h2">How the Portal Works</h2>
-            </div>
+        <div class="about-how-section how-works-section">
+          <div class="how-works-header">
+            <span class="line-eyebrow">How It Works</span>
+            <h2 class="how-works-title">Built for citizens, coordinators, and city administrators.</h2>
           </div>
-          <div class="grid home-pillar-grid">
-            <div class="card home-pillar-card">
-              <span class="step-badge">01</span>
-              <h3 class="h3">For Citizens &amp; Visitors</h3>
-              <p class="muted">Explore upcoming activities by barangay or category, view venue maps and schedules, and book individual or group passes with instant QR reference codes.</p>
-            </div>
-            <div class="card home-pillar-card">
-              <span class="step-badge">02</span>
-              <h3 class="h3">For Event Coordinators</h3>
-              <p class="muted">Register with an official LGU Coordinator Key to publish barangay or city events, manage seating capacity, and export verified attendee manifests.</p>
-            </div>
-            <div class="card home-pillar-card">
-              <span class="step-badge">03</span>
-              <h3 class="h3">For City Administrators</h3>
-              <p class="muted">Supervise citywide event calendars, curate featured homepage highlights, and maintain official barangay directories and popular search tags.</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="card about-cta-banner">
-          <div>
-            <h2 class="h2">Ready to experience Iligan's vibrant community life?</h2>
-            <p class="muted">Browse our live calendar of cultural festivals, workshops, and eco-adventures today.</p>
-          </div>
-          <div class="about-cta-actions">
-            <a href="#/events" class="button button-secondary">Discover Events</a>
-            <a href="#/contact" class="button button-outline">Contact Tourism Office</a>
+          <div class="how-works-grid" role="list">
+            <article class="how-step-card" role="listitem">
+              <span class="how-step-num" aria-hidden="true">01</span>
+              <h3 class="how-step-heading">For Citizens &amp; Visitors</h3>
+              <p class="how-step-text">Explore upcoming activities by barangay or category, view venue maps and
+                schedules, and book individual or group passes with instant QR reference codes.</p>
+              <div class="how-preview-box" aria-hidden="true">
+                <div class="how-check-row">
+                  <span class="how-check-icon">✓</span>
+                  <span>Browse 44 barangays</span>
+                </div>
+                <div class="how-check-row">
+                  <span class="how-check-icon">✓</span>
+                  <span>Instant QR pass download</span>
+                </div>
+                <div class="how-pill-row">
+                  <span class="how-pill is-solid">Citizen Pass</span>
+                  <span class="how-pill is-Ghost">Free &amp; Paid</span>
+                </div>
+              </div>
+            </article>
+            <article class="how-step-card" role="listitem">
+              <span class="how-step-num" aria-hidden="true">02</span>
+              <h3 class="how-step-heading">For Event Coordinators</h3>
+              <p class="how-step-text">Accredited sector and barangay coordinators publish official events, monitor
+                real-time seating capacity, and manage verified attendee rosters.</p>
+              <div class="how-preview-box how-feed-box" aria-hidden="true">
+                <div class="how-feed-item">
+                  <span class="how-feed-name"><strong>Tourism Office</strong> · Verified</span>
+                  <span class="how-feed-badge is-warm">Active</span>
+                </div>
+                <div class="how-feed-item">
+                  <span class="how-feed-name"><strong>Arts &amp; Culture Guild</strong> · Host</span>
+                  <span class="how-feed-badge">Protected</span>
+                </div>
+              </div>
+            </article>
+            <article class="how-step-card" role="listitem">
+              <span class="how-step-num" aria-hidden="true">03</span>
+              <h3 class="how-step-heading">For City Administrators</h3>
+              <p class="how-step-text">Supervise citywide event calendars, curate featured homepage highlights, and
+                maintain official barangay directories and citizen inquiries.</p>
+              <div class="how-preview-box how-apply-box" aria-hidden="true">
+                <div class="how-skeleton-lines">
+                  <span class="how-skel-line is-accent" style="width: 78%;"></span>
+                  <span class="how-skel-line" style="width: 60%;"></span>
+                </div>
+                <div class="how-apply-footer">
+                  <span class="how-ready-label">Featured on Home</span>
+                  <span class="how-apply-btn">Live</span>
+                </div>
+              </div>
+            </article>
           </div>
         </div>
       </div>
     </section>
 
     <!-- ===== View: Contact Us ===== -->
-    <section class="view" id="view-contact" aria-labelledby="contact-heading" hidden>
+    <section class="view landing-scrollspy-section" id="view-contact" data-landing-section="contact"
+      aria-labelledby="contact-heading">
       <div class="page-banner">
         <div class="container">
           <span class="eyebrow-accent">Get in Touch</span>
           <h1 id="contact-heading" class="h1">Contact the Iligan City Event &amp; Tourism Desk</h1>
-          <p class="page-banner-description">Have questions about an upcoming festival, need assistance with your digital pass, or applying for an LGU Coordinator Key? Reach out to our team.</p>
         </div>
       </div>
 
@@ -386,27 +555,38 @@
           <div class="contact-info-stack">
             <div class="card contact-info-card">
               <div class="contact-icon-box">
-                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-7.6 7-13a7 7 0 1 0-14 0c0 5.4 7 13 7 13z"/><circle cx="12" cy="9" r="2.5"/></svg>
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 22s7-7.6 7-13a7 7 0 1 0-14 0c0 5.4 7 13 7 13z" />
+                  <circle cx="12" cy="9" r="2.5" />
+                </svg>
               </div>
               <div>
                 <h2 class="h4">City Hall &amp; Tourism Office</h2>
-                <p class="muted">City Hall Complex, Buhanginan Hills, Barangay Pala-o, Iligan City, Lanao del Norte 9200</p>
+                <p class="muted">City Hall Complex, Buhanginan Hills, Barangay Pala-o, Iligan City, Lanao del Norte 9200
+                </p>
               </div>
             </div>
 
             <div class="card contact-info-card">
               <div class="contact-icon-box">
-                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                  <polyline points="22,6 12,13 2,6" />
+                </svg>
               </div>
               <div>
                 <h2 class="h4">Email Channels</h2>
-                <p class="muted"><a href="mailto:tourism@iligancity.gov.ph">tourism@iligancity.gov.ph</a><br><a href="mailto:events@iligancity.gov.ph">events@iligancity.gov.ph</a></p>
+                <p class="muted"><a href="mailto:tourism@iligancity.gov.ph">tourism@iligancity.gov.ph</a><br><a
+                    href="mailto:events@iligancity.gov.ph">events@iligancity.gov.ph</a></p>
               </div>
             </div>
 
             <div class="card contact-info-card">
               <div class="contact-icon-box">
-                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                </svg>
               </div>
               <div>
                 <h2 class="h4">Telephone &amp; Hotline</h2>
@@ -416,11 +596,15 @@
 
             <div class="card contact-info-card">
               <div class="contact-icon-box">
-                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="12" cy="12" r="9" />
+                  <path d="M12 7v5l3 2" />
+                </svg>
               </div>
               <div>
                 <h2 class="h4">Public Service Hours</h2>
-                <p class="muted">Monday – Friday: 8:00 AM – 5:00 PM (PST)<br>Special Festival Desk: Open on weekends during Diyandi</p>
+                <p class="muted">Monday – Friday: 8:00 AM – 5:00 PM (PST)<br>Special Festival Desk: Open on weekends
+                  during Diyandi</p>
               </div>
             </div>
           </div>
@@ -429,7 +613,7 @@
           <div class="card contact-form-card">
             <span class="eyebrow-accent">Send a Message</span>
             <h2 class="h2">Submit an Inquiry or Request</h2>
-            <p class="muted">Fill out the form below and our Tourism &amp; Community Events Desk will respond within 1 business day.</p>
+            <p class="muted">Your inquiry will be saved in the portal support inbox for an administrator to review.</p>
             <div id="contact-alert"></div>
             <form id="contact-form" novalidate>
               <div class="form-grid">
@@ -458,12 +642,16 @@
                 </div>
                 <div class="field span-2">
                   <label for="contact-message">Message</label>
-                  <textarea id="contact-message" rows="4" required minlength="10" placeholder="How can the Iligan Community Event Portal team help you?"></textarea>
+                  <textarea id="contact-message" rows="4" maxlength="1000" required minlength="10"
+                    placeholder="How can the Iligan Community Event Portal team help you?"></textarea>
                 </div>
               </div>
               <div class="form-actions">
                 <button type="submit" class="button button-primary">
-                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                    <polyline points="22,6 12,13 2,6" />
+                  </svg>
                   <span>Send Message</span>
                 </button>
               </div>
@@ -493,9 +681,12 @@
           </section>
           <aside class="dashboard-panel" aria-labelledby="citizen-links-heading">
             <h2 class="h3" id="citizen-links-heading">Plan your visit</h2>
-            <a class="dashboard-link" href="#/bookings"><strong>My Bookings &amp; Passes</strong><span>Open passes and manage your reservations →</span></a>
-            <a class="dashboard-link" href="#/events"><strong>Find something to do</strong><span>Explore events around Iligan City →</span></a>
-            <a class="dashboard-link" href="#/contact"><strong>Need a hand?</strong><span>Contact the City Tourism Office →</span></a>
+            <a class="dashboard-link" href="#/bookings"><strong>My Bookings &amp; Passes</strong><span>Open passes and
+                manage your reservations →</span></a>
+            <a class="dashboard-link" href="#/events"><strong>Find something to do</strong><span>Explore events around
+                Iligan City →</span></a>
+            <a class="dashboard-link" href="#/contact"><strong>Need a hand?</strong><span>Contact the City Tourism
+                Office →</span></a>
           </aside>
         </div>
       </div>
@@ -507,7 +698,7 @@
         <div class="page-head">
           <span class="eyebrow-accent">My Reservations</span>
           <h1 id="bookings-heading" class="h1">My Bookings & Passes</h1>
-          <p class="muted">View your active reservations, presentation QR reference passes, and ticket histories.</p>
+          <p class="muted">View your active reservations, digital passes, and ticket histories.</p>
         </div>
         <div id="bookings-alert"></div>
         <div id="bookings-list" class="stack"></div>
@@ -521,12 +712,31 @@
           <div>
             <span class="eyebrow-accent">LGU Coordinator Desk</span>
             <h1 id="dashboard-heading" class="h1">Coordinator Dashboard</h1>
-            <p class="muted">Publish and supervise events you organize for the citizens of Iligan City.</p>
+            <p class="muted" id="dashboard-subheading">Publish and openly promote events for the citizens of Iligan
+              City.</p>
           </div>
           <button type="button" class="button button-primary" data-new-event>
-            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
             <span>Add New Event</span>
           </button>
+        </div>
+        <div class="coordinator-hub-banner" id="coordinator-hub-banner">
+          <div class="hub-banner-icon">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M12 2l3.09 3.26 4.41.64 1.55 4.19 3.1 3.25-3.1 3.26-1.55 4.19-4.41.64L12 22l-3.09-3.26-4.41-.64-1.55-4.19-3.1-3.26 3.1-3.25 1.55-4.19 4.41-.64z" />
+              <polyline points="9 12 11 14 15 10" />
+            </svg>
+          </div>
+          <div class="hub-banner-content">
+            <h2 class="hub-banner-title" id="hub-coordinator-name">Coordinator Workspace</h2>
+            <p class="hub-banner-text">This portal empowers coordinators to openly promote their events to the
+              community. Listings published by your coordinator account are managed exclusively by you; events published
+              by other coordinators are publicly promoted across the portal and protected from unauthorized edits.</p>
+          </div>
         </div>
         <div id="dashboard-alert"></div>
         <div class="grid stats" id="dashboard-stats"></div>
@@ -554,16 +764,28 @@
             <p class="muted">Supervise citywide events, manage homepage settings, and configure portal locations.</p>
           </div>
           <button type="button" class="button button-primary" data-new-event>
-            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
             <span>Add New Event</span>
           </button>
         </div>
         <div id="admin-alert"></div>
         <div class="tabs" role="tablist" aria-label="Admin sections">
-          <button type="button" class="tab" role="tab" id="tab-events" aria-controls="panel-events" aria-selected="true" data-tab="events">All Events</button>
-          <button type="button" class="tab" role="tab" id="tab-content" aria-controls="panel-content" aria-selected="false" data-tab="content" tabindex="-1">Homepage Content</button>
-          <button type="button" class="tab" role="tab" id="tab-barangays" aria-controls="panel-barangays" aria-selected="false" data-tab="barangays" tabindex="-1">Barangays</button>
-          <button type="button" class="tab" role="tab" id="tab-tags" aria-controls="panel-tags" aria-selected="false" data-tab="tags" tabindex="-1">Popular Tags</button>
+          <button type="button" class="tab" role="tab" id="tab-events" aria-controls="panel-events" aria-selected="true"
+            data-tab="events">All Events</button>
+          <button type="button" class="tab" role="tab" id="tab-content" aria-controls="panel-content"
+            aria-selected="false" data-tab="content" tabindex="-1">Homepage Content</button>
+          <button type="button" class="tab" role="tab" id="tab-barangays" aria-controls="panel-barangays"
+            aria-selected="false" data-tab="barangays" tabindex="-1">Barangays</button>
+          <button type="button" class="tab" role="tab" id="tab-tags" aria-controls="panel-tags" aria-selected="false"
+            data-tab="tags" tabindex="-1">Popular Tags</button>
+          <button type="button" class="tab" role="tab" id="tab-inquiries" aria-controls="panel-inquiries"
+            aria-selected="false" data-tab="inquiries" tabindex="-1">Support Inbox</button>
+        </div>
+        <div class="tab-panel" role="tabpanel" id="panel-inquiries" aria-labelledby="tab-inquiries" hidden>
+          <div id="inquiries-list" class="stack"></div>
         </div>
         <div class="tab-panel" role="tabpanel" id="panel-events" aria-labelledby="tab-events">
           <div class="grid stats" id="admin-stats"></div>
@@ -584,14 +806,16 @@
               <label for="homepage-image">Hero Background Image (URL or path)</label>
               <input type="text" id="homepage-image" placeholder="images/diyandi_festival_panoramic_header.jpg">
             </div>
-            <div class="form-actions"><button type="submit" class="button button-primary">Save Homepage Content</button></div>
+            <div class="form-actions"><button type="submit" class="button button-primary">Save Homepage Content</button>
+            </div>
           </form>
         </div>
         <div class="tab-panel" role="tabpanel" id="panel-barangays" aria-labelledby="tab-barangays" hidden>
           <div class="card form-card">
             <h2 class="h3">Manage Barangays</h2>
             <form class="inline-form" id="barangay-form" novalidate>
-              <div class="field grow"><label for="new-barangay">New barangay name</label><input type="text" id="new-barangay" maxlength="100" placeholder="e.g. Mahayahay"></div>
+              <div class="field grow"><label for="new-barangay">New barangay name</label><input type="text"
+                  id="new-barangay" maxlength="100" placeholder="e.g. Mahayahay"></div>
               <button type="submit" class="button button-primary">Add Barangay</button>
             </form>
             <ul class="pill-list" id="barangay-list"></ul>
@@ -602,7 +826,8 @@
             <h2 class="h3">Popular Search Tags</h2>
             <p class="muted">Quick search tags displayed directly beneath the search input on the homepage.</p>
             <form class="inline-form" id="tag-form" novalidate>
-              <div class="field grow"><label for="new-tag">New tag</label><input type="text" id="new-tag" maxlength="60" placeholder="e.g. Waterfalls"></div>
+              <div class="field grow"><label for="new-tag">New tag</label><input type="text" id="new-tag" maxlength="60"
+                  placeholder="e.g. Waterfalls"></div>
               <button type="submit" class="button button-primary">Add Tag</button>
             </form>
             <ul class="pill-list" id="tag-list"></ul>
@@ -611,172 +836,315 @@
       </div>
     </section>
 
+    <section class="view" id="view-guide" aria-labelledby="guide-heading" hidden>
+      <div class="container section">
+        <div class="page-head"><span class="eyebrow-accent">Portal help</span>
+          <h1 class="h1" id="guide-heading">Plan your visit with confidence</h1>
+          <p class="muted">Quick answers about accounts, reservations, digital passes, and event management.</p>
+        </div>
+        <div class="guide-layout">
+          <aside>
+            <details class="guide-sidebar" open>
+              <summary>Help topics</summary>
+              <nav aria-label="Help topics">
+                <a href="#/guide?topic=booking" data-help-topic="booking">Booking and passes</a>
+                <a href="#/guide?topic=accounts" data-help-topic="accounts">Accounts and roles</a>
+                <a href="#/guide?topic=events" data-help-topic="events">Publishing events</a>
+                <a href="#/guide?topic=privacy" data-help-topic="privacy">Privacy and support</a>
+              </nav>
+            </details>
+          </aside>
+          <div class="guide-content">
+            <section id="guide-booking">
+              <h2 class="h3">Booking and passes</h2>
+              <details class="help-answer" open>
+                <summary>How do I reserve a pass?</summary>
+                <p>Open Discover Events, choose an available event, and select Book Event Pass. Check your name, contact
+                  details, and ticket quantity before confirming. Your reservation is saved in My Bookings and Passes.
+                </p>
+              </details>
+              <details class="help-answer">
+                <summary>Can I cancel or restore a booking?</summary>
+                <p>Select Cancel Booking in My Bookings and confirm your choice. Seats are released immediately. Use
+                  Undo within five seconds, or Restore Booking later if seats are still available.</p>
+              </details>
+              <details class="help-answer">
+                <summary>Does a paid listing collect payment here?</summary>
+                <p>No online payment is collected by this student project. The displayed amount describes the
+                  reservation. Confirm payment arrangements with the event organizer.</p>
+              </details>
+            </section>
+            <section id="guide-accounts">
+              <h2 class="h3">Accounts and roles</h2>
+              <details class="help-answer">
+                <summary>Which account should I choose?</summary>
+                <p>Citizens discover events and manage their own passes. Coordinators publish and manage their own
+                  events. Administrators oversee citywide listings, portal content, locations, and support inquiries.
+                </p>
+              </details>
+              <details class="help-answer">
+                <summary>Why do coordinators need a registration key?</summary>
+                <p>The coordinator key limits event-publishing accounts to approved users. Citizens do not need a key.
+                  Ask the project administrator for coordinator access.</p>
+              </details>
+            </section>
+            <section id="guide-events">
+              <h2 class="h3">Publishing events</h2>
+              <details class="help-answer">
+                <summary>What should I prepare before publishing?</summary>
+                <p>Prepare an event title, description, category, barangay, venue, date, time, price, seating capacity,
+                  and image. Duplicate titles trigger a warning. Coordinators can edit their own listings and view their
+                  attendees.</p>
+              </details>
+              <details class="help-answer">
+                <summary>What happens when an event is deleted?</summary>
+                <p>Event deletion is permanent and removes its related bookings. The confirmation dialog requires the
+                  word DELETE. Cancel the dialog if you are unsure.</p>
+              </details>
+            </section>
+            <section id="guide-privacy">
+              <h2 class="h3">Privacy and support</h2>
+              <details class="help-answer">
+                <summary>How is my information used?</summary>
+                <p>Your account and reservation details are stored in the project database. Authorized coordinators can
+                  view attendees for their own events. Administrators can oversee listings and support inquiries.</p>
+                <button type="button" class="button button-outline" data-open-privacy>Read Privacy Notice</button>
+              </details>
+              <p>Need help with an account or reservation? <a href="#/contact">Send a support inquiry</a>.</p>
+              <p class="muted">This is a student demonstration portal. Listings marked Sample are illustrative and are
+                not official announcements.</p>
+            </section>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </main>
+
+  <button type="button" class="floating-action" id="mobile-action">Discover Events</button>
 
   <footer class="site-footer">
     <div class="container footer-inner">
       <div class="footer-brand">
-        <img src="images/iligan_city_seal_circle.webp" alt="Seal" width="32" height="32" class="footer-logo">
+        <img src="images/iligan_city_seal_circle.webp" alt="Iligan City seal" width="32" height="32"
+          class="footer-logo">
         <p>&copy; 2026 City Government of Iligan. Interactive Community Event Discovery and Booking Portal.</p>
       </div>
-      <p class="muted-light">Tourism & Inquiries: <a href="mailto:tourism@iligancity.gov.ph">tourism@iligancity.gov.ph</a></p>
+      <nav class="footer-links" aria-label="Footer">
+        <a href="#/home">Home</a><a href="#/events">Discover Events</a><a href="#/about">About Us</a><a
+          href="#/contact">Contact Us</a><a href="#/guide">Portal Guide</a><a
+          href="https://github.com/Vydeee/ILIGAN-COMMUNITY-EVENT-PORTAL" target="_blank" rel="noopener">Project on
+          GitHub</a>
+        <button type="button" class="button-link" data-open-privacy>Privacy Notice</button>
+      </nav>
+      <p class="muted-light"><span class="visually-hidden">Tourism and inquiries: </span><a
+          href="mailto:tourism@iligancity.gov.ph">tourism@iligancity.gov.ph</a></p>
     </div>
   </footer>
 
   <!-- ===== Live region for toasts ===== -->
-  <div class="toast-region" id="toast-region" role="status" aria-live="polite"></div>
+  <div class="toast-region" id="toast-region" popover="manual" role="region" aria-label="Notifications"></div>
 
   <!-- ===== Dialog: Sign In / Register (Redesigned & Interactive) ===== -->
   <dialog class="dialog account-dialog" id="dlg-auth" aria-labelledby="auth-title">
-    <div class="account-dialog-banner">
-      <div class="auth-badge-ring">
-        <img src="images/iligan_city_seal_circle.webp" alt="Iligan City" width="56" height="56" class="auth-seal">
+    <aside class="account-dialog-banner" aria-label="Iligan Community Event Portal">
+      <div class="auth-brand"><img src="images/iligan_city_seal_circle.webp" alt="" width="40" height="40"><span>Iligan
+          City Community Event Portal</span></div>
+      <h2 class="auth-panel-title">Community events<br> across Iligan City</h2>
+      <p class="auth-panel-description">Discover local activities, reserve your place, and keep your event passes
+        together.</p>
+      <button type="button" class="button auth-panel-button" id="auth-panel-switch">Create Account →</button>
+    </aside>
+    <button type="button" class="icon-button account-close-button" data-close aria-label="Close dialog">×</button>
+    <div class="auth-form-panel">
+      <div class="auth-form-heading">
+        <h2 class="auth-header-title" id="auth-title">Log in to Your Account</h2>
+        <p class="auth-header-sub" id="auth-description">Welcome back! Sign in to discover events and manage your
+          passes.</p>
       </div>
-      <h2 class="auth-header-title" id="auth-title">Welcome to Iligan Events</h2>
-      <p class="auth-header-sub" id="auth-description">Sign in to discover community gatherings and manage your reservations.</p>
-      <button type="button" class="icon-button account-close-button" data-close aria-label="Close dialog">
-        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
-      </button>
-    </div>
 
-    <!-- Animated Sliding Tab Switcher -->
-    <div class="auth-tabs-wrap">
-      <div class="auth-tab-slider" id="auth-tab-slider"></div>
-      <button type="button" class="auth-tab is-active" id="auth-tab-login" aria-selected="true" aria-controls="login-form" data-auth-tab="login">Sign In</button>
-      <button type="button" class="auth-tab" id="auth-tab-register" aria-selected="false" aria-controls="register-form" data-auth-tab="register">Create Account</button>
-    </div>
+      <div class="dialog-content auth-body">
+        <div id="auth-alert"></div>
 
-    <div class="dialog-content auth-body">
-      <div id="auth-alert"></div>
+        <!-- Sign In Form -->
+        <form id="login-form" aria-labelledby="auth-title" novalidate>
+          <div class="field">
+            <label for="login-email">Email address</label>
+            <div class="input-icon-wrap">
+              <svg class="input-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                <polyline points="22,6 12,13 2,6" />
+              </svg>
+              <input type="email" id="login-email" autocomplete="email" placeholder="e.g. name@domain.com" required>
+            </div>
+          </div>
+          <div class="field">
+            <label for="login-password">Password</label>
+            <div class="input-icon-wrap">
+              <svg class="input-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+              <input type="password" id="login-password" autocomplete="current-password"
+                placeholder="Enter your password" required>
+              <button type="button" class="password-toggle-button" data-toggle-password="login-password"
+                aria-label="Toggle password visibility">
+                <svg class="icon-pw-eye" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <button type="submit" class="button button-primary button-full-width account-submit-button">
+            <span>Sign In</span>
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </button>
+        </form>
 
-      <!-- Sign In Form -->
-      <form id="login-form" role="tabpanel" aria-labelledby="auth-tab-login" novalidate>
-        <div class="field">
-          <label for="login-email">Email address</label>
-          <div class="input-icon-wrap">
-            <svg class="input-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-            <input type="email" id="login-email" autocomplete="email" placeholder="e.g. name@domain.com" required>
+        <!-- Register Form -->
+        <form id="register-form" aria-labelledby="auth-title" hidden novalidate>
+          <div class="field">
+            <label for="register-name">Full name</label>
+            <div class="input-icon-wrap">
+              <svg class="input-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+              <input type="text" id="register-name" autocomplete="name" placeholder="First and last name" required
+                minlength="3">
+            </div>
           </div>
-        </div>
-        <div class="field">
-          <label for="login-password">Password</label>
-          <div class="input-icon-wrap">
-            <svg class="input-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            <input type="password" id="login-password" autocomplete="current-password" placeholder="Enter your password" required>
-            <button type="button" class="password-toggle-button" data-toggle-password="login-password" aria-label="Toggle password visibility">
-              <svg class="icon-pw-eye" viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            </button>
+          <div class="field">
+            <label for="register-email">Email address</label>
+            <div class="input-icon-wrap">
+              <svg class="input-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                <polyline points="22,6 12,13 2,6" />
+              </svg>
+              <input type="email" id="register-email" autocomplete="email" placeholder="name@domain.com" required>
+            </div>
           </div>
-        </div>
-        <button type="submit" class="button button-primary button-full-width account-submit-button">
-          <span>Sign In</span>
-          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
-        <p class="auth-switch-prompt">Don't have an account? <button type="button" class="button-link" onclick="window.switchAuthTab('register')">Register here</button></p>
-      </form>
+          <div class="field">
+            <label for="register-phone">Mobile number</label>
+            <div class="input-icon-wrap">
+              <svg class="input-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+              </svg>
+              <input type="tel" id="register-phone" autocomplete="tel" placeholder="0917 123 4567">
+            </div>
+          </div>
+          <div class="field">
+            <label for="register-password">Password (min. 6 characters)</label>
+            <div class="input-icon-wrap">
+              <svg class="input-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+              <input type="password" id="register-password" autocomplete="new-password"
+                placeholder="Create a secure password" required minlength="6">
+              <button type="button" class="password-toggle-button" data-toggle-password="register-password"
+                aria-label="Toggle password visibility">
+                <svg class="icon-pw-eye" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              </button>
+            </div>
+          </div>
 
-      <!-- Register Form -->
-      <form id="register-form" role="tabpanel" aria-labelledby="auth-tab-register" hidden novalidate>
-        <div class="field">
-          <label for="register-name">Full name</label>
-          <div class="input-icon-wrap">
-            <svg class="input-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            <input type="text" id="register-name" autocomplete="name" placeholder="First and last name" required minlength="3">
+          <!-- Interactive Role Switcher Cards -->
+          <div class="field">
+            <span class="label">Select Account Type</span>
+            <div class="role-selector" role="radiogroup" aria-label="Account Type">
+              <label class="role-card is-selected" id="role-card-user">
+                <input type="radio" name="r-role-radio" value="user" checked>
+                <div class="role-card-content">
+                  <svg class="role-icon" viewBox="0 0 24 24">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                  <div class="role-card-title">Citizen / Tourist</div>
+                  <div class="role-card-description">Discover & reserve passes</div>
+                </div>
+              </label>
+              <label class="role-card" id="role-card-organizer">
+                <input type="radio" name="r-role-radio" value="organizer">
+                <div class="role-card-content">
+                  <svg class="role-icon" viewBox="0 0 24 24">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  </svg>
+                  <div class="role-card-title">LGU Coordinator</div>
+                  <div class="role-card-description">Host & publish city events</div>
+                </div>
+              </label>
+            </div>
+            <!-- Hidden select kept for seamless JS API compatibility -->
+            <input type="hidden" id="register-role" value="user">
           </div>
-        </div>
-        <div class="field">
-          <label for="register-email">Email address</label>
-          <div class="input-icon-wrap">
-            <svg class="input-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-            <input type="email" id="register-email" autocomplete="email" placeholder="name@domain.com" required>
-          </div>
-        </div>
-        <div class="field">
-          <label for="register-phone">Mobile number</label>
-          <div class="input-icon-wrap">
-            <svg class="input-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            <input type="tel" id="register-phone" autocomplete="tel" placeholder="0917 123 4567">
-          </div>
-        </div>
-        <div class="field">
-          <label for="register-password">Password (min. 6 characters)</label>
-          <div class="input-icon-wrap">
-            <svg class="input-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            <input type="password" id="register-password" autocomplete="new-password" placeholder="Create a secure password" required minlength="6">
-            <button type="button" class="password-toggle-button" data-toggle-password="register-password" aria-label="Toggle password visibility">
-              <svg class="icon-pw-eye" viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            </button>
-          </div>
-        </div>
 
-        <!-- Interactive Role Switcher Cards -->
-        <div class="field">
-          <span class="label">Select Account Type</span>
-          <div class="role-selector" role="radiogroup" aria-label="Account Type">
-            <label class="role-card is-selected" id="role-card-user">
-              <input type="radio" name="r-role-radio" value="user" checked>
-              <div class="role-card-content">
-                <svg class="role-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                <div class="role-card-title">Citizen / Tourist</div>
-                <div class="role-card-description">Discover & reserve passes</div>
-              </div>
-            </label>
-            <label class="role-card" id="role-card-organizer">
-              <input type="radio" name="r-role-radio" value="organizer">
-              <div class="role-card-content">
-                <svg class="role-icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                <div class="role-card-title">LGU Coordinator</div>
-                <div class="role-card-description">Host & publish city events</div>
-              </div>
-            </label>
+          <!-- Coordinator Authorization Key (Revealed with animation) -->
+          <div class="field role-key-box" id="coordinator-key-field" hidden>
+            <label for="coordinator-key">Official LGU Authorization Key</label>
+            <div class="input-icon-wrap">
+              <svg class="input-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M21 2l-2 2m-1.5 1.5L12 11l-4-4-6 6 4 4 6-6 5.5-5.5z" />
+              </svg>
+              <input type="password" id="coordinator-key" autocomplete="off"
+                placeholder="Enter the key provided by the Tourism Office" aria-describedby="coordinator-key-help">
+            </div>
+            <p class="hint" id="coordinator-key-help">Only approved event coordinators need this key. Ask the Iligan
+              City Tourism Office for it. Citizens can register without a key.</p>
           </div>
-          <!-- Hidden select kept for seamless JS API compatibility -->
-          <select id="register-role" class="visually-hidden">
-            <option value="user" selected>Citizen / Visitor</option>
-            <option value="organizer">Event Coordinator / LGU Official</option>
-          </select>
-        </div>
 
-        <!-- Coordinator Authorization Key (Revealed with animation) -->
-        <div class="field role-key-box" id="coordinator-key-field" hidden>
-          <label for="coordinator-key">Official LGU Authorization Key</label>
-          <div class="input-icon-wrap">
-            <svg class="input-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 2l-2 2m-1.5 1.5L12 11l-4-4-6 6 4 4 6-6 5.5-5.5z"/></svg>
-            <input type="password" id="coordinator-key" autocomplete="off" placeholder="Enter the key provided by the Tourism Office" aria-describedby="coordinator-key-help">
-          </div>
-          <p class="hint" id="coordinator-key-help">Only approved event coordinators need this key. Ask the Iligan City Tourism Office for it. Citizens can register without a key.</p>
-        </div>
+          <button type="submit" class="button button-primary button-full-width account-submit-button">
+            <span>Create Account</span>
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </button>
+        </form>
+      </div>
 
-        <button type="submit" class="button button-primary button-full-width account-submit-button">
-          <span>Create Account</span>
-          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
-        <p class="auth-switch-prompt">Already have an account? <button type="button" class="button-link" onclick="window.switchAuthTab('login')">Sign in here</button></p>
-      </form>
-    </div>
-
-    <!-- =========================================================
+      <!-- =========================================================
          [DEV ONLY] QUICK LOGIN (EASY TO REMOVE LATER)
          To remove: simply delete this <div class="test-login"> container.
          ========================================================= -->
-    <div class="test-login" id="test-login" title="Quick Login (Dev Testing)">
-      <span class="test-login-toggle" id="test-login-toggle" role="button" tabindex="0" aria-label="Toggle quick login options">
-        <span class="test-login-icon">⚡</span><span class="test-login-label">quick</span>
-      </span>
-      <div class="test-login-actions">
-        <button type="button" class="test-login-button" data-test-role="admin" title="Sign in as Administrator (Portal Admin)">Admin</button>
-        <button type="button" class="test-login-button" data-test-role="organizer" title="Sign in as Coordinator (Tourism Office)">Coord</button>
-        <button type="button" class="test-login-button" data-test-role="citizen" title="Sign in as Citizen (Mohammad Saumay)">Citizen</button>
+      <div class="test-login" id="test-login" title="Quick Coordinator Switcher (Dev Testing)">
+        <span class="test-login-toggle" id="test-login-toggle" role="button" tabindex="0"
+          aria-label="Toggle quick login options">
+          <span class="test-login-icon">⚡</span><span class="test-login-label">switch coordinator</span>
+        </span>
+        <div class="test-login-actions">
+          <button type="button" class="test-login-button" data-test-role="coord_tourism"
+            title="Tourism Office Coordinator (Diyandi Festival, Miss Iligan, Opening Salvo)">Tourism Coord</button>
+          <button type="button" class="test-login-button" data-test-role="coord_sports"
+            title="Youth & Sports Coordinator (Timoga Cold Springs Aquatics, Paramotor Show)">Sports Coord</button>
+          <button type="button" class="test-login-button" data-test-role="coord_arts"
+            title="Arts & Culture Coordinator (Kulintang Workshop, Harana Sessions, SouthNova St.)">Arts Coord</button>
+          <button type="button" class="test-login-button" data-test-role="coord_eco"
+            title="Eco-Tourism & Nature Council (Maria Cristina, Tinago, Mimbalot)">Eco Coord</button>
+          <button type="button" class="test-login-button" data-test-role="admin"
+            title="Sign in as Administrator (Portal Admin)">Admin</button>
+          <button type="button" class="test-login-button" data-test-role="citizen"
+            title="Sign in as Citizen (Mohammad Saumay)">Citizen</button>
+        </div>
       </div>
+      <!-- [/DEV ONLY QUICK LOGIN] -->
     </div>
-    <!-- [/DEV ONLY QUICK LOGIN] -->
   </dialog>
 
   <!-- ===== Dialog: Event Details ===== -->
   <dialog class="dialog dialog-large" id="event-dialog" aria-labelledby="event-title">
     <div class="dialog-header">
       <h2 class="h3" id="event-title">Event details</h2>
-      <button type="button" class="icon-button" data-close aria-label="Close dialog"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      <button type="button" class="icon-button" data-close aria-label="Close dialog"><svg class="icon"
+          viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 6l12 12M18 6 6 18" />
+        </svg></button>
     </div>
     <div class="dialog-content" id="event-body"></div>
   </dialog>
@@ -785,7 +1153,10 @@
   <dialog class="dialog" id="booking-dialog" aria-labelledby="booking-title">
     <div class="dialog-header">
       <h2 class="h3" id="booking-title">Book Event Pass</h2>
-      <button type="button" class="icon-button" data-close aria-label="Close dialog"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      <button type="button" class="icon-button" data-close aria-label="Close dialog"><svg class="icon"
+          viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 6l12 12M18 6 6 18" />
+        </svg></button>
     </div>
     <div class="dialog-content" id="booking-content"></div>
   </dialog>
@@ -794,62 +1165,69 @@
   <dialog class="dialog dialog-large" id="event-form-dialog" aria-labelledby="event-form-heading">
     <div class="dialog-header">
       <h2 class="h3" id="event-form-heading">Add New Event</h2>
-      <button type="button" class="icon-button" data-close aria-label="Close dialog"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      <button type="button" class="icon-button" data-close aria-label="Close dialog"><svg class="icon"
+          viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 6l12 12M18 6 6 18" />
+        </svg></button>
     </div>
     <form class="dialog-content" id="event-form" novalidate>
       <div id="event-form-alert"></div>
       <input type="hidden" id="event-form-id">
       <div class="form-grid">
-        <div class="field span-2">
+        <div class="field event-wide-field">
           <label for="event-form-title">Event title</label>
-          <input type="text" id="event-form-title" maxlength="200" required aria-describedby="event-duplicate-warning" placeholder="e.g. Kasadya sa Diyandi Street Dancing Competition">
+          <input type="text" id="event-form-title" maxlength="200" required aria-describedby="event-duplicate-warning"
+            placeholder="e.g. Kasadya sa Diyandi Street Dancing Competition">
           <div id="event-duplicate-warning"></div>
         </div>
-        <div class="field span-2">
-          <label for="event-form-description">Event overview and instructions</label>
-          <textarea id="event-form-description" rows="4" required placeholder="Provide an engaging description so attendees know what to expect..."></textarea>
-        </div>
-        <div class="field">
+        <div class="field event-third-field">
           <label for="event-form-category">Category</label>
-          <input type="text" id="event-form-category" list="category-options" required placeholder="e.g. Festival, Eco-Tourism">
+          <input type="text" id="event-form-category" list="category-options" required
+            placeholder="e.g. Festival, Eco-Tourism">
           <datalist id="category-options"></datalist>
         </div>
-        <div class="field">
+        <div class="field event-wide-field">
+          <label for="event-form-venue">Venue or landmark</label>
+          <input type="text" id="event-form-venue" maxlength="150" required
+            placeholder="e.g. Anahaw Amphitheater, Buhanginan Hills">
+        </div>
+        <div class="field event-third-field">
           <label for="event-form-barangay">Barangay</label>
           <select id="event-form-barangay" required></select>
         </div>
-        <div class="field span-2">
-          <label for="event-form-venue">Venue or landmark</label>
-          <input type="text" id="event-form-venue" maxlength="150" required placeholder="e.g. Anahaw Amphitheater, Buhanginan Hills">
-        </div>
-        <div class="field">
+        <div class="field event-small-field">
           <label for="event-form-date">Event date</label>
           <input type="date" id="event-form-date" required>
         </div>
-        <div class="field">
+        <div class="field event-small-field">
           <label for="event-form-time">Start time</label>
           <input type="time" id="event-form-time" required>
         </div>
-        <div class="field">
+        <div class="field event-small-field">
           <label for="event-form-price">Ticket price (PHP, 0 for free)</label>
           <input type="number" id="event-form-price" min="0" step="0.01" value="0" required>
         </div>
-        <div class="field">
+        <div class="field event-small-field">
           <label for="event-form-capacity">Total seating slots</label>
           <input type="number" id="event-form-capacity" min="1" step="1" required placeholder="e.g. 150">
         </div>
-        <div class="field span-2">
+        <div class="field event-description-field">
+          <label for="event-form-description">Event overview and instructions</label>
+          <textarea id="event-form-description" rows="3" maxlength="2000" required
+            placeholder="Provide an engaging description so attendees know what to expect..."></textarea>
+        </div>
+        <div class="field">
           <label for="event-form-organizer">Organizer or sponsoring office</label>
           <input type="text" id="event-form-organizer" maxlength="100" placeholder="e.g. Iligan City Tourism Office">
         </div>
-        <div class="field span-2">
+        <div class="field event-image-field">
           <label for="event-form-image">Banner image URL or path</label>
           <input type="text" id="event-form-image" placeholder="images/kasadya_sa_diyandi.jpg">
           <img class="image-preview" id="event-image-preview" alt="Banner preview" hidden>
         </div>
-        <label class="check span-2"><input type="checkbox" id="event-form-featured"> <span>Feature this event on the homepage highlights</span></label>
       </div>
       <div class="form-actions">
+        <label class="check"><input type="checkbox" id="event-form-featured"> <span>Feature on homepage</span></label>
         <button type="button" class="button button-plain" data-close>Discard Changes</button>
         <button type="submit" class="button button-primary" id="save-event-button">Publish Event</button>
       </div>
@@ -860,7 +1238,10 @@
   <dialog class="dialog dialog-large" id="attendees-dialog" aria-labelledby="attendees-title">
     <div class="dialog-header">
       <h2 class="h3" id="attendees-title">Attendees</h2>
-      <button type="button" class="icon-button" data-close aria-label="Close dialog"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      <button type="button" class="icon-button" data-close aria-label="Close dialog"><svg class="icon"
+          viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 6l12 12M18 6 6 18" />
+        </svg></button>
     </div>
     <div class="dialog-content" id="attendees-content"></div>
   </dialog>
@@ -869,14 +1250,20 @@
   <dialog class="dialog" id="profile-dialog" aria-labelledby="profile-title">
     <div class="dialog-header">
       <h2 class="h3" id="profile-title">My Profile</h2>
-      <button type="button" class="icon-button" data-close aria-label="Close dialog"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      <button type="button" class="icon-button" data-close aria-label="Close dialog"><svg class="icon"
+          viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 6l12 12M18 6 6 18" />
+        </svg></button>
     </div>
     <form class="dialog-content" id="profile-form" novalidate>
       <div id="profile-alert"></div>
-      <div class="field"><label for="profile-email">Email address</label><input type="email" id="profile-email" readonly></div>
-      <div class="field"><label for="profile-name">Full name</label><input type="text" id="profile-name" required minlength="3"></div>
+      <div class="field"><label for="profile-email">Email address</label><input type="email" id="profile-email"
+          readonly></div>
+      <div class="field"><label for="profile-name">Full name</label><input type="text" id="profile-name" required
+          minlength="3"></div>
       <div class="field"><label for="profile-phone">Mobile number</label><input type="tel" id="profile-phone"></div>
-      <div class="field"><label for="profile-password">New password (leave blank to keep current)</label><input type="password" id="profile-password" autocomplete="new-password" minlength="6"></div>
+      <div class="field"><label for="profile-password">New password (leave blank to keep current)</label><input
+          type="password" id="profile-password" autocomplete="new-password" minlength="6"></div>
       <p class="muted" id="profile-stats"></p>
       <div class="form-actions">
         <button type="button" class="button button-plain" data-close>Close</button>
@@ -886,8 +1273,13 @@
   </dialog>
 
   <!-- ===== Dialog: Confirm Destructive Action ===== -->
-  <dialog class="dialog dialog-small" id="dlg-confirm" role="alertdialog" aria-labelledby="confirm-title" aria-describedby="confirm-message">
+  <dialog class="dialog dialog-small" id="dlg-confirm" role="alertdialog" aria-labelledby="confirm-title"
+    aria-describedby="confirm-message">
     <div class="dialog-header">
+      <svg class="icon confirm-warning" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 3 2 21h20L12 3Z" />
+        <path d="M12 9v4M12 17h.01" />
+      </svg>
       <h2 class="h3" id="confirm-title">Are you sure?</h2>
     </div>
     <div class="dialog-content">
@@ -902,5 +1294,37 @@
       </div>
     </div>
   </dialog>
+
+  <dialog class="dialog" id="privacy-dialog" aria-labelledby="privacy-heading">
+    <div class="dialog-header">
+      <h2 class="h3" id="privacy-heading">Privacy notice</h2><button type="button" class="icon-button" data-close
+        aria-label="Close dialog">×</button>
+    </div>
+    <div class="dialog-content stack">
+      <p>This student project stores account names, email addresses, phone numbers, reservations, and support inquiries
+        in its MySQL database.</p>
+      <p>Citizens see their own bookings. Coordinators see attendee details for the events they manage. Administrators
+        oversee listings and submitted support inquiries. Do not submit sensitive information in support messages.</p>
+      <p>Contact inquiries are saved in the portal inbox. The project does not currently send email replies
+        automatically or collect online payments.</p>
+      <p>For a correction or deletion request, use Contact Us and include the relevant booking reference. Sample
+        listings are demonstration content.</p><button type="button" class="button button-primary" data-close>Got
+        It</button>
+    </div>
+  </dialog>
+
+  <dialog class="dialog" id="portal-alert" role="alertdialog" aria-labelledby="portal-alert-title"
+    aria-describedby="portal-alert-message">
+    <div class="dialog-header"><svg class="icon confirm-warning" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 3 2 21h20L12 3Z" />
+        <path d="M12 9v4M12 17h.01" />
+      </svg>
+      <h2 class="h3" id="portal-alert-title">Reservation needs attention</h2>
+    </div>
+    <div class="dialog-content stack">
+      <p id="portal-alert-message"></p><button type="button" class="button button-primary" data-close>Got It</button>
+    </div>
+  </dialog>
 </body>
+
 </html>
